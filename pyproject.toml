@@ -7,3 +7,6 @@ requires-python = ">=3.14"
 dependencies = [
     "ruff>=0.15.6",
 ]
+
+[tool.ruff]
+exclude = ["notebooks/"]
