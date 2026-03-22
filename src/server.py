@@ -10,7 +10,9 @@ from pathlib import Path
 
 from fastapi import FastAPI, UploadFile
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="HealthAI ETL", version="0.1.0")

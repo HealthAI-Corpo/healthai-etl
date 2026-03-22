@@ -1,8 +1,19 @@
-from sqlalchemy import Column, Integer, String, Numeric, Date, TIMESTAMP, text, ForeignKey, Text
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Numeric,
+    Date,
+    TIMESTAMP,
+    text,
+    ForeignKey,
+    Text,
+)
 from sqlalchemy.orm import relationship
 from src.data_pipeline.database import Base
 
 # --- TABLES RÉFÉRENTIELS  ---
+
 
 class Utilisateur(Base):
     __tablename__ = "utilisateur"
@@ -20,10 +31,16 @@ class Utilisateur(Base):
     date_inscription = Column(TIMESTAMP, server_default=text("CURRENT_TIMESTAMP"))
     mot_de_passe_hash = Column(String(255), nullable=False)
 
-    # Relations 
-    alimentation_logs = relationship("LogAliment", back_populates="utilisateur", cascade="all, delete-orphan")
-    seance_logs = relationship("LogSeance", back_populates="utilisateur", cascade="all, delete-orphan")
-    sante_logs = relationship("LogSante", back_populates="utilisateur", cascade="all, delete-orphan")
+    # Relations
+    alimentation_logs = relationship(
+        "LogAliment", back_populates="utilisateur", cascade="all, delete-orphan"
+    )
+    seance_logs = relationship(
+        "LogSeance", back_populates="utilisateur", cascade="all, delete-orphan"
+    )
+    sante_logs = relationship(
+        "LogSante", back_populates="utilisateur", cascade="all, delete-orphan"
+    )
 
 
 class Aliment(Base):
@@ -52,6 +69,7 @@ class Exercice(Base):
 
 # --- TABLES DE LOGS (Historiques) ---
 
+
 class LogAliment(Base):
     __tablename__ = "log_aliment"
 
@@ -59,9 +77,13 @@ class LogAliment(Base):
     log_date = Column(TIMESTAMP, nullable=False)
     repas = Column(String(50), nullable=False)
     quantite_g = Column(Numeric(7, 2), nullable=False)
-    
+
     id_aliment = Column(Integer, ForeignKey("aliment.id_aliment"), nullable=False)
-    id_utilisateur = Column(Integer, ForeignKey("utilisateur.id_utilisateur", ondelete="CASCADE"), nullable=False)
+    id_utilisateur = Column(
+        Integer,
+        ForeignKey("utilisateur.id_utilisateur", ondelete="CASCADE"),
+        nullable=False,
+    )
 
     utilisateur = relationship("Utilisateur", back_populates="alimentation_logs")
 
@@ -75,7 +97,11 @@ class LogSeance(Base):
     calorie_brulee = Column(Numeric(6, 1), nullable=False)
 
     id_exercice = Column(Integer, ForeignKey("exercice.id_exercice"), nullable=False)
-    id_utilisateur = Column(Integer, ForeignKey("utilisateur.id_utilisateur", ondelete="CASCADE"), nullable=False)
+    id_utilisateur = Column(
+        Integer,
+        ForeignKey("utilisateur.id_utilisateur", ondelete="CASCADE"),
+        nullable=False,
+    )
 
     utilisateur = relationship("Utilisateur", back_populates="seance_logs")
 
@@ -91,6 +117,10 @@ class LogSante(Base):
     nb_pas = Column(Integer, default=0)
     frequence_cardiaque = Column(Integer)
 
-    id_utilisateur = Column(Integer, ForeignKey("utilisateur.id_utilisateur", ondelete="CASCADE"), nullable=False)
+    id_utilisateur = Column(
+        Integer,
+        ForeignKey("utilisateur.id_utilisateur", ondelete="CASCADE"),
+        nullable=False,
+    )
 
     utilisateur = relationship("Utilisateur", back_populates="sante_logs")
