@@ -62,3 +62,7 @@ uv run alembic upgrade head
 ### Exécuter le pipeline
 
 uv run python src/main.py
+
+### Pour le Downloader
+
+Récupérer la clé API sur kaggle créer son compte et aller dans les paramètres , récupérer également son username placer les crédentials dans .env
