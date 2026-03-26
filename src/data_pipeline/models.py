@@ -8,6 +8,7 @@ from sqlalchemy import (
     text,
     ForeignKey,
     Text,
+    Boolean,
 )
 from sqlalchemy.orm import relationship
 from src.data_pipeline.database import Base
@@ -124,3 +125,56 @@ class LogSante(Base):
     )
 
     utilisateur = relationship("Utilisateur", back_populates="sante_logs")
+
+
+# --- TABLES ANOMALIES D'IMPORT ---
+
+
+class UtilisateurImportAnomalies(Base):
+    __tablename__ = "utilisateur_import_anomalies"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nom = Column(String(1000), nullable=True)
+    prenom = Column(String(1000), nullable=True)
+    email = Column(String(1000), nullable=True)
+    date_de_naissance = Column(String(1000), nullable=True)
+    genre = Column(String(1000), nullable=True)
+    objectif_principal = Column(String(1000), nullable=True)
+    poids_actuel = Column(String(1000), nullable=True)
+    taille_cm = Column(String(1000), nullable=True)
+    type_abonnement = Column(String(1000), nullable=True)
+    date_inscription = Column(String(1000), nullable=True)
+    mot_de_passe_hash = Column(String(1000), nullable=True)
+    erreur = Column(Text, nullable=False)
+    est_corrige = Column(Boolean, nullable=False, server_default=text("false"))
+    date_import = Column(TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+
+
+class AlimentImportAnomalies(Base):
+    __tablename__ = "aliment_import_anomalies"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nom = Column(String(1000), nullable=True)
+    calories = Column(String(1000), nullable=True)
+    proteines = Column(String(1000), nullable=True)
+    lipides = Column(String(1000), nullable=True)
+    glucides = Column(String(1000), nullable=True)
+    unite_mesure = Column(String(1000), nullable=True)
+    erreur = Column(Text, nullable=False)
+    est_corrige = Column(Boolean, nullable=False, server_default=text("false"))
+    date_import = Column(TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+
+
+class ExerciceImportAnomalies(Base):
+    __tablename__ = "exercice_import_anomalies"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nom = Column(String(1000), nullable=True)
+    type_exercice = Column(String(1000), nullable=True)
+    muscle_cible = Column(String(1000), nullable=True)
+    equipement = Column(String(1000), nullable=True)
+    difficulte = Column(String(1000), nullable=True)
+    instructions = Column(String(1000), nullable=True)
+    erreur = Column(Text, nullable=False)
+    est_corrige = Column(Boolean, nullable=False, server_default=text("false"))
+    date_import = Column(TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
