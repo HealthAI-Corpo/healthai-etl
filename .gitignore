@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+.pytest_cache/
+.history/
+
+# Environnement / Secrets
+.env
+.envrc
+
+# IDE
+.vscode/
+.idea/
+
+# Docker
+.docker/
+
+# Data (On ne versionne pas les données brutes souvent lourdes)
+data/raw/*
+data/clean/*
+!data/raw/.gitkeep
+!data/clean/.gitkeep
+
+# Base de données locale (Docker volume)
+postgres_data/
+
+# OS
+.DS_Store
+Thumbs.db
