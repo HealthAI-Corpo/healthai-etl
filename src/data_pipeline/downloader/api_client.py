@@ -1,6 +1,7 @@
 import os
 import requests
 import kagglehub
+import json
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -9,37 +10,78 @@ DATA_RAW_DIR = "data/raw"
 os.makedirs(DATA_RAW_DIR, exist_ok=True)
 
 def download_from_kaggle(dataset_handle: str):
-    """Télécharge un dataset Kaggle et le déplace dans data/raw"""
-    print(f"Récupération Kaggle : {dataset_handle}...")
-    path = kagglehub.dataset_download(dataset_handle)
+    """Télécharge un dataset Kaggle avec gestion d'erreurs et de cache."""
+    dataset_name = dataset_handle.split('/')[-1]
     
-    for file in os.listdir(path):
-        src = os.path.join(path, file)
-        dest = os.path.join(DATA_RAW_DIR, file)
-        if os.path.isfile(src):
-            os.replace(src, dest)
-            print(f"Fichier déplacé : {dest}")
+    # Cache 
+    existing_files = os.listdir(DATA_RAW_DIR)
+    if any(dataset_name.split('-')[0] in f for f in existing_files):
+        print(f"[SKIP] {dataset_handle} est déjà présent.")
+        return
+    
+    print(f"[KAGGLE] Tentative de récupération : {dataset_handle}...")
+    
+    try:
+        # Téléchargement via kagglehub
+        path = kagglehub.dataset_download(dataset_handle)
+        
+        # Envoie des fichiers vers data/raw
+        for file in os.listdir(path):
+            src = os.path.join(path, file)
+            dest = os.path.join(DATA_RAW_DIR, file)
+            if os.path.isfile(src):
+                os.replace(src, dest)
+                print(f"Fichier déplacé : {dest}")
+                
+    except Exception as e:
+        print(f"[ERREUR KAGGLE] Impossible de récupérer {dataset_handle} : {e}")
 
-def download_github_raw(url: str, filename: str):
-    """Télécharge un fichier brut depuis GitHub via l'URL Raw"""
-    path = os.path.join(DATA_RAW_DIR, filename)
-    token = os.getenv("GITHUB_TOKEN")
+def fetch_exercisedb_data():
+    """Récupère les exercices via l'API ExerciseDB avec gestion d'erreurs."""
+    output_path = os.path.join(DATA_RAW_DIR, "exercisedb_hobby.json")
+
+    if os.path.exists(output_path):
+        print(f"[SKIP] API ExerciseDB : Cache local trouvé.")
+        return
+
+    api_key = os.getenv("EXERCISE_DB_API_KEY")
+    if not api_key:
+        print("[ERREUR API] Clé EXERCISE_DB_API_KEY manquante dans le .env")
+        return
+
+    base_url = "https://edb-with-videos-and-images-by-ascendapi.p.rapidapi.com/api/v1/exercises" 
+    headers = {
+        "X-RapidAPI-Key": api_key,
+        "X-RapidAPI-Host": "edb-with-videos-and-images-by-ascendapi.p.rapidapi.com"
+    }
     
-    headers = {}
-    if token:
-        headers["Authorization"] = f"token {token}"
+    print("[API] Appel de ExerciseDB ...")
     
-    print(f"Téléchargement GitHub : {filename}...")
-    
-    r = requests.get(url, headers=headers)
-    r.raise_for_status() # Génère une erreur si le lien est mort (404)
-    
-    with open(path, "wb") as f:
-        f.write(r.content)
-    print(f"Fichier sauvegardé : {path}")
+    try:
+        # On utilise le timeout pour éviter que le script ne bloque indéfiniment
+        response = requests.get(base_url, headers=headers, params={"limit": 200}, timeout=30)
+        
+        # Verification du code HTTP si différent de 200-99 -> except
+        response.raise_for_status() 
+        
+        data = response.json()
+        
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+            
+        print(f"[API] {len(data)} exercices sauvegardés dans {output_path}")
+        
+    except requests.exceptions.HTTPError as http_err:
+        print(f"[ERREUR HTTP] {http_err}")
+    except requests.exceptions.ConnectionError:
+        print("[ERREUR CONNEXION] Vérifiez votre accès internet.")
+    except Exception as e:
+        print(f"[ERREUR INCONNUE API] : {e}")
 
 def run_downloader():
-    # Datasets Kaggle
+    """Point d'entrée principal de l'extraction."""
+    print("--- Démarrage de la phase EXTRACT ---")
+    
     kaggle_datasets = [
         "adilshamim8/daily-food-and-nutrition-dataset",
         "ziya07/diet-recommendations-dataset",
@@ -47,20 +89,14 @@ def run_downloader():
         "nadeemajeedch/fitness-tracker-dataset"
     ]
     
-    # Téléchargement Kaggle
+    # On boucle sur Kaggle
     for ds in kaggle_datasets:
-        try:
-            download_from_kaggle(ds)
-        except Exception as e:
-            print(f"❌ Erreur Kaggle {ds}: {e}")
-
-    # Téléchargement GitHub (ExerciseDB)
-    exercisedb_url = "https://raw.githubusercontent.com/Joeyybad/exercisedb-api/main/exercisedb.json"
+        download_from_kaggle(ds)
+        
+    # On finit par l'API
+    fetch_exercisedb_data()
     
-    try:
-        download_github_raw(exercisedb_url, "exercisedb.json")
-    except Exception as e:
-        print(f"❌ Erreur ExerciseDB: {e}")
+    print("--- Fin de la phase EXTRACT ---")
 
 if __name__ == "__main__":
     run_downloader()

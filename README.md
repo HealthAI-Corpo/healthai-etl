@@ -61,8 +61,19 @@ uv run alembic upgrade head
 
 ### Exécuter le pipeline
 
+Avant d'exécuter la ligne suivante entrer dans le terminal -> $env:PYTHONPATH = "."
+
 uv run python src/main.py
 
 ### Pour le Downloader
 
 Récupérer la clé API sur kaggle créer son compte et aller dans les paramètres , récupérer également son username placer les crédentials dans .env
+Pour les exercices il faut créer un compte sur https://rapidapi.com/hub pour avoir une clé API (suivre le env.example)
+se rendre sur API EDB : https://rapidapi.com/ascendapi/api/edb-with-videos-and-images-by-ascendapi/playground/apiendpoint_bafbc96b-3f58-4a76-aad0-6f8bc44d3afb
+
+### Notebook
+
+Pour lire les données recueillies dans Raw et faire une analyse
+Selectionner le kernel en haut a droite python 3.13 (stable pour utiliser pandas etc) pour pouvoir activer les cellules.
+
+uv run python src/data_pipeline/downloader/api_client.py -> fichiers dans raw
