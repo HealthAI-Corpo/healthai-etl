@@ -1,41 +1,41 @@
-from src.data_pipeline.database import SessionLocal
-from src.data_pipeline.models import Utilisateur
 from datetime import date
+from data_pipeline.database import SessionLocal, engine, Base
+from data_pipeline.models import Utilisateur, ProfilSante
 
 
 def run_test_insert():
-
     session = SessionLocal()
-
     try:
-        print("Insertion de données de test...")
+        print("🔍 Vérification de l'utilisateur de test...")
 
-        # Vérification si l'utilisateur existe
-        existing_user = (
-            session.query(Utilisateur)
-            .filter_by(email="jordan.test@healthai.com")
-            .first()
-        )
+        user_email = "jordan.test@healthai.com"
+        existing_user = session.query(Utilisateur).filter_by(email=user_email).first()
 
         if not existing_user:
+            #  Création de l'entité de l'utilisateur
             new_user = Utilisateur(
-                nom="Jordan",
-                prenom="Nkunga",
-                email="jordan.test@healthai.com",
+                nom="Nkunga",
+                prenom="Jordan",
+                email=user_email,
                 date_de_naissance=date(1995, 5, 20),
                 genre="Masculin",
-                objectif_principal="Prise de masse",
-                poids_actuel=75.5,
-                taille_cm=180,
                 mot_de_passe_hash="hash_securise_123",
             )
-            session.add(new_user)
-            session.commit()
-            print(
-                f"Utilisateur '{new_user.prenom}' créé (ID: {new_user.id_utilisateur})"
+
+            #  Création profil santé lié à l'utilisateur
+            ProfilSante(
+                objectif_principal="Prise de masse",
+                poids_initial=75.5,
+                taille_cm=180,
+                imc_initial=23.3,
+                utilisateur=new_user,  # Le lien est fait ici
             )
+
+            session.add(new_user)  # Ajoute aussi le profil grâce à la relation
+            session.commit()
+            print(f" Utilisateur '{new_user.prenom}' et son Profil Santé créés !")
         else:
-            print("L'utilisateur de test existe déjà en base.")
+            print(f"L'utilisateur {user_email} existe déjà.")
 
     except Exception as e:
         session.rollback()
@@ -45,4 +45,7 @@ def run_test_insert():
 
 
 if __name__ == "__main__":
+    print("♻️ Réinitialisation de la base de données...")
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
     run_test_insert()

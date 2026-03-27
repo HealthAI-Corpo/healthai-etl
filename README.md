@@ -64,6 +64,7 @@ uv run alembic upgrade head
 Avant d'exécuter la ligne suivante entrer dans le terminal -> $env:PYTHONPATH = "."
 
 uv run python src/main.py
+-> structuration de la base et test d'insertion de donnée dans la table utilisateur et profil_sante
 
 ### Pour le Downloader
 
@@ -74,6 +75,6 @@ se rendre sur API EDB : https://rapidapi.com/ascendapi/api/edb-with-videos-and-i
 ### Notebook
 
 Pour lire les données recueillies dans Raw et faire une analyse
-Selectionner le kernel en haut a droite python 3.13 (stable pour utiliser pandas etc) pour pouvoir activer les cellules.
+Selectionner le kernel en haut a droite python 3.13 (stable pour utiliser pandas etc) pour pouvoir activer les cellules. UV nous a proposé directement la version 3.14 de python mais elle n'est pas stable je m'en suis rendu compte j'ai utilisé la commande : uv python pin 3.13 fermé vscode et ouvert et selectionné le kernel 3.13
 
 uv run python src/data_pipeline/downloader/api_client.py -> fichiers dans raw
