@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DATA_RAW_DIR = "data/raw"
+DATA_RAW_DIR = os.getenv("DATA_RAW_DIR", "data/raw")
 os.makedirs(DATA_RAW_DIR, exist_ok=True)
 
 
