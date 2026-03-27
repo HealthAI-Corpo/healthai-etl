@@ -196,7 +196,9 @@ class UtilisateurImportAnomalies(Base):
     mot_de_passe_hash = Column(String(1000), nullable=True)
     erreur = Column(Text, nullable=False)
     est_corrige = Column(Boolean, nullable=False, server_default=text("false"))
-    date_import = Column(TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    date_import = Column(
+        TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP")
+    )
 
 
 class AlimentImportAnomalies(Base):
@@ -211,7 +213,9 @@ class AlimentImportAnomalies(Base):
     unite_mesure = Column(String(1000), nullable=True)
     erreur = Column(Text, nullable=False)
     est_corrige = Column(Boolean, nullable=False, server_default=text("false"))
-    date_import = Column(TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    date_import = Column(
+        TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP")
+    )
 
 
 class ExerciceImportAnomalies(Base):
@@ -226,4 +230,6 @@ class ExerciceImportAnomalies(Base):
     instructions = Column(String(1000), nullable=True)
     erreur = Column(Text, nullable=False)
     est_corrige = Column(Boolean, nullable=False, server_default=text("false"))
-    date_import = Column(TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    date_import = Column(
+        TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP")
+    )
