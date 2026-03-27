@@ -10,7 +10,7 @@ from sqlalchemy import (
     Text,
 )
 from sqlalchemy.orm import relationship
-from src.data_pipeline.database import Base
+from data_pipeline.database import Base
 
 # --- TABLES RÉFÉRENTIELS  ---
 
@@ -24,14 +24,17 @@ class Utilisateur(Base):
     email = Column(String(255), unique=True, nullable=False, index=True)
     date_de_naissance = Column(Date, nullable=False)
     genre = Column(String(50), nullable=False)
-    objectif_principal = Column(String(200), nullable=False)
-    poids_actuel = Column(Numeric(5, 2), nullable=False)
-    taille_cm = Column(Integer, nullable=False)
+    mot_de_passe_hash = Column(String(255), nullable=False)
     type_abonnement = Column(String(50), server_default="Freemium")
     date_inscription = Column(TIMESTAMP, server_default=text("CURRENT_TIMESTAMP"))
-    mot_de_passe_hash = Column(String(255), nullable=False)
+    profil_sante = relationship(
+        "ProfilSante",
+        back_populates="utilisateur",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
 
-    # Relations
+    # Relation logs
     alimentation_logs = relationship(
         "LogAliment", back_populates="utilisateur", cascade="all, delete-orphan"
     )
@@ -43,16 +46,46 @@ class Utilisateur(Base):
     )
 
 
+class ProfilSante(Base):
+    __tablename__ = "profil_sante"
+
+    id_profil = Column(Integer, primary_key=True, index=True)
+    id_utilisateur = Column(ForeignKey("utilisateur.id_utilisateur"), unique=True)
+    poids_kg = Column(Numeric(5, 2), nullable=False)
+    taille_cm = Column(Integer, nullable=False)
+    imc = Column(Numeric(4, 1))
+    niveau_activite = Column(String(100))
+    type_maladie = Column(String(255))
+    severite = Column(String(50))
+    restrictions_alimentaires = Column(Text)
+    allergies = Column(Text)
+    objectif_principal = Column(String(200))
+    experience_sportive = Column(String(50))
+    frequence_entrainement = Column(Integer)
+
+    # Relation
+    utilisateur = relationship("Utilisateur", back_populates="profil_sante")
+
+
 class Aliment(Base):
     __tablename__ = "aliment"
 
     id_aliment = Column(Integer, primary_key=True, index=True)
-    nom = Column(String(100), nullable=False)
+    nom = Column(String(255), nullable=False)
+    categorie = Column(String(100))
+    type_repas = Column(String(50))
+
     calories = Column(Numeric(6, 1), nullable=False)
-    proteines = Column(Numeric(4, 1), nullable=False)
-    lipides = Column(Numeric(4, 1), nullable=False)
-    glucides = Column(Numeric(4, 1), nullable=False)
-    unite_mesure = Column(String(20), server_default="100g")
+    proteines = Column(Numeric(5, 2), nullable=False)
+    lipides = Column(Numeric(5, 2), nullable=False)
+    glucides = Column(Numeric(5, 2), nullable=False)
+
+    fibres = Column(Numeric(5, 2))
+    sucres = Column(Numeric(5, 2))
+    sodium_mg = Column(Numeric(7, 2))
+    cholesterol_mg = Column(Numeric(7, 2))
+
+    unite_mesure = Column(String(50), server_default="portion")
 
 
 class Exercice(Base):
@@ -76,8 +109,10 @@ class LogAliment(Base):
     id_log_aliment = Column(Integer, primary_key=True, index=True)
     log_date = Column(TIMESTAMP, nullable=False)
     repas = Column(String(50), nullable=False)
-    quantite_g = Column(Numeric(7, 2), nullable=False)
+    quantite = Column(Numeric(7, 2), nullable=False)
+    unite = Column(String(20), server_default="g")  # g ou ml
 
+    # Clés étrangères
     id_aliment = Column(Integer, ForeignKey("aliment.id_aliment"), nullable=False)
     id_utilisateur = Column(
         Integer,
@@ -85,7 +120,9 @@ class LogAliment(Base):
         nullable=False,
     )
 
+    # Relations
     utilisateur = relationship("Utilisateur", back_populates="alimentation_logs")
+    aliment = relationship("Aliment")
 
 
 class LogSeance(Base):
@@ -93,17 +130,24 @@ class LogSeance(Base):
 
     id_seance_log = Column(Integer, primary_key=True, index=True)
     log_date = Column(TIMESTAMP, nullable=False)
-    duree_exercice = Column(Numeric(5, 1), nullable=False)
+    type_seance = Column(String(50))
+    duree_minutes = Column(Numeric(5, 1), nullable=False)
     calorie_brulee = Column(Numeric(6, 1), nullable=False)
+    bpm_moyen = Column(Integer)
 
-    id_exercice = Column(Integer, ForeignKey("exercice.id_exercice"), nullable=False)
+    # Clés étrangères
+    # On met nullable=True pour id_exercice car une séance peut être un "global"
+    # sans pointer vers un exercice spécifique de l'API
+    id_exercice = Column(Integer, ForeignKey("exercice.id_exercice"), nullable=True)
     id_utilisateur = Column(
         Integer,
         ForeignKey("utilisateur.id_utilisateur", ondelete="CASCADE"),
         nullable=False,
     )
 
+    # Relations
     utilisateur = relationship("Utilisateur", back_populates="seance_logs")
+    exercice = relationship("Exercice")
 
 
 class LogSante(Base):
@@ -112,15 +156,20 @@ class LogSante(Base):
     id_log_sante = Column(Integer, primary_key=True, index=True)
     date_log = Column(TIMESTAMP, server_default=text("CURRENT_TIMESTAMP"))
     poids_kg = Column(Numeric(5, 2), nullable=False)
-    moyenne_bpm = Column(Numeric(4, 1), nullable=False)
-    heures_sommeil = Column(Numeric(4, 2), nullable=False)
+    pourcentage_gras = Column(Numeric(4, 1))
+    imc_actuel = Column(Numeric(4, 1))
+    bpm_repos = Column(Integer)
+    bpm_moyen_journee = Column(Integer)
+    heures_sommeil = Column(Numeric(4, 2))
     nb_pas = Column(Integer, default=0)
-    frequence_cardiaque = Column(Integer)
+    hydratation_litres = Column(Numeric(4, 2))
 
+    # Clé étrangère
     id_utilisateur = Column(
         Integer,
         ForeignKey("utilisateur.id_utilisateur", ondelete="CASCADE"),
         nullable=False,
     )
 
+    # Relation
     utilisateur = relationship("Utilisateur", back_populates="sante_logs")
