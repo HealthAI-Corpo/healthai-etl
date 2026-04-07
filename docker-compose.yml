@@ -10,6 +10,21 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+  metabase:
+    image: metabase/metabase:latest
+    container_name: healthai_metabase
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_HOST: db
+      MB_DB_PORT: 5432
+      MB_DB_DBNAME: ${POSTGRES_DB}
+      MB_DB_USER: ${POSTGRES_USER}
+      MB_DB_PASS: ${POSTGRES_PASSWORD}
+    ports:
+      - "3000:3000"
 
 volumes:
   postgres_data:
