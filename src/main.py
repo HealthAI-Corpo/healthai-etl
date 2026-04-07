@@ -25,9 +25,9 @@ def run_test_insert():
             #  Création profil santé lié à l'utilisateur
             ProfilSante(
                 objectif_principal="Prise de masse",
-                poids_initial=75.5,
+                poids_kg=75.5,
                 taille_cm=180,
-                imc_initial=23.3,
+                imc=23.3,
                 utilisateur=new_user,  # Le lien est fait ici
             )
 
