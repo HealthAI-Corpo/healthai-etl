@@ -1,7 +1,6 @@
 """Tests unitaires — harmonize/validators.py"""
 
 import pandas as pd
-import pytest
 
 from data_pipeline.harmonize.validators import (
     check_column_constraint,

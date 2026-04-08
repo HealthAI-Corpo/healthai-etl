@@ -1,8 +1,6 @@
 """Tests unitaires — harmonize/cleaners.py"""
 
-import numpy as np
 import pandas as pd
-import pytest
 
 from data_pipeline.harmonize.cleaners import (
     apply_transformations,
@@ -14,7 +12,6 @@ from data_pipeline.utils import (
     ConditionFailBehavior,
     ETLColumnMapping,
     ETLColumnTransformation,
-    ExtensionFichier,
     StringConstraint,
     TypeDonnees,
     TypeTransformation,
