@@ -34,6 +34,7 @@ class TypeTransformation(Enum):
     CEIL = "ceil"           # arrondir à l'entier supérieur
     CLIP_MIN = "clip_min"   # valeur min pour éviter les abus (si X > 110 -> x = 100)   -> fournir valeur float
     CLIP_MAX = "clip_max"   # valeur max pour éviter les abus (si X > 110 -> x = 100)   -> fournir valeur float
+    AGE_TO_BIRTHDATE = "age_to_birthdate"   # age (nombre) -> date de naissance au 1er janvier
 
     UPPER = "upper"         # MAJUSCULE
     LOWER = "lower"         # minuscule

@@ -198,6 +198,16 @@ def apply_transformation(
             # Arrondi à l'entier supérieur
             result[mask] = np.ceil(series[mask])
 
+        elif transformation.type_transformation == TypeTransformation.AGE_TO_BIRTHDATE:
+            # Transforme un age en date de naissance fixee au 1er janvier (annee courante - age).
+            ages_floor = np.floor(series[mask]).astype("Int64")
+            birth_years = pd.Timestamp.now().year - ages_floor
+            result[mask] = pd.to_datetime(
+                birth_years.astype(str) + "-01-01",
+                format="%Y-%m-%d",
+                errors="coerce",
+            )
+
 
         # Type string
         elif transformation.type_transformation == TypeTransformation.UPPER:
@@ -319,6 +329,7 @@ def get_expected_type(transformation: ETLColumnTransformation) -> str:
 		TypeTransformation.POWER,
 		TypeTransformation.CEIL,
 		TypeTransformation.FLOOR,
+        TypeTransformation.AGE_TO_BIRTHDATE,
 	}:
 		return "numeric"
 
