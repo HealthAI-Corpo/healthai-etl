@@ -1,5 +1,5 @@
 from data_pipeline.pipeline import execute_pipeline_exercisedb_hobby
-from data_pipeline.database import SessionLocal, engine, Base
+from data_pipeline.database import engine, Base
 
 if __name__ == "__main__":
     print("♻️ Réinitialisation de la base de données...")

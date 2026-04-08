@@ -5,76 +5,95 @@ Ce repository contient le pipeline de données de l'écosystème **HealthAI**. S
 ## Stack Technique
 
 - **Langage :** Python 3.12+
-- **Gestionnaire de paquets :** [uv](https://docs.astral.sh/uv/) (Ultra-rapide, remplace pip/poetry)
-- **ORM :** SQLAlchemy 2.0 (Mapping Objet-Relationnel)
-- **Migrations :** Alembic (Versionnage du schéma de base de données)
-- **Environnement :** Docker & Docker-Compose
+- **Gestionnaire de paquets :** [uv](https://docs.astral.sh/uv/) (remplace pip/poetry)
+- **ORM :** SQLAlchemy 2.0
+- **Serveur :** FastAPI + Uvicorn
+- **Tests :** pytest
+- **Lint :** Ruff
+- **Environnement :** Docker (image GHCR)
 
 ## Structure du Projet
 
 ```text
-├── alembic/              # Scripts de migrations SQL
-├── data/                 # Stockage local des données (raw/clean)
+├── alembic/              # Migrations Alembic (référence, schéma géré par init.sql)
+├── data/
+│   ├── raw/              # Données sources (gitignored)
+│   └── clean/            # Données nettoyées (gitignored)
 ├── src/
 │   ├── data_pipeline/
-│   │   ├── downloader/   # Récupération des données sources
-│   │   ├── harmonize/    # Nettoyage et transformation (Logique métier)
+│   │   ├── downloader/   # Lecture fichiers CSV/JSON
+│   │   ├── harmonize/    # Nettoyage, transformations, validation contraintes
 │   │   ├── loader/       # Insertion en base de données
-│   │   ├── database.py   # Configuration de la connexion SQLAlchemy
-│   │   └── models.py     # Définition des tables (Modèles ORM)
-│   └── main.py           # Point d'entrée du pipeline
-├── .env                  # Variables d'environnement
-├── docker-compose.yml    # Infrastructure locale (Postgres)
-└── pyproject.toml        # Dépendances du projet (gérées par uv)
+│   │   ├── utils/        # Config pipeline (dataclasses, enums)
+│   │   ├── database.py   # Connexion SQLAlchemy (lazy init)
+│   │   ├── models.py     # Modèles ORM (source de vérité du schéma)
+│   │   └── pipeline.py   # Orchestrateur ETL
+│   ├── server.py         # API FastAPI (POST /upload, GET /health)
+│   ├── run_pipeline.py   # Point d'entrée batch (CMD Docker)
+│   └── main.py           # Script de test dev local
+├── tests/
+├── pyproject.toml        # Dépendances (gérées par uv)
+└── uv.lock
 ```
 
-## Workflow Developpement
+## Installation locale
 
-1. **Dev Local** En gros on taff en local pour tester rapidement avec uv sur nos machines pour coder et tester, la base de données est sur docker.
+### Prérequis
 
-2. **Livraison** Lorsque c'est validé -> création et déploiement d'une image de L'ETL.
+Installer uv :
+```powershell
+# Windows
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+```bash
+# Linux/Mac
+curl -LsSf https://astral.sh/uv | sh
+```
 
-## Installation et Démarrage.
+### Configuration
 
-### prérequis
+Créer un fichier `.env` à la racine :
+```env
+DATABASE_URL=postgresql://healthai:healthai_secret@localhost:5432/healthai_db
+```
 
-Installer UV sur la machine :
-powershell -ExecutionPolicy ByPass -c "irm [https://astral.sh/uv/install.ps1](https://astral.sh/uv/install.ps1) | iex
+### Démarrage
 
-### configuration
+```bash
+# Démarrer la base de données (depuis le repo MSPRHealthAI)
+docker compose up db -d
 
-Créez un fichier .env  
-avec les variables d'environnement pour la connexion à la base de données :
-DATABASE_URL=postgresql://healthai:healthai_pass@localhost:5432/healthai_db
-
-### Lancer la base de données
-
-Docker-compose up -d
-
-### Installer les dépendances et synchroniser
-
+# Installer les dépendances
 uv sync
 
-### appliquer les migrations
+# Lancer les tests
+uv run pytest tests/ -v
 
-uv run alembic upgrade head
+# Lancer le serveur FastAPI
+uv run uvicorn src.server:app --reload
 
-### Exécuter le pipeline
+# Lancer le pipeline batch (dev)
+uv run python src/run_pipeline.py
+```
 
-Avant d'exécuter la ligne suivante entrer dans le terminal -> $env:PYTHONPATH = "."
+> **Note :** Le schéma de base de données est géré par `db/init.sql` dans le repo `MSPRHealthAI`.
+> Les migrations Alembic (`alembic/`) sont conservées comme référence mais ne sont pas appliquées en production.
 
-uv run python src/main.py
--> structuration de la base et test d'insertion de donnée dans la table utilisateur et profil_sante
+## Données sources
 
-### Pour le Downloader
+Placer les fichiers dans `data/raw/` (non commités) :
 
-Récupérer la clé API sur kaggle créer son compte et aller dans les paramètres , récupérer également son username placer les crédentials dans .env
-Pour les exercices il faut créer un compte sur https://rapidapi.com/hub pour avoir une clé API (suivre le env.example)
-se rendre sur API EDB : https://rapidapi.com/ascendapi/api/edb-with-videos-and-images-by-ascendapi/playground/apiendpoint_bafbc96b-3f58-4a76-aad0-6f8bc44d3afb
+| Fichier | Source |
+|---|---|
+| `exercisedb_hobby.json` | API ExerciseDB (via `api_client.py`) |
+| `*.csv` | Kaggle (voir credentials dans `.env`) |
 
-### Notebook
+Pour récupérer les données Kaggle : ajouter `KAGGLE_USERNAME` et `KAGGLE_KEY` dans `.env`.
 
-Pour lire les données recueillies dans Raw et faire une analyse
-Selectionner le kernel en haut a droite python 3.13 (stable pour utiliser pandas etc) pour pouvoir activer les cellules. UV nous a proposé directement la version 3.14 de python mais elle n'est pas stable je m'en suis rendu compte j'ai utilisé la commande : uv python pin 3.13 fermé vscode et ouvert et selectionné le kernel 3.13
+Pour les exercices (RapidAPI) : ajouter `RAPIDAPI_KEY` dans `.env`.
 
-uv run python src/data_pipeline/downloader/api_client.py -> fichiers dans raw
+## CI / CD
+
+- **Lint** (Ruff) : sur push `develop`/`main` et PR vers `main`
+- **Tests** (pytest) : idem, avec PostgreSQL en service
+- **Build & Push** : sur push `main` uniquement → `ghcr.io/healthai-corpo/healthai-etl:latest`
