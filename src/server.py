@@ -6,9 +6,13 @@ Expose les endpoints utilisés par le dashboard Next.js (via Traefik Forward Aut
 """
 
 import logging
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 from fastapi import FastAPI, UploadFile
+
+load_dotenv()
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
@@ -17,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="HealthAI ETL", version="0.1.0")
 
-DATA_RAW = Path("data/raw")
+DATA_RAW = Path(os.getenv("DATA_RAW_DIR", "data/raw"))
 
 
 @app.get("/health")
