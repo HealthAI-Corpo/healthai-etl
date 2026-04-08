@@ -102,7 +102,7 @@ class Exercice(Base):
     instructions = Column(Text)
 
 
-# --- TABLES DATASET --- 
+# --- TABLES DATASET ---
 
 
 class DatasetRecommendationsRegime(Base):
@@ -132,7 +132,9 @@ class DatasetRecommendationsRegime(Base):
 class DatasetHistoriqueSeanceExercice(Base):
     __tablename__ = "dataset_historique_seance_exercice"
 
-    id_dataset_historique_seance_exercice = Column(Integer, primary_key=True, index=True)
+    id_dataset_historique_seance_exercice = Column(
+        Integer, primary_key=True, index=True
+    )
     age = Column(Integer)
     sexe = Column(String(50))
     poids_kg = Column(Numeric(5, 2))

@@ -34,12 +34,7 @@ def ingest_cleaned_data(file_path: str, pipeline: PipelineETL) -> None:
     # 2. Envoyer dans la BDD
     # 'name' doit correspondre au tablename du modèle (ex: "profil_sante")
     try:
-        df.to_sql(
-            name=pipeline.table_nom,
-            con=engine,
-            if_exists='append',
-            index=False
-        )
+        df.to_sql(name=pipeline.table_nom, con=engine, if_exists="append", index=False)
         print(f"Ingestion réussie : {len(df)} lignes ajoutées.")
 
     except SQLAlchemyError as e:
@@ -50,27 +45,27 @@ def ingest_cleaned_data(file_path: str, pipeline: PipelineETL) -> None:
 
 
 def loader_pipeline(
-	df: pd.DataFrame, anomalies: pd.DataFrame, pipeline: PipelineETL
+    df: pd.DataFrame, anomalies: pd.DataFrame, pipeline: PipelineETL
 ) -> str:
-	"""Sauvegarde les fichiers clean/anomalies puis insere les donnees en base."""
-	normalized_folder = normalize_path(pipeline.dossier_clean_emplacement)
+    """Sauvegarde les fichiers clean/anomalies puis insere les donnees en base."""
+    normalized_folder = normalize_path(pipeline.dossier_clean_emplacement)
 
-	timestamp = datetime.now().strftime("_%Y%m%d_%H%M%S")
-	clean_file_name = (
-		pipeline.nom_fichier_fixe + pipeline.nom_fichier_variable + timestamp
-	)
-	path = save_dataframe_to_csv(df, normalized_folder, clean_file_name)
+    timestamp = datetime.now().strftime("_%Y%m%d_%H%M%S")
+    clean_file_name = (
+        pipeline.nom_fichier_fixe + pipeline.nom_fichier_variable + timestamp
+    )
+    path = save_dataframe_to_csv(df, normalized_folder, clean_file_name)
 
     # TEST POUR LES ANOMALIES
-	anomaly_file_name = (
-		pipeline.nom_fichier_fixe
-		+ pipeline.nom_fichier_variable
-		+ "_anomalies"
-		+ timestamp
-	)
-	save_dataframe_to_csv(anomalies, normalized_folder, anomaly_file_name)
+    anomaly_file_name = (
+        pipeline.nom_fichier_fixe
+        + pipeline.nom_fichier_variable
+        + "_anomalies"
+        + timestamp
+    )
+    save_dataframe_to_csv(anomalies, normalized_folder, anomaly_file_name)
     # FIN TEST POUR LES ANOMALIES
 
-	ingest_cleaned_data(path, pipeline)
-    
-	return path
+    ingest_cleaned_data(path, pipeline)
+
+    return path

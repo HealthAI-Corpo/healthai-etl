@@ -18,49 +18,51 @@ class ConditionOperator(Enum):
 
 
 class ConditionFailBehavior(Enum):
-    SKIP = "skip"       # si la contion passe pas, on passe à la transformation suivante
-    STOP = "stop"       # si la contion passe pas, on arrête de transformer cette ligne
-    ERROR = "error"     # si condition passe pas la ligne est une anomalie
+    SKIP = "skip"  # si la contion passe pas, on passe à la transformation suivante
+    STOP = "stop"  # si la contion passe pas, on arrête de transformer cette ligne
+    ERROR = "error"  # si condition passe pas la ligne est une anomalie
 
 
 class TypeTransformation(Enum):
-    MULTIPLY = "multiply"   # multiplication -> fournir valeur float
-    DIVIDE = "divide"       # Diviser        -> fournir valeur float
-    ADD = "add"             # Additionner    -> fournir valeur float
-    SUBTRACT = "subtract"   # Soustraire     -> fournir valeur float
-    POWER = "power"         # Puissance      -> fournir valeur float
-    ROUND = "round"         # Arrondir       -> fournir int
-    FLOOR = "floor"         # arrondir à l'entier inférieur
-    CEIL = "ceil"           # arrondir à l'entier supérieur
-    CLIP_MIN = "clip_min"   # valeur min pour éviter les abus (si X > 110 -> x = 100)   -> fournir valeur float
-    CLIP_MAX = "clip_max"   # valeur max pour éviter les abus (si X > 110 -> x = 100)   -> fournir valeur float
-    AGE_TO_BIRTHDATE = "age_to_birthdate"   # age (nombre) -> date de naissance au 1er janvier
+    MULTIPLY = "multiply"  # multiplication -> fournir valeur float
+    DIVIDE = "divide"  # Diviser        -> fournir valeur float
+    ADD = "add"  # Additionner    -> fournir valeur float
+    SUBTRACT = "subtract"  # Soustraire     -> fournir valeur float
+    POWER = "power"  # Puissance      -> fournir valeur float
+    ROUND = "round"  # Arrondir       -> fournir int
+    FLOOR = "floor"  # arrondir à l'entier inférieur
+    CEIL = "ceil"  # arrondir à l'entier supérieur
+    CLIP_MIN = "clip_min"  # valeur min pour éviter les abus (si X > 110 -> x = 100)   -> fournir valeur float
+    CLIP_MAX = "clip_max"  # valeur max pour éviter les abus (si X > 110 -> x = 100)   -> fournir valeur float
+    AGE_TO_BIRTHDATE = (
+        "age_to_birthdate"  # age (nombre) -> date de naissance au 1er janvier
+    )
 
-    UPPER = "upper"         # MAJUSCULE
-    LOWER = "lower"         # minuscule
-    REPLACE = "replace"     # replace - > fournir old/new 
-    REGEX_REPLACE = "regex_replace"     # Regex ? #TODO
-    SUBSTRING = "substring" # -> start/end
+    UPPER = "upper"  # MAJUSCULE
+    LOWER = "lower"  # minuscule
+    REPLACE = "replace"  # replace - > fournir old/new
+    REGEX_REPLACE = "regex_replace"  # Regex ? #TODO
+    SUBSTRING = "substring"  # -> start/end
 
     # Pour les type array,c'est des arrays json type : [xxx, xxx, xx, xxx]
-    ARRAY_UNIQUE = "array_unique"   # supprime doublons
-    ARRAY_SLICE = "array_slice"     # ex [0, 1, 2]
+    ARRAY_UNIQUE = "array_unique"  # supprime doublons
+    ARRAY_SLICE = "array_slice"  # ex [0, 1, 2]
 
     # Pour type date ou type datetime, mais comment savoir si c'est une date format anglais ou format fr ??
-    ADD_DAYS = "add_days"           # -> fournir int
+    ADD_DAYS = "add_days"  # -> fournir int
     ADD_MONTH = "add_month"
-    ADD_YEAR = "add_year"   #
-    EXTRACT_DAY = "extract_day"   # fournir string dans string 1 
-    EXTRACT_MONTH = "extract_month" # fournir string dans string 1 et il ressort un nombre comme un 1 pour janvier
-    EXTRACT_YEAR = "extract_year"   # fournir string dans string 1
-    DEFAULT_DAY = "default_day"     # fournir un entier qui est un numéro de jour
-    DEFAULT_MONTH = "default_month" # fournir un entier qui est le numéro du mois
+    ADD_YEAR = "add_year"  #
+    EXTRACT_DAY = "extract_day"  # fournir string dans string 1
+    EXTRACT_MONTH = "extract_month"  # fournir string dans string 1 et il ressort un nombre comme un 1 pour janvier
+    EXTRACT_YEAR = "extract_year"  # fournir string dans string 1
+    DEFAULT_DAY = "default_day"  # fournir un entier qui est un numéro de jour
+    DEFAULT_MONTH = "default_month"  # fournir un entier qui est le numéro du mois
     DEFAULT_YEAR = "default_year"
     ADD_HOUR = "add_hour"
-    ADD_MINUTE = "add_minute" 
-    ADD_SECOND = "add_second" 
-    EXTRACT_HOUR = "extract_hour" 
-    EXTRACT_MINUTE = "extract_hour" 
+    ADD_MINUTE = "add_minute"
+    ADD_SECOND = "add_second"
+    EXTRACT_HOUR = "extract_hour"
+    EXTRACT_MINUTE = "extract_hour"
     EXTRACT_SECOND = "extract_hour"
 
 
@@ -71,8 +73,8 @@ class TypeDonnees(Enum):
     DATE = "date"
     TIMESTAMP = "timestamp"
     BOOLEAN = "boolean"
-    ARRAY_DELIMITED_JSON = "array_delimited_json"       # → "item1;item2;item3"
-    ARRAY_JSON = "array_json"                           # → '["item1","item2"]'
+    ARRAY_DELIMITED_JSON = "array_delimited_json"  # → "item1;item2;item3"
+    ARRAY_JSON = "array_json"  # → '["item1","item2"]'
 
 
 class ExtensionFichier(Enum):

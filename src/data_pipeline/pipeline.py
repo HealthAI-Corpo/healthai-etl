@@ -1,55 +1,55 @@
 from data_pipeline.downloader import get_df_matched_files
 from data_pipeline.harmonize import (
-	apply_transformations,
-	check_column_constraint,
-	clean_txt,
-	column_mapper,
-	convert_column_type,
-	generate_anomaly_dataframe,
-	handle_missing_values,
+    apply_transformations,
+    check_column_constraint,
+    clean_txt,
+    column_mapper,
+    convert_column_type,
+    generate_anomaly_dataframe,
+    handle_missing_values,
 )
 from data_pipeline.loader import loader_pipeline
 from data_pipeline.utils import (
-	ConditionFailBehavior,
-	ETLColumnMapping,
-	ETLColumnTransformation,
-	ExtensionFichier,
-	PipelineETL,
-	StringConstraint,
-	TypeDonnees,
-	TypeTransformation,
+    ConditionFailBehavior,
+    ETLColumnMapping,
+    ETLColumnTransformation,
+    ExtensionFichier,
+    PipelineETL,
+    StringConstraint,
+    TypeDonnees,
+    TypeTransformation,
 )
 
 
 def execute_pipeline_etl(pipeline: PipelineETL) -> list[str]:
-	"""Execute the ETL flow for a pipeline definition and return output clean file paths."""
-	pipeline_column_mapping = pipeline.colonnes
-	dfs_matched_files = get_df_matched_files(pipeline)
+    """Execute the ETL flow for a pipeline definition and return output clean file paths."""
+    pipeline_column_mapping = pipeline.colonnes
+    dfs_matched_files = get_df_matched_files(pipeline)
 
-	output_paths: list[str] = []
+    output_paths: list[str] = []
 
-	for df in dfs_matched_files:
-		df_clean = column_mapper(df, pipeline_column_mapping)
-		anomalies = generate_anomaly_dataframe(pipeline_column_mapping)
+    for df in dfs_matched_files:
+        df_clean = column_mapper(df, pipeline_column_mapping)
+        anomalies = generate_anomaly_dataframe(pipeline_column_mapping)
 
-		df_clean = clean_txt(df_clean)
-		df_clean, anomalies = apply_transformations(
-			df_clean, anomalies, pipeline_column_mapping
-		)
-		df_clean, anomalies = handle_missing_values(
-			df_clean, anomalies, pipeline_column_mapping
-		)
-		df_clean, anomalies = convert_column_type(
-			df_clean, anomalies, pipeline_column_mapping
-		)
-		df_clean, anomalies = check_column_constraint(
-			df_clean, anomalies, pipeline_column_mapping
-		)
+        df_clean = clean_txt(df_clean)
+        df_clean, anomalies = apply_transformations(
+            df_clean, anomalies, pipeline_column_mapping
+        )
+        df_clean, anomalies = handle_missing_values(
+            df_clean, anomalies, pipeline_column_mapping
+        )
+        df_clean, anomalies = convert_column_type(
+            df_clean, anomalies, pipeline_column_mapping
+        )
+        df_clean, anomalies = check_column_constraint(
+            df_clean, anomalies, pipeline_column_mapping
+        )
 
-		path = loader_pipeline(df_clean, anomalies, pipeline)
-		output_paths.append(path)
+        path = loader_pipeline(df_clean, anomalies, pipeline)
+        output_paths.append(path)
 
-	return output_paths
+    return output_paths
 
 
 def execute_pipeline_exercisedb_hobby() -> list[str]:

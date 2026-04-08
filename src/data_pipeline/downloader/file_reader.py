@@ -10,13 +10,15 @@ def build_filename_pattern(nom_fixe: str, nom_variable: str, extension: str) -> 
     """Construit un motif regex pour retrouver les fichiers d'un pipeline."""
     if not extension.startswith("."):
         extension = "." + extension
-    
+
     if nom_variable:
         # Le nom variable a une longueur connue : on remplace par autant de "."
-        motif = f"^{re.escape(nom_fixe)}{'.' * len(nom_variable)}{re.escape(extension)}$"
+        motif = (
+            f"^{re.escape(nom_fixe)}{'.' * len(nom_variable)}{re.escape(extension)}$"
+        )
     else:
         motif = f"^{re.escape(nom_fixe)}{re.escape(extension)}$"
-    
+
     return motif
 
 
@@ -28,7 +30,7 @@ def find_matching_files(dossier: str, motif_regex: str) -> list[str]:
             if re.match(motif_regex, f):
                 matched_files.append(os.path.join(dossier, f))  # chemin complet
     else:
-        print(f"[WARNING] Le dossier '{dossier}' n'existe pas.") # TODO mettre logger
+        print(f"[WARNING] Le dossier '{dossier}' n'existe pas.")  # TODO mettre logger
     return matched_files
 
 
@@ -37,15 +39,19 @@ def read_single_file_with_pandas(file_path: str) -> pd.DataFrame | None:
     ext = os.path.splitext(file_path)[1].lower()
     try:
         if ext == ".csv":
-            df = pd.read_csv(file_path, header=0, on_bad_lines='skip') # header obligatoire et saute les lignes incorrectes (nb colonne different du header)
+            df = pd.read_csv(
+                file_path, header=0, on_bad_lines="skip"
+            )  # header obligatoire et saute les lignes incorrectes (nb colonne different du header)
         elif ext == ".json":
             df = pd.read_json(file_path)
         else:
-            print(f"[WARNING] Extension non supportée pour {file_path}, ignoré.") # TODO mettre logger
+            print(
+                f"[WARNING] Extension non supportée pour {file_path}, ignoré."
+            )  # TODO mettre logger
             return None
         return df
     except Exception as e:
-        print(f"[ERROR] Impossible de lire {file_path}: {e}") # TODO mettre logger
+        print(f"[ERROR] Impossible de lire {file_path}: {e}")  # TODO mettre logger
         return None
 
 
@@ -69,7 +75,7 @@ def get_df_matched_files(pipeline: PipelineETL) -> list[pd.DataFrame]:
     pattern = build_filename_pattern(
         pipeline.nom_fichier_fixe,
         pipeline.nom_fichier_variable,
-        pipeline.extension_fichier.value  # Enum → string
+        pipeline.extension_fichier.value,  # Enum → string
     )
     # print("[debug] get_df_matched_files - pattern : " + pattern)
 

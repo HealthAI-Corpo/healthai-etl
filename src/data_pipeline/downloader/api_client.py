@@ -71,7 +71,9 @@ def fetch_exercisedb_data():
         data = response.json()["data"]
 
         if not data:
-            print("[SKIP] API ExerciseDB : Fichier récupéré mais aucune data à enregistrer.")
+            print(
+                "[SKIP] API ExerciseDB : Fichier récupéré mais aucune data à enregistrer."
+            )
             return
 
         with open(output_path, "w", encoding="utf-8") as f:
