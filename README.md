@@ -41,10 +41,12 @@ Ce repository contient le pipeline de données de l'écosystème **HealthAI**. S
 ### Prérequis
 
 Installer uv :
+
 ```powershell
 # Windows
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
+
 ```bash
 # Linux/Mac
 curl -LsSf https://astral.sh/uv | sh
@@ -53,6 +55,7 @@ curl -LsSf https://astral.sh/uv | sh
 ### Configuration
 
 Créer un fichier `.env` à la racine :
+
 ```env
 DATABASE_URL=postgresql://healthai:healthai_secret@localhost:5432/healthai_db
 ```
@@ -83,10 +86,10 @@ uv run python src/run_pipeline.py
 
 Placer les fichiers dans `data/raw/` (non commités) :
 
-| Fichier | Source |
-|---|---|
-| `exercisedb_hobby.json` | API ExerciseDB (via `api_client.py`) |
-| `*.csv` | Kaggle (voir credentials dans `.env`) |
+| Fichier                 | Source                                |
+| ----------------------- | ------------------------------------- |
+| `exercisedb_hobby.json` | API ExerciseDB (via `api_client.py`)  |
+| `*.csv`                 | Kaggle (voir credentials dans `.env`) |
 
 Pour récupérer les données Kaggle : ajouter `KAGGLE_USERNAME` et `KAGGLE_KEY` dans `.env`.
 
