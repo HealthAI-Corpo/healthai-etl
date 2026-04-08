@@ -324,7 +324,7 @@ def apply_transformation(
 
         return result
 
-    except Exception as e:
+    except Exception:
         series[mask] = np.nan
         return series
 
