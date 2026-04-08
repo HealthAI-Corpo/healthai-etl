@@ -62,8 +62,8 @@ class TypeTransformation(Enum):
     ADD_MINUTE = "add_minute"
     ADD_SECOND = "add_second"
     EXTRACT_HOUR = "extract_hour"
-    EXTRACT_MINUTE = "extract_hour"
-    EXTRACT_SECOND = "extract_hour"
+    EXTRACT_MINUTE = "extract_minute"
+    EXTRACT_SECOND = "extract_second"
 
 
 class TypeDonnees(Enum):
