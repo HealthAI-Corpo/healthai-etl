@@ -24,11 +24,11 @@ from data_pipeline.utils import (
 def execute_pipeline_etl(pipeline: PipelineETL) -> list[str]:
     """Execute the ETL flow for a pipeline definition and return output clean file paths."""
     pipeline_column_mapping = pipeline.colonnes
-    dfs_matched_files = get_df_matched_files(pipeline)
+    files_with_df = get_df_matched_files(pipeline)
 
     output_paths: list[str] = []
 
-    for df in dfs_matched_files:
+    for source_path, df in files_with_df:
         df_clean = column_mapper(df, pipeline_column_mapping)
         anomalies = generate_anomaly_dataframe(pipeline_column_mapping)
 
@@ -46,7 +46,12 @@ def execute_pipeline_etl(pipeline: PipelineETL) -> list[str]:
             df_clean, anomalies, pipeline_column_mapping
         )
 
-        path = loader_pipeline(df_clean, anomalies, pipeline)
+        path, _ = loader_pipeline(
+            df_clean,
+            anomalies,
+            pipeline,
+            source_path=source_path,
+        )
         output_paths.append(path)
 
     return output_paths
