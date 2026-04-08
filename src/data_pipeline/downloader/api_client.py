@@ -15,13 +15,13 @@ DATA_RAW_DIR.mkdir(parents=True, exist_ok=True)
 
 def download_from_kaggle(dataset_handle: str):
     """Télécharge un dataset Kaggle avec gestion d'erreurs et de cache."""
-    dataset_name = dataset_handle.split("/")[-1]
+    # dataset_name = dataset_handle.split("/")[-1]
 
-    # Cache
-    existing_files = os.listdir(DATA_RAW_DIR)
-    if any(dataset_name.split("-")[0] in f for f in existing_files):
-        print(f"[SKIP] {dataset_handle} est déjà présent.")
-        return
+    # Test inutile prcq les fichier ont pas le meme nom que dataset_handle
+    # existing_files = os.listdir(DATA_RAW_DIR)
+    # if any(dataset_name.split("-")[0] in f for f in existing_files):
+    #     print(f"[SKIP] {dataset_handle} est déjà présent.")
+    #     return
 
     print(f"[KAGGLE] Tentative de récupération : {dataset_handle}...")
 
@@ -71,7 +71,13 @@ def fetch_exercisedb_data():
         # Verification du code HTTP si différent de 200-99 -> except
         response.raise_for_status()
 
-        data = response.json()
+        data = response.json()["data"]
+
+        if not data:
+            print(
+                "[SKIP] API ExerciseDB : Fichier récupéré mais aucune data à enregistrer."
+            )
+            return
 
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4, ensure_ascii=False)

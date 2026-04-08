@@ -31,5 +31,5 @@ postgres_data/
 Thumbs.db
 
 # log cron 
-logs/
+logs
 .job
