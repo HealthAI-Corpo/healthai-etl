@@ -2,12 +2,15 @@ import os
 import requests
 import kagglehub
 import json
+from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
 
-DATA_RAW_DIR = os.getenv("DATA_RAW_DIR", "data/raw")
-os.makedirs(DATA_RAW_DIR, exist_ok=True)
+BASE_DATA_DIR = Path(os.getenv("DATA_DIR", "data"))
+DATA_RAW_DIR = BASE_DATA_DIR / "raw"
+
+DATA_RAW_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def download_from_kaggle(dataset_handle: str):

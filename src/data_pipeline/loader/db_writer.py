@@ -4,8 +4,8 @@ from datetime import datetime
 import pandas as pd
 from sqlalchemy.exc import SQLAlchemyError
 
-from data_pipeline.database import engine
-from data_pipeline.utils import PipelineETL, normalize_path
+from src.data_pipeline.database import engine
+from src.data_pipeline.utils import PipelineETL, normalize_path
 
 
 def save_dataframe_to_csv(df: pd.DataFrame, folder_path: str, file_name: str) -> str:

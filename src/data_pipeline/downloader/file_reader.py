@@ -3,7 +3,7 @@ import re
 
 import pandas as pd
 
-from data_pipeline.utils import PipelineETL, normalize_path
+from src.data_pipeline.utils import PipelineETL, normalize_path
 
 FileWithDataFrame = tuple[str, pd.DataFrame]
 
