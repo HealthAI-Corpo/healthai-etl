@@ -1,5 +1,8 @@
-from data_pipeline.pipeline import execute_pipeline_exercisedb_hobby, execute_pipeline_daily_food, execute_pipeline_diet_recommendations_dataset
+from src.data_pipeline.pipeline import execute_pipeline_exercisedb_hobby, execute_pipeline_daily_food, execute_pipeline_diet_recommendations_dataset
 from src.data_pipeline.database import engine, Base
+
+from src.data_pipeline.models import Aliment, Exercice, Utilisateur, DatasetRecommendationsRegime, DatasetHistoriqueSeanceExercice
+
 
 def run_all_pipelines():
     print("Démarrage de la suite ETL complète...")

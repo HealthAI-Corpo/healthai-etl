@@ -22,6 +22,11 @@ def save_dataframe_to_csv(df: pd.DataFrame, folder_path: str, file_name: str) ->
 
     # Sauvegarde
     df.to_csv(full_path, index=False)
+    
+    if os.path.exists(full_path):
+        print(f"Fichier vérifié sur le disque : {full_path}")
+    else:
+        print(f"ERREUR : Le fichier n'a pas été créé malgré to_csv !")
 
     return full_path
 
@@ -76,6 +81,7 @@ def loader_pipeline(
     clean_file_name = (
         pipeline.nom_fichier_fixe + pipeline.nom_fichier_variable + timestamp
     )
+    print(f"📍 CHEMIN ABSOLU CIBLE : {os.path.abspath(normalized_folder)}")
     path = save_dataframe_to_csv(df, normalized_folder, clean_file_name)
 
     # TEST POUR LES ANOMALIES

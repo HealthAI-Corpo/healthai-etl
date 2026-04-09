@@ -11,7 +11,7 @@ from sqlalchemy import (
     Boolean,
 )
 from sqlalchemy.orm import relationship
-from data_pipeline.database import Base
+from src.data_pipeline.database import Base
 
 # --- TABLES RÉFÉRENTIELS  ---
 
