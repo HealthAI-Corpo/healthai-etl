@@ -25,16 +25,15 @@ from src.data_pipeline.downloader.file_reader import read_single_file_with_panda
 def execute_pipeline_etl(pipeline: PipelineETL, override_path: str = None) -> list[str]:
     """Execute the ETL flow for a pipeline definition and return output clean file paths."""
     pipeline_column_mapping = pipeline.colonnes
-    files_with_df = get_df_matched_files(pipeline)
 
     # LOGIQUE DE SÉLECTION DE LA SOURCE
     if override_path:
         # Cas API : On lit directement le fichier uploadé
         df_to_process = read_single_file_with_pandas(override_path)
-        dfs_matched_files = [df_to_process] if df_to_process is not None else []
+        files_with_df = [(override_path, df_to_process)] if df_to_process is not None else []
     else:
         # Cas CRON : On scanne le dossier selon la config du pipeline
-        dfs_matched_files = get_df_matched_files(pipeline)
+        files_with_df = get_df_matched_files(pipeline)
 
     output_paths: list[str] = []
 
