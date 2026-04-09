@@ -30,7 +30,9 @@ def execute_pipeline_etl(pipeline: PipelineETL, override_path: str = None) -> li
     if override_path:
         # Cas API : On lit directement le fichier uploadé
         df_to_process = read_single_file_with_pandas(override_path)
-        files_with_df = [(override_path, df_to_process)] if df_to_process is not None else []
+        files_with_df = (
+            [(override_path, df_to_process)] if df_to_process is not None else []
+        )
     else:
         # Cas CRON : On scanne le dossier selon la config du pipeline
         files_with_df = get_df_matched_files(pipeline)
