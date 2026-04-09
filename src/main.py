@@ -1,5 +1,5 @@
-from data_pipeline.pipeline import execute_pipeline_exercisedb_hobby
-
+from data_pipeline.pipeline import execute_pipeline_exercisedb_hobby, execute_pipeline_daily_food, execute_pipeline_diet_recommendations_dataset
+from src.data_pipeline.database import engine, Base
 
 def run_all_pipelines():
     print("Démarrage de la suite ETL complète...")
@@ -7,13 +7,27 @@ def run_all_pipelines():
     # Pipeline Exercices
     results_exercises = execute_pipeline_exercisedb_hobby()
     print(f"Exercices traités : {results_exercises}")
+    
+    # Pipeline diet_recommendations_dataset
+    results_diet_recommendations_dataset = execute_pipeline_diet_recommendations_dataset()
+    print(f"diet_recommendations_dataset traités : {results_diet_recommendations_dataset}")
+    
+    # Pipeline pipeline_daily_food
+    results_pipeline_daily_food = execute_pipeline_daily_food()
+    print(f"pipeline_daily_food traités : {results_pipeline_daily_food}")
 
     # Ajouter les autres traitement
     # execute_pipeline_nutrition()
     # execute_pipeline_users()
 
+def init_db():
+    print("♻️ Réinitialisation de la base de données...")
+
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    print("Base de données prête (tables vides).")
 
 if __name__ == "__main__":
     # Optionnel : réinitialisation de la DB pour tes tests
-    # init_db()
+    init_db()
     run_all_pipelines()

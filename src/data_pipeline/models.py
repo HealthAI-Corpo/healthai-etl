@@ -85,6 +85,7 @@ class Aliment(Base):
     sucres = Column(Numeric(5, 2))
     sodium_mg = Column(Numeric(7, 2))
     cholesterol_mg = Column(Numeric(7, 2))
+    eau_ml = Column(Numeric(7, 2))
 
     unite_mesure = Column(String(50), server_default="portion")
 
@@ -124,7 +125,7 @@ class DatasetRecommendationsRegime(Base):
     allergies = Column(String(255))
     cuisine_preferee = Column(String(100))
     heures_exercice_semaine = Column(Numeric(4, 2))
-    adherence_regime = Column(Numeric(4, 2))
+    adherence_regime = Column(Numeric(5, 2))
     score_desiquilibre_nutriment = Column(Numeric(4, 1))
     recommendation_regime = Column(String(255))
 
