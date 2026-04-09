@@ -145,7 +145,7 @@ class DatasetHistoriqueSeanceExercice(Base):
     duree_seance_minutes = Column(Numeric(5, 1))
     calories_brulees = Column(Numeric(6, 1))
     type_sport = Column(String(100))
-    pourcentage_gras = Column(Numeric(4, 1))
+    pourcentage_gras = Column(Numeric(5, 1))
     consommation_eau_l = Column(Numeric(4, 1))
     frequence_sport_jour_semaine = Column(Integer)
     niveau_experience = Column(Integer)

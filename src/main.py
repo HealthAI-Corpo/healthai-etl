@@ -1,8 +1,10 @@
-from src.data_pipeline.pipeline import (
-    execute_pipeline_exercisedb_hobby,
-    execute_pipeline_daily_food,
+from data_pipeline.pipeline import (
+    execute_pipeline_exercisedb_hobby, 
+    execute_pipeline_daily_food, 
     execute_pipeline_diet_recommendations_dataset,
     execute_pipeline_profil_sante,
+    execute_pipeline_dataset_historique_seance_exercice,
+    execute_pipeline_dataset_historique_seance_exercice_synthetic_data,
 )
 from src.data_pipeline.database import engine, Base
 
@@ -34,6 +36,13 @@ def run_all_pipelines():
     # Pipeline pipeline_daily_food
     results_pipeline_daily_food = execute_pipeline_daily_food()
     print(f"pipeline_daily_food traités : {results_pipeline_daily_food}")
+    
+    # Pipeline historique_seance_exercice
+    results_historique_seance_exercice = execute_pipeline_dataset_historique_seance_exercice()
+    print(f"dataset_historique_seance_exercice traités : {results_historique_seance_exercice}")
+    # Pipeline historique_seance_exercice
+    results_historique_seance_exercice_synthetic_data = execute_pipeline_dataset_historique_seance_exercice_synthetic_data()
+    print(f"dataset_historique_seance_exercice_synthetic_data traités : {results_historique_seance_exercice_synthetic_data}")
 
     # Pipeline profil_sante
     results_profil_sante = execute_pipeline_profil_sante()
