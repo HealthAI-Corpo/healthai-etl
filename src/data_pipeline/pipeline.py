@@ -1,5 +1,5 @@
-from data_pipeline.downloader import get_df_matched_files
-from data_pipeline.harmonize import (
+from src.data_pipeline.downloader import get_df_matched_files
+from src.data_pipeline.harmonize import (
     apply_transformations,
     check_column_constraint,
     clean_txt,
@@ -8,8 +8,8 @@ from data_pipeline.harmonize import (
     generate_anomaly_dataframe,
     handle_missing_values,
 )
-from data_pipeline.loader import loader_pipeline
-from data_pipeline.utils import (
+from src.data_pipeline.loader import loader_pipeline
+from src.data_pipeline.utils import (
     ConditionFailBehavior,
     ETLColumnMapping,
     ETLColumnTransformation,
@@ -19,12 +19,22 @@ from data_pipeline.utils import (
     TypeDonnees,
     TypeTransformation,
 )
+from src.data_pipeline.downloader.file_reader import read_single_file_with_pandas
 
 
-def execute_pipeline_etl(pipeline: PipelineETL) -> list[str]:
+def execute_pipeline_etl(pipeline: PipelineETL, override_path: str = None) -> list[str]:
     """Execute the ETL flow for a pipeline definition and return output clean file paths."""
     pipeline_column_mapping = pipeline.colonnes
     dfs_matched_files = get_df_matched_files(pipeline)
+
+    # LOGIQUE DE SÉLECTION DE LA SOURCE
+    if override_path:
+        # Cas API : On lit directement le fichier uploadé
+        df_to_process = read_single_file_with_pandas(override_path)
+        dfs_matched_files = [df_to_process] if df_to_process is not None else []
+    else:
+        # Cas CRON : On scanne le dossier selon la config du pipeline
+        dfs_matched_files = get_df_matched_files(pipeline)
 
     output_paths: list[str] = []
 
@@ -52,7 +62,7 @@ def execute_pipeline_etl(pipeline: PipelineETL) -> list[str]:
     return output_paths
 
 
-def execute_pipeline_exercisedb_hobby() -> list[str]:
+def execute_pipeline_exercisedb_hobby(file_path: str = None) -> list[str]:
     """Build a PipelineETL config for exercisedb_hobby import."""
     col_nom = ETLColumnMapping(
         id_etl_column_mapping=1,
@@ -162,4 +172,4 @@ def execute_pipeline_exercisedb_hobby() -> list[str]:
         ],
     )
 
-    return execute_pipeline_etl(pipeline)
+    return execute_pipeline_etl(pipeline, override_path=file_path)

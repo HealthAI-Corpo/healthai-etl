@@ -6,7 +6,7 @@ from .file_reader import (
     read_files_with_pandas,
     read_single_file_with_pandas,
 )
-from data_pipeline.utils import normalize_path
+from src.data_pipeline.utils import normalize_path
 
 __all__ = [
     "build_filename_pattern",

@@ -1,11 +1,19 @@
 from data_pipeline.pipeline import execute_pipeline_exercisedb_hobby
-from data_pipeline.database import engine, Base
+
+
+def run_all_pipelines():
+    print("Démarrage de la suite ETL complète...")
+
+    # Pipeline Exercices
+    results_exercises = execute_pipeline_exercisedb_hobby()
+    print(f"Exercices traités : {results_exercises}")
+
+    # Ajouter les autres traitement
+    # execute_pipeline_nutrition()
+    # execute_pipeline_users()
+
 
 if __name__ == "__main__":
-    print("♻️ Réinitialisation de la base de données...")
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-
-    print("Lancement de l'ETL")
-    test = execute_pipeline_exercisedb_hobby()
-    print("Fin de l'ETL")
+    # Optionnel : réinitialisation de la DB pour tes tests
+    # init_db()
+    run_all_pipelines()
