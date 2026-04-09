@@ -44,9 +44,31 @@ def ingest_cleaned_data(file_path: str, pipeline: PipelineETL) -> None:
         print("Erreur inattendue :", e)
 
 
+def mark_source_file_as_processed(file_path: str) -> str | None:
+    """Renomme le fichier source en nomActuel.yyyyMMddHHmm.extension."""
+    if not file_path or not os.path.exists(file_path):
+        return None
+
+    folder, filename = os.path.split(file_path)
+    base_name, extension = os.path.splitext(filename)
+    timestamp = datetime.now().strftime("%Y%m%d%H%M")
+    new_filename = f"{base_name}.{timestamp}{extension}"
+    new_path = os.path.join(folder, new_filename)
+
+    try:
+        os.replace(file_path, new_path)
+        return new_path
+    except Exception as e:
+        print(f"[ERROR] Impossible de renommer le fichier source '{file_path}': {e}")
+        return None
+
+
 def loader_pipeline(
-    df: pd.DataFrame, anomalies: pd.DataFrame, pipeline: PipelineETL
-) -> str:
+    df: pd.DataFrame,
+    anomalies: pd.DataFrame,
+    pipeline: PipelineETL,
+    source_path: str | None = None,
+) -> tuple[str, str | None]:
     """Sauvegarde les fichiers clean/anomalies puis insere les donnees en base."""
     normalized_folder = normalize_path(pipeline.dossier_clean_emplacement)
 
@@ -68,4 +90,7 @@ def loader_pipeline(
 
     ingest_cleaned_data(path, pipeline)
 
-    return path
+    # Le renommage du fichier source est centralise ici pour garder un flux ETL unique.
+    renamed_source = mark_source_file_as_processed(source_path) if source_path else None
+
+    return path, renamed_source

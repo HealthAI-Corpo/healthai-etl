@@ -1,35 +1,43 @@
+# Environnement
+.env
+.env.local
+.env.*.local
+
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
+*.pyo
+*.pyd
+.Python
+
+# uv / virtualenv
 .venv/
-.pytest_cache/
-.history/
+venv/
+env/
 
-# Environnement / Secrets
-.env
-.envrc
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
 
-# IDE
-.vscode/
-.idea/
+# Jupyter
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
 
-# Docker
-.docker/
-
-# Data (On ne versionne pas les données brutes souvent lourdes)
+# Données (gitignored sauf .gitkeep)
 data/raw/*
-data/clean/*
 !data/raw/.gitkeep
+data/clean/*
 !data/clean/.gitkeep
-
-# Base de données locale (Docker volume)
-postgres_data/
+logs/*
+!logs/.gitkeep
 
 # OS
 .DS_Store
 Thumbs.db
 
-# log cron 
-logs
-.job
+# IDE
+.idea/
+.vscode/
+*.swp

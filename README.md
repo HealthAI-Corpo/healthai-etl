@@ -81,7 +81,7 @@ uv run python src/data_pipeline/downloader/api_client.py -> fichiers dans raw
 
 ### Linter Ruff
 
-run uv run ruff format --check -> check le format
+uv run ruff format --check -> check le format
 uv run ruff format . -> formate le code
 uv run pytest -> run les test
 

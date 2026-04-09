@@ -15,13 +15,13 @@ DATA_RAW_DIR.mkdir(parents=True, exist_ok=True)
 
 def download_from_kaggle(dataset_handle: str):
     """Télécharge un dataset Kaggle avec gestion d'erreurs et de cache."""
-    # dataset_name = dataset_handle.split("/")[-1]
-
+    dataset_name = dataset_handle.split("/")[-1]
     # Test inutile prcq les fichier ont pas le meme nom que dataset_handle
-    # existing_files = os.listdir(DATA_RAW_DIR)
-    # if any(dataset_name.split("-")[0] in f for f in existing_files):
-    #     print(f"[SKIP] {dataset_handle} est déjà présent.")
-    #     return
+    existing_files = os.listdir(DATA_RAW_DIR)
+    print(dataset_name.split(".")[0])
+    if any(dataset_name.split(".")[0] in f for f in existing_files):
+        print(f"[SKIP] {dataset_handle} est déjà présent.")
+        return
 
     print(f"[KAGGLE] Tentative de récupération : {dataset_handle}...")
 
@@ -45,7 +45,14 @@ def fetch_exercisedb_data():
     """Récupère les exercices via l'API ExerciseDB avec gestion d'erreurs."""
     output_path = os.path.join(DATA_RAW_DIR, "exercisedb_hobby.json")
 
-    if os.path.exists(output_path):
+    # Cache: on skip si un fichier de type exercisedb_hobby.*.json existe deja.
+    existing_files = os.listdir(DATA_RAW_DIR)
+    has_versioned_cache = any(
+        filename.startswith("exercisedb_hobby.") and filename.endswith(".json")
+        for filename in existing_files
+    )
+
+    if has_versioned_cache:
         print("[SKIP] API ExerciseDB : Cache local trouvé.")
         return
 

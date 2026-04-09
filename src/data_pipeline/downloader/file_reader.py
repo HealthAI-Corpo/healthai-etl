@@ -5,6 +5,8 @@ import pandas as pd
 
 from src.data_pipeline.utils import PipelineETL, normalize_path
 
+FileWithDataFrame = tuple[str, pd.DataFrame]
+
 
 def build_filename_pattern(nom_fixe: str, nom_variable: str, extension: str) -> str:
     """Construit un motif regex pour retrouver les fichiers d'un pipeline."""
@@ -55,18 +57,18 @@ def read_single_file_with_pandas(file_path: str) -> pd.DataFrame | None:
         return None
 
 
-def read_files_with_pandas(file_paths: list[str]) -> list[pd.DataFrame]:
-    """Lit une liste de fichiers en ignorant ceux qui ne sont pas lisibles."""
-    dfs = []
+def read_files_with_pandas(file_paths: list[str]) -> list[FileWithDataFrame]:
+    """Lit une liste de fichiers et retourne des couples (file_path, dataframe)."""
+    files_with_df: list[FileWithDataFrame] = []
     for fpath in file_paths:
         df = read_single_file_with_pandas(fpath)
         if df is not None:
-            dfs.append(df)
-    return dfs
+            files_with_df.append((fpath, df))
+    return files_with_df
 
 
-def get_df_matched_files(pipeline: PipelineETL) -> list[pd.DataFrame]:
-    """Extrait les DataFrames correspondant au pattern d'un pipeline."""
+def get_df_matched_files(pipeline: PipelineETL) -> list[FileWithDataFrame]:
+    """Extrait les fichiers correspondant au pattern puis lit leur DataFrame."""
     # 1. Normalisation du chemin
     normalized_folder = normalize_path(pipeline.dossier_emplacement)
     # print("[debug] get_df_matched_files - normalized_folder : " + normalized_folder)
@@ -83,7 +85,7 @@ def get_df_matched_files(pipeline: PipelineETL) -> list[pd.DataFrame]:
     matched_files_path = find_matching_files(normalized_folder, pattern)
     # print("[debug] get_df_matched_files - Fichiers trouvés :", matched_files_path)
 
-    # 4. Ouvre les fichier en retournant une liste de dataframe
-    df_matched = read_files_with_pandas(matched_files_path)
+    # 4. Ouvre les fichiers en retournant des couples (file_path, dataframe)
+    files_with_df = read_files_with_pandas(matched_files_path)
 
-    return df_matched
+    return files_with_df
