@@ -1,0 +1,837 @@
+{
+    "success": true,
+    "meta": {
+        "total": 200,
+        "hasNextPage": true,
+        "hasPreviousPage": false,
+        "nextCursor": "exr_41n2hfa11fPnk8y9"
+    },
+    "data": [
+        {
+            "exerciseId": "exr_41n2ha5iPFpN3hEJ",
+            "name": "Bridge - Mountain Climber ",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/EsVOYBdhDN.jpg",
+            "bodyParts": [
+                "WAIST"
+            ],
+            "equipments": [
+                "BODY WEIGHT"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "OBLIQUES"
+            ],
+            "secondaryMuscles": [
+                "QUADRICEPS",
+                "PECTINEUS",
+                "ADDUCTOR BREVIS",
+                "TENSOR FASCIAE LATAE",
+                "ILIOPSOAS",
+                "ADDUCTOR LONGUS",
+                "RECTUS ABDOMINIS",
+                "ANTERIOR DELTOID"
+            ],
+            "keywords": [
+                "Bodyweight exercise for waist",
+                "Bridge Mountain Climber workout",
+                "Waist targeting exercises",
+                "Bodyweight Bridge - Mountain Climber",
+                "Waist toning exercises",
+                "Bridge - Mountain Climber for waist",
+                "Bodyweight exercises for core",
+                "Strengthening waist exercise",
+                "Home workout for waist",
+                "No-equipment waist exercise"
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2haAabPyN5t8y",
+            "name": "Side Lunge",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/RB7NBcf79I.jpg",
+            "bodyParts": [
+                "QUADRICEPS",
+                "THIGHS"
+            ],
+            "equipments": [
+                "BODY WEIGHT"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "GLUTEUS MAXIMUS",
+                "QUADRICEPS"
+            ],
+            "secondaryMuscles": [
+                "ADDUCTOR MAGNUS",
+                "GLUTEUS MEDIUS",
+                "SOLEUS",
+                "TENSOR FASCIAE LATAE"
+            ],
+            "keywords": [
+                "Body weight exercise for thighs",
+                "Quadriceps strengthening exercises",
+                "Side Lunge workout",
+                "Bodyweight workout for legs",
+                "Thigh toning exercises",
+                "Side Lunge body weight exercise",
+                "Quadriceps body weight workout",
+                "Thigh strengthening workouts",
+                "Body weight Side Lunge",
+                "Leg toning exercises with body weight"
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2hadPLLFRGvFk",
+            "name": "Sliding Floor Pulldown on Towel",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/9fW96RFqRZ.jpg",
+            "bodyParts": [
+                "BACK"
+            ],
+            "equipments": [
+                "BODY WEIGHT"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "LATISSIMUS DORSI"
+            ],
+            "secondaryMuscles": [
+                "POSTERIOR DELTOID",
+                "TRICEPS BRACHII",
+                "TERES MINOR",
+                "TRAPEZIUS LOWER FIBERS",
+                "TRAPEZIUS MIDDLE FIBERS",
+                "TERES MAJOR",
+                "INFRASPINATUS"
+            ],
+            "keywords": [
+                "Body weight back exercise",
+                "Sliding Floor Pulldown tutorial",
+                "Towel workout for back",
+                "Bodyweight back strengthening",
+                "Sliding Floor Pulldown technique",
+                "Back exercises with towel",
+                "No-equipment back workout",
+                "Sliding Floor Pulldown on Towel instructions",
+                "Home workout for back muscles",
+                "Body weight exercises for back strength"
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2hadQgEEX8wDN",
+            "name": "Triceps Dip",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/MruSDlnk0M.jpg",
+            "bodyParts": [
+                "TRICEPS",
+                "UPPER ARMS"
+            ],
+            "equipments": [
+                "BODY WEIGHT"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "TRICEPS BRACHII"
+            ],
+            "secondaryMuscles": [
+                "PECTORALIS MAJOR STERNAL HEAD",
+                "PECTORALIS MAJOR CLAVICULAR HEAD",
+                "ANTERIOR DELTOID",
+                "LATISSIMUS DORSI",
+                "LEVATOR SCAPULAE"
+            ],
+            "keywords": [
+                "Triceps Dip Workout",
+                "Bodyweight Tricep Exercises",
+                "Upper Arm Toning Exercises",
+                "Bodyweight Dips",
+                "Triceps Strengthening",
+                "Arm Muscle Workout",
+                "Upper Body Bodyweight Exercise",
+                "Tricep Dip Training",
+                "Home Triceps Workout",
+                "Arm Toning Bodyweight Exercises"
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2haNJ3NA8yCE2",
+            "name": "Dumbbell Incline One Arm Hammer Press",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/qkXo99D6UI.jpg",
+            "bodyParts": [
+                "UPPER ARMS"
+            ],
+            "equipments": [
+                "DUMBBELL"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "RECTUS ABDOMINIS"
+            ],
+            "secondaryMuscles": [
+                "TERES MAJOR",
+                "PECTORALIS MAJOR CLAVICULAR HEAD",
+                "TRAPEZIUS MIDDLE FIBERS"
+            ],
+            "keywords": [
+                "One Arm Dumbbell Press",
+                "Hammer Press Workout",
+                "Incline Dumbbell Exercise",
+                "Upper Arm Strengthening",
+                "Single Arm Dumbbell Press",
+                "Incline Hammer Press",
+                "Dumbbell Workout for Arms",
+                "One Arm Incline Press",
+                "Upper Arm Dumbbell Exercise",
+                "Single Hand Incline Dumbbell Press"
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2havo95Y2QpkW",
+            "name": "Feet and Ankles Stretch ",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/AwDLoYPc84.jpg",
+            "bodyParts": [
+                "CALVES"
+            ],
+            "equipments": [
+                "BODY WEIGHT"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "SOLEUS",
+                "TIBIALIS ANTERIOR"
+            ],
+            "secondaryMuscles": [],
+            "keywords": [
+                "Body weight feet and ankles stretch",
+                "Calves workout at home",
+                "Bodyweight exercises for calves",
+                "Strengthening ankles with body weight",
+                "Feet and ankles flexibility exercises",
+                "Body weight calf stretching",
+                "Ankle strengthening bodyweight exercise",
+                "Home exercises for strong calves",
+                "Body weight exercises for foot and ankle",
+                "Improving calf muscles with body weight."
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2hbdZww1thMKz",
+            "name": "Jump Squat ",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/YfCTLiECo2.jpg",
+            "bodyParts": [
+                "QUADRICEPS",
+                "THIGHS"
+            ],
+            "equipments": [
+                "BODY WEIGHT"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "GLUTEUS MAXIMUS",
+                "QUADRICEPS"
+            ],
+            "secondaryMuscles": [
+                "SOLEUS",
+                "ADDUCTOR MAGNUS"
+            ],
+            "keywords": [
+                "Jump Squat workout",
+                "Body weight exercises for thighs",
+                "Quadriceps strengthening exercises",
+                "Thigh toning workouts",
+                "Body weight Jump Squat",
+                "Jump Squat for leg muscles",
+                "Home workouts for thighs",
+                "Quadriceps exercises with no equipment",
+                "Jump Squat body weight exercise",
+                "Thigh and Quadriceps workout"
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2hbLX4XH8xgN7",
+            "name": "Dumbbell Single Leg Calf Raise",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/bAEQLWIqH4.jpg",
+            "bodyParts": [
+                "CALVES"
+            ],
+            "equipments": [
+                "DUMBBELL"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "GASTROCNEMIUS"
+            ],
+            "secondaryMuscles": [
+                "SOLEUS"
+            ],
+            "keywords": [
+                "Dumbbell Calf Raise Exercise",
+                "Single Leg Calf Workout with Dumbbell",
+                "Dumbbell Exercise for Strong Calves",
+                "Strengthen Calves with Dumbbell",
+                "One Leg Dumbbell Calf Raise",
+                "Dumbbell Workout for Calves",
+                "Single Leg Calf Raise with Weights",
+                "Dumbbell Single Leg Calf Strengthening",
+                "Calf Muscle Building with Dumbbell",
+                "Dumbbell Weighted Single Leg Calf Raise."
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2hbYPY4jLKxW3",
+            "name": "Peroneals Stretch ",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/AcGb20UoJg.jpg",
+            "bodyParts": [
+                "CALVES"
+            ],
+            "equipments": [
+                "BODY WEIGHT"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "SOLEUS"
+            ],
+            "secondaryMuscles": [],
+            "keywords": [
+                "Bodyweight Peroneals Stretch",
+                "Calves Stretching Exercise",
+                "Bodyweight Calf Exercise",
+                "Peroneals Strengthening Workout",
+                "Calf Muscle Stretch",
+                "Bodyweight Exercise for Calves",
+                "Peroneals Stretching Routine",
+                "Home Workout for Calves",
+                "Bodyweight Peroneals Training",
+                "Calves Flexibility Exercise"
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2hc2VrB8ofxrW",
+            "name": "Lying Double Legs Biceps Curl with Towel",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/sGKkXKxdYy.jpg",
+            "bodyParts": [
+                "BICEPS",
+                "UPPER ARMS"
+            ],
+            "equipments": [
+                "BODY WEIGHT"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "BICEPS BRACHII"
+            ],
+            "secondaryMuscles": [
+                "BRACHIALIS",
+                "BRACHIORADIALIS"
+            ],
+            "keywords": [
+                "Bodyweight Biceps Exercise",
+                "Towel Biceps Curl",
+                "Lying Double Legs Curl",
+                "Upper Arms Bodyweight Workout",
+                "Biceps Curl with Towel",
+                "Home Biceps Exercise",
+                "No Equipment Upper Arms Workout",
+                "Bodyweight Biceps Curl",
+                "Lying Legs Biceps Curl",
+                "Towel Exercise for Upper Arms."
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2hcFJpBvAkXCP",
+            "name": "Seated Row with Towel",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/XsWkx1qcBC.jpg",
+            "bodyParts": [
+                "BACK"
+            ],
+            "equipments": [
+                "BODY WEIGHT"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "INFRASPINATUS",
+                "TRAPEZIUS UPPER FIBERS",
+                "LATISSIMUS DORSI",
+                "TERES MINOR",
+                "TRAPEZIUS MIDDLE FIBERS",
+                "TERES MAJOR"
+            ],
+            "secondaryMuscles": [
+                "POSTERIOR DELTOID",
+                "BRACHIORADIALIS",
+                "BRACHIALIS"
+            ],
+            "keywords": [
+                "Bodyweight back exercise",
+                "Seated towel row workout",
+                "Back strengthening exercises",
+                "Bodyweight seated row",
+                "Towel row exercise",
+                "Home workout for back",
+                "No equipment back exercises",
+                "Seated row exercise variations",
+                "Towel workout for back muscles",
+                "DIY back exercises at home"
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2hcm5HH6H684G",
+            "name": "Calf Raise from Deficit with Chair Supported",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/po63VThsX2.jpg",
+            "bodyParts": [
+                "CALVES"
+            ],
+            "equipments": [
+                "BODY WEIGHT"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "GASTROCNEMIUS"
+            ],
+            "secondaryMuscles": [
+                "SOLEUS"
+            ],
+            "keywords": [
+                "Deficit Calf Raise with Chair Support",
+                "Bodyweight Calf Exercise",
+                "Calves Workout at Home",
+                "Chair Supported Calf Raises",
+                "Calf Strengthening Exercise",
+                "Bodyweight Deficit Calf Raises",
+                "Fitness Routine for Calves",
+                "Chair Assisted Calf Workout",
+                "Home Exercise for Strong Calves",
+                "Bodyweight Exercise for Calf Muscles"
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2hcw2FN534HcA",
+            "name": "Dumbbell Stiff Leg Deadlift",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/1aHXOCzatq.jpg",
+            "bodyParts": [
+                "HIPS"
+            ],
+            "equipments": [
+                "DUMBBELL"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "ERECTOR SPINAE",
+                "GLUTEUS MAXIMUS"
+            ],
+            "secondaryMuscles": [
+                "HAMSTRINGS"
+            ],
+            "keywords": [
+                "Dumbbell Stiff Leg Deadlift tutorial",
+                "Hips workout with Dumbbells",
+                "Stiff Leg Deadlift exercise guide",
+                "Strengthening Hips with Dumbbell Deadlift",
+                "Dumbbell exercises for hip muscles",
+                "Dumbbell Stiff Leg Deadlift technique",
+                "Hip targeting workouts with Dumbbells",
+                "How to do Dumbbell Stiff Leg Deadlift",
+                "Dumbbell Deadlift for hip strength",
+                "Instruction for Dumbbell Stiff Leg Deadlift."
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2hd6SThQhAdnZ",
+            "name": "Chin-ups",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/TLX9vGr1dx.jpg",
+            "bodyParts": [
+                "BACK"
+            ],
+            "equipments": [
+                "BODY WEIGHT"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "INFRASPINATUS",
+                "LATISSIMUS DORSI",
+                "TRAPEZIUS LOWER FIBERS",
+                "TERES MINOR",
+                "TERES MAJOR",
+                "TRAPEZIUS MIDDLE FIBERS"
+            ],
+            "secondaryMuscles": [
+                "BRACHIORADIALIS",
+                "PECTORALIS MAJOR STERNAL HEAD",
+                "BRACHIALIS",
+                "POSTERIOR DELTOID"
+            ],
+            "keywords": [
+                "Bodyweight back exercise",
+                "Chin-up workout",
+                "Strength training for back",
+                "Home back exercises",
+                "Upper body workout",
+                "Back muscle building exercises",
+                "Chin-ups for back strength",
+                "Bodyweight exercises for back",
+                "Back strengthening exercises",
+                "Fitness routine with chin-ups"
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2hd78zujKUEWK",
+            "name": "Single Leg Squat ",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/MosYINt7dV.jpg",
+            "bodyParts": [
+                "QUADRICEPS",
+                "THIGHS"
+            ],
+            "equipments": [
+                "BODY WEIGHT"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "GLUTEUS MAXIMUS",
+                "QUADRICEPS"
+            ],
+            "secondaryMuscles": [
+                "SOLEUS",
+                "ADDUCTOR MAGNUS"
+            ],
+            "keywords": [
+                "Bodyweight exercise for thighs",
+                "Quadriceps strengthening exercises",
+                "Single Leg Squat workout",
+                "Thigh toning exercises",
+                "Bodyweight leg exercises",
+                "Single Leg Squat for quads",
+                "Home workout for thighs",
+                "Quadriceps bodyweight exercise",
+                "Single leg bodyweight squat",
+                "Thigh strengthening exercises"
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2hdCBvmbCPaVE",
+            "name": "Diamond Press",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/6SPVwjalAc.jpg",
+            "bodyParts": [
+                "BACK",
+                "CHEST"
+            ],
+            "equipments": [
+                "BODY WEIGHT"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "PECTORALIS MAJOR STERNAL HEAD",
+                "PECTORALIS MAJOR CLAVICULAR HEAD",
+                "ERECTOR SPINAE"
+            ],
+            "secondaryMuscles": [
+                "ANTERIOR DELTOID"
+            ],
+            "keywords": [
+                "Diamond Press exercise",
+                "Bodyweight back workout",
+                "Chest exercises at home",
+                "Diamond Press for chest",
+                "Bodyweight Diamond Press",
+                "No-equipment back exercises",
+                "Diamond Press workout routine",
+                "Bodyweight exercises for back and chest",
+                "Diamond Press technique",
+                "How to do Diamond Press exercise"
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2hdHtZrMPkcqY",
+            "name": "Dumbbell Lying Floor Skull Crusher",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/LqKaE2JobC.jpg",
+            "bodyParts": [
+                "UPPER ARMS"
+            ],
+            "equipments": [
+                "DUMBBELL"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "TRICEPS BRACHII"
+            ],
+            "secondaryMuscles": [],
+            "keywords": [
+                "Dumbbell Skull Crusher Workout",
+                "Upper Arm Dumbbell Exercise",
+                "Dumbbell Lying Tricep Exercise",
+                "Floor Skull Crusher Dumbbell Workout",
+                "Arm Toning Dumbbell Exercise",
+                "Tricep Strengthening Skull Crusher",
+                "Dumbbell Lying Floor Exercise for Arms",
+                "Skull Crusher Arm Workout",
+                "Dumbbell Exercise for Upper Arms",
+                "Floor Tricep Workout with Dumbbells."
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2hdkBpqwoDmVq",
+            "name": "Suspended Row",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/bXwXW2WUCj.jpg",
+            "bodyParts": [
+                "BACK"
+            ],
+            "equipments": [
+                "BODY WEIGHT"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "INFRASPINATUS",
+                "TRAPEZIUS UPPER FIBERS",
+                "TRAPEZIUS LOWER FIBERS",
+                "TERES MAJOR",
+                "TERES MINOR",
+                "LATISSIMUS DORSI",
+                "TRAPEZIUS MIDDLE FIBERS"
+            ],
+            "secondaryMuscles": [
+                "PECTORALIS MAJOR STERNAL HEAD",
+                "BRACHIORADIALIS",
+                "BRACHIALIS",
+                "POSTERIOR DELTOID",
+                "BICEPS BRACHII"
+            ],
+            "keywords": [
+                "Bodyweight back exercise",
+                "Suspended row workout",
+                "Suspension training for back",
+                "Bodyweight rowing exercise",
+                "Home workout for back muscles",
+                "Back strengthening with body weight",
+                "Suspension row exercise",
+                "Bodyweight exercises for back",
+                "Suspended row for back strength",
+                "Back muscle workout with suspension row"
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2hdo2vCtq4F3E",
+            "name": "Right Cross. Boxing",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/NenhkXpa3a.jpg",
+            "bodyParts": [
+                "SHOULDERS",
+                "BICEPS",
+                "TRICEPS"
+            ],
+            "equipments": [
+                "BODY WEIGHT"
+            ],
+            "exerciseType": "PLYOMETRICS",
+            "targetMuscles": [],
+            "secondaryMuscles": [],
+            "keywords": [
+                "Boxing workouts",
+                "Right Cross exercise",
+                "Body weight boxing training",
+                "Plyometrics boxing techniques",
+                "Right Cross punch training",
+                "Boxing for fitness",
+                "Body weight exercises",
+                "Plyometric training",
+                "Boxing techniques Right Cross",
+                "High intensity boxing workouts"
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2hdsGcuzs4WrV",
+            "name": "Self Assisted Inverted Pullover",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/n4N7gfo3Ph.jpg",
+            "bodyParts": [
+                "BACK",
+                "WAIST"
+            ],
+            "equipments": [
+                "BODY WEIGHT"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "RECTUS ABDOMINIS",
+                "LATISSIMUS DORSI"
+            ],
+            "secondaryMuscles": [],
+            "keywords": [
+                "Bodyweight back exercise",
+                "Inverted Pullover workout",
+                "Self Assisted exercise for back",
+                "Waist toning exercises",
+                "Bodyweight exercise for waist",
+                "Inverted Pullover technique",
+                "Back strengthening workouts",
+                "Bodyweight Pullover exercise",
+                "Self Assisted Inverted Pullover guide",
+                "Waist and back bodyweight exercises"
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2hdWu3oaCGdWT",
+            "name": "Standing Calf Raise",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/RfXMrjCG6o.jpg",
+            "bodyParts": [
+                "CALVES"
+            ],
+            "equipments": [
+                "DUMBBELL"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "GASTROCNEMIUS"
+            ],
+            "secondaryMuscles": [
+                "SOLEUS"
+            ],
+            "keywords": [
+                "Dumbbell Calf Raise",
+                "Calf Strengthening Exercise",
+                "Dumbbell Exercise for Calves",
+                "Standing Calf Raise with Dumbbells",
+                "Lower Leg Workout",
+                "Dumbbell Calf Workout",
+                "Muscle Building Exercise for Calves",
+                "Home Exercise for Strong Calves",
+                "Dumbbell Standing Calf Raise",
+                "Fitness Routine for Calves."
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2he2doZNpmXkX",
+            "name": "Ankle - Plantar Flexion - Articulations",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/cnT7tKYHyl.jpg",
+            "bodyParts": [
+                "CALVES"
+            ],
+            "equipments": [
+                "BODY WEIGHT"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "SOLEUS"
+            ],
+            "secondaryMuscles": [
+                "GLUTEUS MAXIMUS",
+                "TERES MAJOR"
+            ],
+            "keywords": [
+                "Bodyweight calf exercise",
+                "Ankle Plantar Flexion workout",
+                "Calves strengthening exercise",
+                "Bodyweight ankle exercise",
+                "Plantar Flexion articulations",
+                "Bodyweight workout for calves",
+                "Ankle flexion exercise",
+                "Calf muscle exercise",
+                "Lower leg bodyweight exercise",
+                "Strengthening exercise for ankles"
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2hek6i3exMARx",
+            "name": "Elbow - Flexion - Articulations",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/vIYXc6qul1.jpg",
+            "bodyParts": [
+                "UPPER ARMS"
+            ],
+            "equipments": [
+                "BODY WEIGHT"
+            ],
+            "exerciseType": "STRENGTH",
+            "targetMuscles": [
+                "BRACHIALIS",
+                "TRICEPS BRACHII",
+                "BICEPS BRACHII"
+            ],
+            "secondaryMuscles": [
+                "TRAPEZIUS MIDDLE FIBERS",
+                "ADDUCTOR MAGNUS"
+            ],
+            "keywords": [
+                "Bodyweight elbow flexion exercises",
+                "Upper arm workouts",
+                "Elbow flexion articulations",
+                "Bodyweight exercises for upper arms",
+                "Arm strengthening exercises",
+                "Flexion articulation workouts",
+                "Elbow flexion exercises without equipment",
+                "Bodyweight training for upper arms",
+                "Home workouts for arm muscles",
+                "Elbow flexion bodyweight movements"
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2hezAZ6CdkAcM",
+            "name": "Alternate Punching ",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/5XjzsH1SBh.jpg",
+            "bodyParts": [
+                "SHOULDERS",
+                "TRICEPS",
+                "FULL BODY"
+            ],
+            "equipments": [
+                "BODY WEIGHT"
+            ],
+            "exerciseType": "CARDIO",
+            "targetMuscles": [
+                "DEEP HIP EXTERNAL ROTATORS",
+                "LATISSIMUS DORSI",
+                "BRACHIALIS"
+            ],
+            "secondaryMuscles": [
+                "SERRATUS ANTERIOR",
+                "ANTERIOR DELTOID",
+                "RECTUS ABDOMINIS"
+            ],
+            "keywords": [
+                "Alternate Punching exercise",
+                "Body weight cardio workout",
+                "Punching cardio routine",
+                "Body weight punching drills",
+                "Cardiovascular punching exercise",
+                "Alternate punching for cardio health",
+                "Bodyweight boxing workout",
+                "Non-equipment cardio workout",
+                "High-intensity punching exercise",
+                "Full body cardio with alternate punching"
+            ]
+        },
+        {
+            "exerciseId": "exr_41n2hfa11fPnk8y9",
+            "name": "Elliptical Machine Walk",
+            "imageUrl": "https://cdn.exercisedb.dev/media/w/images/gLx4xoDVFv.jpg",
+            "bodyParts": [
+                "FULL BODY"
+            ],
+            "equipments": [
+                "LEVERAGE MACHINE"
+            ],
+            "exerciseType": "CARDIO",
+            "targetMuscles": [
+                "ANTERIOR DELTOID",
+                "HAMSTRINGS",
+                "POSTERIOR DELTOID",
+                "PECTORALIS MAJOR STERNAL HEAD",
+                "GLUTEUS MAXIMUS",
+                "PECTORALIS MAJOR CLAVICULAR HEAD",
+                "SERRATUS ANTE",
+                "LATERAL DELTOID",
+                "LEVATOR SCAPULAE",
+                "BICEPS BRACHII",
+                "LATISSIMUS DORSI",
+                "BRACHIALIS",
+                "QUADRICEPS",
+                "BRACHIORADIALIS"
+            ],
+            "secondaryMuscles": [],
+            "keywords": [
+                "Elliptical Machine Cardio Workout",
+                "Leverage Machine Exercise",
+                "Cardiovascular Elliptical Training",
+                "Leverage Elliptical Fitness Routine",
+                "Elliptical Walk for Heart Health",
+                "Cardio Exercise on Elliptical Machine",
+                "Elliptical Machine Walking Workout",
+                "Leverage Cardio Training",
+                "Heart-Focused Elliptical Exercise",
+                "Full Body Cardio on Elliptical Machine"
+            ]
+        }
+    ]
+}
