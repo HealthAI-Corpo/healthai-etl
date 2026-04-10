@@ -23,14 +23,14 @@ PIPELINE_TARGET = "src.server.execute_pipeline_exercisedb_hobby"
 
 def test_upload_extension_invalide_retourne_400():
     data = {"file": ("data.txt", io.BytesIO(b"content"), "text/plain")}
-    response = client.post("/upload/exercises", files=data)
+    response = client.post("/upload/exercices", files=data)
     assert response.status_code == 400
     assert "Format non supporté" in response.json()["detail"]
 
 
 def test_upload_extension_xml_retourne_400():
     data = {"file": ("data.xml", io.BytesIO(b"<root/>"), "application/xml")}
-    response = client.post("/upload/exercises", files=data)
+    response = client.post("/upload/exercices", files=data)
     assert response.status_code == 400
 
 
@@ -54,14 +54,14 @@ def test_upload_pipeline_type_inconnu_retourne_400():
 def test_upload_exercises_json_retourne_202():
     with patch(PIPELINE_TARGET, return_value=[]):
         data = {"file": ("exercises.json", io.BytesIO(b"[]"), "application/json")}
-        response = client.post("/upload/exercises", files=data)
+        response = client.post("/upload/exercices", files=data)
     assert response.status_code == 202
 
 
 def test_upload_exercises_reponse_contient_nom_fichier():
     with patch(PIPELINE_TARGET, return_value=[]):
         data = {"file": ("exercises.json", io.BytesIO(b"[]"), "application/json")}
-        response = client.post("/upload/exercises", files=data)
+        response = client.post("/upload/exercices", files=data)
     body = response.json()
     assert body["file"] == "exercises.json"
     assert "message" in body
@@ -76,5 +76,5 @@ def test_upload_exercises_csv_accepte():
                 "text/csv",
             )
         }
-        response = client.post("/upload/exercises", files=data)
+        response = client.post("/upload/exercices", files=data)
     assert response.status_code == 202
