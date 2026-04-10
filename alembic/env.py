@@ -1,17 +1,15 @@
-import os
-import sys
 from logging.config import fileConfig
 
-from dotenv import load_dotenv
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
 
-# Add src to path to allow imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+import sys
+from os.path import abspath, dirname
 
-load_dotenv()
+# Ajoute la racine du projet au chemin de recherche de Python
+sys.path.insert(0, abspath(dirname(dirname(__file__))))
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -23,27 +21,24 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
-# for 'autogenerate' support
-from data_pipeline.database import Base
-from data_pipeline import models
+from src.data_pipeline.database import Base
+from src.data_pipeline.models import (
+    Aliment,
+    Exercice,
+    Utilisateur,
+    DatasetRecommendationsRegime,
+    DatasetHistoriqueSeanceExercice,
+)
 
+# for 'autogenerate' support
+# from myapp import mymodel
+# target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-
-
-def include_object(object, name, type_, reflected, compare_to):
-    """
-    Only include tables that are defined in our models.
-    This prevents Alembic from trying to manage unrelated tables in the database.
-    """
-    if type_ == "table":
-        # Only include tables that are in target_metadata (i.e., in our models)
-        return name in target_metadata.tables
-    return True
 
 
 def run_migrations_offline() -> None:
@@ -58,13 +53,12 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = os.getenv("DATABASE_URL") or config.get_main_option("sqlalchemy.url")
+    url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
-        include_object=include_object,
     )
 
     with context.begin_transaction():
@@ -78,27 +72,14 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    database_url = os.getenv("DATABASE_URL")
-    
-    if database_url:
-        connectable = engine_from_config(
-            {"sqlalchemy.url": database_url},
-            prefix="sqlalchemy.",
-            poolclass=pool.NullPool,
-        )
-    else:
-        connectable = engine_from_config(
-            config.get_section(config.config_ini_section, {}),
-            prefix="sqlalchemy.",
-            poolclass=pool.NullPool,
-        )
+    connectable = engine_from_config(
+        config.get_section(config.config_ini_section, {}),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
+    )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection,
-            target_metadata=target_metadata,
-            include_object=include_object,
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()
