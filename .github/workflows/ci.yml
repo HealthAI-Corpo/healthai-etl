@@ -20,7 +20,6 @@ jobs:
   test:
     name: pytest
     runs-on: ubuntu-latest
-    continue-on-error: true
     services:
       postgres:
         image: postgres:15-alpine
