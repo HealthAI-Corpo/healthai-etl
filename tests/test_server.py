@@ -7,7 +7,6 @@ Le pipeline ETL est mocké pour éviter toute écriture disque ou DB.
 import io
 from unittest.mock import patch
 
-import pytest
 from fastapi.testclient import TestClient
 
 from src.server import app
