@@ -1289,24 +1289,32 @@ def execute_pipeline_dataset_historique_seance_exercice(
         ],
     )
 
-    col_consommation_eau_l = ETLColumnMapping(
+    col_consommation_eau_ml = ETLColumnMapping(
         id_etl_column_mapping=1,
-        colonne_bdd="consommation_eau_l",
+        colonne_bdd="consommation_eau_ml",
         colonne_fichier="Water_Intake (liters)",
         in_file=True,
         type_donnees=TypeDonnees.DECIMAL,
         nullable=False,
         valeur_defaut=None,
         unique_constraint=False,
-        constraint=NumericConstraint(1, nb_min=0, nb_max=5, nb_decimal=1),
+        constraint=NumericConstraint(1, nb_min=0, nb_max=5000, nb_decimal=2),
         transformations=[
             ETLColumnTransformation(
                 id_transformation=5,
                 id_etl_column_mapping=3,
                 ordre=1,
+                type_transformation=TypeTransformation.MULTIPLY,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_num=1000,
+            ),
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=2,
                 type_transformation=TypeTransformation.ROUND,
                 condition_fail_behavior=ConditionFailBehavior.ERROR,
-                value_int=1,
+                value_int=2,
             ),
         ],
     )
@@ -1451,7 +1459,7 @@ def execute_pipeline_dataset_historique_seance_exercice(
             col_duree_seance_minutes,
             col_calories_brulees,
             col_pourcentage_gras,
-            col_consommation_eau_l,
+            col_consommation_eau_ml,
             col_frequence_sport_jour_semaine,
             col_niveau_experience,
             col_sexe,
@@ -1679,24 +1687,32 @@ def execute_pipeline_dataset_historique_seance_exercice_synthetic_data(
         ],
     )
 
-    col_consommation_eau_l = ETLColumnMapping(
+    col_consommation_eau_ml = ETLColumnMapping(
         id_etl_column_mapping=1,
-        colonne_bdd="consommation_eau_l",
+        colonne_bdd="consommation_eau_ml",
         colonne_fichier="Water_Intake (liters)",
         in_file=True,
         type_donnees=TypeDonnees.DECIMAL,
         nullable=False,
         valeur_defaut=None,
         unique_constraint=False,
-        constraint=NumericConstraint(1, nb_min=0, nb_max=5, nb_decimal=1),
+        constraint=NumericConstraint(1, nb_min=0, nb_max=5000, nb_decimal=2),
         transformations=[
             ETLColumnTransformation(
                 id_transformation=5,
                 id_etl_column_mapping=3,
                 ordre=1,
+                type_transformation=TypeTransformation.MULTIPLY,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_num=1000,
+            ),
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=2,
                 type_transformation=TypeTransformation.ROUND,
                 condition_fail_behavior=ConditionFailBehavior.ERROR,
-                value_int=1,
+                value_int=2,
             ),
         ],
     )
@@ -1841,7 +1857,7 @@ def execute_pipeline_dataset_historique_seance_exercice_synthetic_data(
             col_duree_seance_minutes,
             col_calories_brulees,
             col_pourcentage_gras,
-            col_consommation_eau_l,
+            col_consommation_eau_ml,
             col_frequence_sport_jour_semaine,
             col_niveau_experience,
             col_sexe,

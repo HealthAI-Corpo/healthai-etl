@@ -1,4 +1,4 @@
-from data_pipeline.pipeline import (
+from src.data_pipeline.pipeline import (
     execute_pipeline_exercisedb_hobby,
     execute_pipeline_daily_food,
     execute_pipeline_diet_recommendations_dataset,

@@ -146,7 +146,7 @@ class DatasetHistoriqueSeanceExercice(Base):
     calories_brulees = Column(Numeric(6, 1))
     type_sport = Column(String(100))
     pourcentage_gras = Column(Numeric(5, 1))
-    consommation_eau_l = Column(Numeric(4, 1))
+    consommation_eau_ml = Column(Numeric(7, 2))
     frequence_sport_jour_semaine = Column(Integer)
     niveau_experience = Column(Integer)
 
@@ -213,7 +213,7 @@ class LogSante(Base):
     bpm_moyen_journee = Column(Integer)
     heures_sommeil = Column(Numeric(4, 2))
     nb_pas = Column(Integer, default=0)
-    hydratation_litres = Column(Numeric(4, 2))
+    hydratation_ml = Column(Numeric(7, 2))
 
     # Clé étrangère
     id_utilisateur = Column(
@@ -356,7 +356,7 @@ class DatasetHistoriqueSeanceExerciceImportAnomalies(Base):
     calories_brulees = Column(String(1000), nullable=True)
     type_sport = Column(String(1000), nullable=True)
     pourcentage_gras = Column(String(1000), nullable=True)
-    consommation_eau_l = Column(String(1000), nullable=True)
+    consommation_eau_ml = Column(String(1000), nullable=True)
     frequence_sport_jour_semaine = Column(String(1000), nullable=True)
     niveau_experience = Column(String(1000), nullable=True)
     erreur = Column(Text, nullable=False)
