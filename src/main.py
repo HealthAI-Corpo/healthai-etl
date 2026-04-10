@@ -1,19 +1,7 @@
-from src.data_pipeline.pipeline import (
-    execute_pipeline_exercisedb_hobby,
-    execute_pipeline_daily_food,
-    execute_pipeline_diet_recommendations_dataset,
-    execute_pipeline_profil_sante,
-)
-from src.data_pipeline.database import engine, Base
+import os
 
-from src.data_pipeline.models import (
-    Aliment,
-    Exercice,
-    Utilisateur,
-    ProfilSante,
-    DatasetRecommendationsRegime,
-    DatasetHistoriqueSeanceExercice,
-)
+from src.data_pipeline.pipeline import execute_pipeline_exercisedb_hobby, execute_pipeline_daily_food, execute_pipeline_diet_recommendations_dataset, execute_pipeline_dataset_historique_seance_exercice, execute_pipeline_dataset_historique_seance_exercice_synthetic_data
+from src.data_pipeline.database import engine, Base
 
 
 def run_all_pipelines():
@@ -25,7 +13,7 @@ def run_all_pipelines():
 
     # Pipeline diet_recommendations_dataset
     results_diet_recommendations_dataset = (
-        execute_pipeline_diet_recommendations_dataset(rename_source=False)
+        execute_pipeline_diet_recommendations_dataset()
     )
     print(
         f"diet_recommendations_dataset traités : {results_diet_recommendations_dataset}"
@@ -35,9 +23,20 @@ def run_all_pipelines():
     results_pipeline_daily_food = execute_pipeline_daily_food()
     print(f"pipeline_daily_food traités : {results_pipeline_daily_food}")
 
-    # Pipeline profil_sante
-    results_profil_sante = execute_pipeline_profil_sante()
-    print(f"profil_sante traités : {results_profil_sante}")
+    # Pipeline historique_seance_exercice
+    results_historique_seance_exercice = (
+        execute_pipeline_dataset_historique_seance_exercice()
+    )
+    print(
+        f"dataset_historique_seance_exercice traités : {results_historique_seance_exercice}"
+    )
+    # Pipeline historique_seance_exercice
+    results_historique_seance_exercice_synthetic_data = (
+        execute_pipeline_dataset_historique_seance_exercice_synthetic_data()
+    )
+    print(
+        f"dataset_historique_seance_exercice_synthetic_data traités : {results_historique_seance_exercice_synthetic_data}"
+    )
 
     # Ajouter les autres traitement
     # execute_pipeline_users()
@@ -52,6 +51,6 @@ def init_db():
 
 
 if __name__ == "__main__":
-    # Optionnel : réinitialisation de la DB pour tes tests
-    # init_db()
+    if os.getenv("ALLOW_INIT_DB", "false").lower() == "true":
+        init_db()
     run_all_pipelines()

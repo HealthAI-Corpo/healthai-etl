@@ -461,11 +461,19 @@ def execute_pipeline_diet_recommendations_dataset(
         valeur_defaut=None,
         unique_constraint=False,
         constraint=NumericConstraint(1, nb_min=16, nb_max=100, nb_decimal=0),
-        transformations=[],
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.FLOOR,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+            ),
+        ],
     )
 
     col_poids_kg = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=2,
         colonne_bdd="poids_kg",
         colonne_fichier="Weight_kg",
         in_file=True,
@@ -487,7 +495,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_taille_cm = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=3,
         colonne_bdd="taille_cm",
         colonne_fichier="Height_cm",
         in_file=True,
@@ -495,7 +503,7 @@ def execute_pipeline_diet_recommendations_dataset(
         nullable=False,
         valeur_defaut=None,
         unique_constraint=False,
-        constraint=NumericConstraint(1, nb_min=0, nb_max=250, nb_decimal=0),
+        constraint=NumericConstraint(1, nb_min=140, nb_max=250, nb_decimal=0),
         transformations=[
             ETLColumnTransformation(
                 id_transformation=5,
@@ -509,7 +517,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_apport_calorique_journalier = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=4,
         colonne_bdd="apport_calorique_journalier",
         colonne_fichier="Daily_Caloric_Intake",
         in_file=True,
@@ -531,7 +539,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_cholesterol_mg_dl = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=5,
         colonne_bdd="cholesterol_mg_dl",
         colonne_fichier="Cholesterol_mg/dL",
         in_file=True,
@@ -553,7 +561,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_tension_arterielle_mmHg = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=6,
         colonne_bdd="tension_arterielle_mmHg",
         colonne_fichier="Blood_Pressure_mmHg",
         in_file=True,
@@ -575,7 +583,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_glucose_mg_dl = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=7,
         colonne_bdd="glucose_mg_dl",
         colonne_fichier="Glucose_mg/dL",
         in_file=True,
@@ -597,7 +605,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_heures_exercice_semaine = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=8,
         colonne_bdd="heures_exercice_semaine",
         colonne_fichier="Weekly_Exercise_Hours",
         in_file=True,
@@ -619,7 +627,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_adherence_regime = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=9,
         colonne_bdd="adherence_regime",
         colonne_fichier="Adherence_to_Diet_Plan",
         in_file=True,
@@ -641,7 +649,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_score_desiquilibre_nutriment = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=10,
         colonne_bdd="score_desiquilibre_nutriment",
         colonne_fichier="Dietary_Nutrient_Imbalance_Score",
         in_file=True,
@@ -663,7 +671,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_sexe = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=11,
         colonne_bdd="sexe",
         colonne_fichier="Gender",
         in_file=True,
@@ -683,7 +691,7 @@ def execute_pipeline_diet_recommendations_dataset(
             ETLColumnTransformation(
                 id_transformation=5,
                 id_etl_column_mapping=3,
-                ordre=1,
+                ordre=2,
                 type_transformation=TypeTransformation.REPLACE,
                 condition_fail_behavior=ConditionFailBehavior.ERROR,
                 value_str="FEMALE",
@@ -708,7 +716,7 @@ def execute_pipeline_diet_recommendations_dataset(
             ETLColumnTransformation(
                 id_transformation=5,
                 id_etl_column_mapping=3,
-                ordre=1,
+                ordre=3,
                 type_transformation=TypeTransformation.REPLACE,
                 condition_fail_behavior=ConditionFailBehavior.ERROR,
                 value_str="MALE",
@@ -718,7 +726,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_type_maladie = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=12,
         colonne_bdd="type_maladie",
         colonne_fichier="Disease_Type",
         in_file=True,
@@ -739,7 +747,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_gravite = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=13,
         colonne_bdd="gravite",
         colonne_fichier="Severity",
         in_file=True,
@@ -760,7 +768,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_restrictions_alimentaires = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=14,
         colonne_bdd="restrictions_alimentaires",
         colonne_fichier="Dietary_Restrictions",
         in_file=True,
@@ -781,7 +789,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_allergies = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=15,
         colonne_bdd="allergies",
         colonne_fichier="Allergies",
         in_file=True,
@@ -802,7 +810,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_cuisine_preferee = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=16,
         colonne_bdd="cuisine_preferee",
         colonne_fichier="Preferred_Cuisine",
         in_file=True,
@@ -823,7 +831,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_niveau_activite_physique = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=17,
         colonne_bdd="niveau_activite_physique",
         colonne_fichier="Physical_Activity_Level",
         in_file=True,
@@ -844,7 +852,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_recommendation_regime = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=18,
         colonne_bdd="recommendation_regime",
         colonne_fichier="Diet_Recommendation",
         in_file=True,
@@ -1062,3 +1070,799 @@ def execute_pipeline_profil_sante(
     return execute_pipeline_etl(
         pipeline, override_path=file_path, rename_source=rename_source
     )
+
+
+def execute_pipeline_dataset_historique_seance_exercice(
+    file_path: str = None,
+) -> list[str]:
+    """Execute la PipelineETL pour importer le csv gym_members_exercise_tracking_synthetic_data dans la table dataset_historique_seance_exercice"""
+    col_age = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="age",
+        colonne_fichier="Age",
+        in_file=True,
+        type_donnees=TypeDonnees.INT,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=16, nb_max=100, nb_decimal=0),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.FLOOR,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+            ),
+        ],
+    )
+
+    col_poids_kg = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="poids_kg",
+        colonne_fichier="Weight (kg)",
+        in_file=True,
+        type_donnees=TypeDonnees.DECIMAL,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=0, nb_max=250, nb_decimal=2),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=2,
+            ),
+        ],
+    )
+
+    col_taille_cm = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="taille_cm",
+        colonne_fichier="Height (m)",
+        in_file=True,
+        type_donnees=TypeDonnees.INT,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=140, nb_max=250, nb_decimal=0),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.MULTIPLY,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_num=100,
+            ),
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=2,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=0,
+            ),
+        ],
+    )
+
+    col_bpm_max = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="bpm_max",
+        colonne_fichier="Max_BPM",
+        in_file=True,
+        type_donnees=TypeDonnees.INT,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=30, nb_max=220, nb_decimal=0),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=0,
+            ),
+        ],
+    )
+
+    col_bpm_moyen = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="bpm_moyen",
+        colonne_fichier="Avg_BPM",
+        in_file=True,
+        type_donnees=TypeDonnees.INT,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=30, nb_max=220, nb_decimal=0),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=0,
+            ),
+        ],
+    )
+
+    col_bpm_repos = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="bpm_repos",
+        colonne_fichier="Resting_BPM",
+        in_file=True,
+        type_donnees=TypeDonnees.INT,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=20, nb_max=220, nb_decimal=0),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=0,
+            ),
+        ],
+    )
+
+    col_duree_seance_minutes = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="duree_seance_minutes",
+        colonne_fichier="Session_Duration (hours)",
+        in_file=True,
+        type_donnees=TypeDonnees.DECIMAL,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=0, nb_max=360, nb_decimal=1),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.MULTIPLY,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_num=60,
+            ),
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=2,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=1,
+            ),
+        ],
+    )
+
+    col_calories_brulees = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="calories_brulees",
+        colonne_fichier="Calories_Burned",
+        in_file=True,
+        type_donnees=TypeDonnees.DECIMAL,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=300, nb_max=3000, nb_decimal=1),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=1,
+            ),
+        ],
+    )
+
+    col_pourcentage_gras = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="pourcentage_gras",
+        colonne_fichier="Fat_Percentage",
+        in_file=True,
+        type_donnees=TypeDonnees.DECIMAL,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=0, nb_max=100, nb_decimal=1),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=1,
+            ),
+        ],
+    )
+
+    col_consommation_eau_ml = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="consommation_eau_ml",
+        colonne_fichier="Water_Intake (liters)",
+        in_file=True,
+        type_donnees=TypeDonnees.DECIMAL,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=0, nb_max=5000, nb_decimal=2),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.MULTIPLY,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_num=1000,
+            ),
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=2,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=2,
+            ),
+        ],
+    )
+
+    col_frequence_sport_jour_semaine = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="frequence_sport_jour_semaine",
+        colonne_fichier="Workout_Frequency (days/week)",
+        in_file=True,
+        type_donnees=TypeDonnees.INT,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=0, nb_max=7, nb_decimal=0),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=0,
+            ),
+        ],
+    )
+
+    col_niveau_experience = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="niveau_experience",
+        colonne_fichier="Experience_Level",
+        in_file=True,
+        type_donnees=TypeDonnees.INT,
+        nullable=False,
+        valeur_defaut=0,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=0, nb_max=3, nb_decimal=0),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=0,
+            ),
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.CLIP_MAX,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_num=3,
+            ),
+        ],
+    )
+
+    col_sexe = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="sexe",
+        colonne_fichier="Gender",
+        in_file=True,
+        type_donnees=TypeDonnees.STRING,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=StringConstraint(1, min_length=0, max_length=50),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.UPPER,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+            ),
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=2,
+                type_transformation=TypeTransformation.REPLACE,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_str="FEMALE",
+                value_str_2="F",
+                conditions=[
+                    ETLTransformationCondition(
+                        id_condition=1,
+                        id_transformation=5,
+                        groupe_code=1,
+                        operator=ConditionOperator.EQ,
+                        value_str="FEMALE",
+                    ),
+                    ETLTransformationCondition(
+                        id_condition=2,
+                        id_transformation=5,
+                        groupe_code=2,
+                        operator=ConditionOperator.EQ,
+                        value_str="MALE",
+                    ),
+                ],
+            ),
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=3,
+                type_transformation=TypeTransformation.REPLACE,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_str="MALE",
+                value_str_2="M",
+            ),
+        ],
+    )
+
+    col_type_sport = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="type_sport",
+        colonne_fichier="Workout_Type",
+        in_file=True,
+        type_donnees=TypeDonnees.STRING,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=StringConstraint(1, min_length=0, max_length=100),
+        transformations=[],
+    )
+
+    pipeline = PipelineETL(
+        id_etl_pipeline=1,
+        libelle="Import gym_members_exercise_tracking",
+        table_nom="dataset_historique_seance_exercice",
+        dossier_emplacement="\\raw\\",
+        nom_fichier_fixe="gym_members_exercise_tracking",
+        nom_fichier_variable="",
+        extension_fichier=ExtensionFichier.CSV,
+        dossier_clean_emplacement="/clean",
+        active=True,
+        colonnes=[
+            col_age,
+            col_poids_kg,
+            col_taille_cm,
+            col_bpm_max,
+            col_bpm_moyen,
+            col_bpm_repos,
+            col_duree_seance_minutes,
+            col_calories_brulees,
+            col_pourcentage_gras,
+            col_consommation_eau_ml,
+            col_frequence_sport_jour_semaine,
+            col_niveau_experience,
+            col_sexe,
+            col_type_sport,
+        ],
+    )
+
+    return execute_pipeline_etl(pipeline, override_path=file_path)
+
+
+def execute_pipeline_dataset_historique_seance_exercice_synthetic_data(
+    file_path: str = None,
+) -> list[str]:
+    """Execute la PipelineETL pour importer le csv gym_members_exercise_tracking_synthetic_data dans la table dataset_historique_seance_exercice"""
+    col_age = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="age",
+        colonne_fichier="Age",
+        in_file=True,
+        type_donnees=TypeDonnees.INT,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=16, nb_max=100, nb_decimal=0),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.FLOOR,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+            ),
+        ],
+    )
+
+    col_poids_kg = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="poids_kg",
+        colonne_fichier="Weight (kg)",
+        in_file=True,
+        type_donnees=TypeDonnees.DECIMAL,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=0, nb_max=250, nb_decimal=2),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=2,
+            ),
+        ],
+    )
+
+    col_taille_cm = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="taille_cm",
+        colonne_fichier="Height (m)",
+        in_file=True,
+        type_donnees=TypeDonnees.INT,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=140, nb_max=250, nb_decimal=0),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.MULTIPLY,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_num=100,
+            ),
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=2,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=0,
+            ),
+        ],
+    )
+
+    col_bpm_max = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="bpm_max",
+        colonne_fichier="Max_BPM",
+        in_file=True,
+        type_donnees=TypeDonnees.INT,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=30, nb_max=220, nb_decimal=0),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=0,
+            ),
+        ],
+    )
+
+    col_bpm_moyen = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="bpm_moyen",
+        colonne_fichier="Avg_BPM",
+        in_file=True,
+        type_donnees=TypeDonnees.INT,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=30, nb_max=220, nb_decimal=0),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=0,
+            ),
+        ],
+    )
+
+    col_bpm_repos = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="bpm_repos",
+        colonne_fichier="Resting_BPM",
+        in_file=True,
+        type_donnees=TypeDonnees.INT,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=20, nb_max=220, nb_decimal=0),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=0,
+            ),
+        ],
+    )
+
+    col_duree_seance_minutes = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="duree_seance_minutes",
+        colonne_fichier="Session_Duration (hours)",
+        in_file=True,
+        type_donnees=TypeDonnees.DECIMAL,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=0, nb_max=360, nb_decimal=1),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.MULTIPLY,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_num=60,
+            ),
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=2,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=1,
+            ),
+        ],
+    )
+
+    col_calories_brulees = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="calories_brulees",
+        colonne_fichier="Calories_Burned",
+        in_file=True,
+        type_donnees=TypeDonnees.DECIMAL,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=300, nb_max=3000, nb_decimal=1),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=1,
+            ),
+        ],
+    )
+
+    col_pourcentage_gras = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="pourcentage_gras",
+        colonne_fichier="Fat_Percentage",
+        in_file=True,
+        type_donnees=TypeDonnees.DECIMAL,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=0, nb_max=100, nb_decimal=1),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=1,
+            ),
+        ],
+    )
+
+    col_consommation_eau_ml = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="consommation_eau_ml",
+        colonne_fichier="Water_Intake (liters)",
+        in_file=True,
+        type_donnees=TypeDonnees.DECIMAL,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=0, nb_max=5000, nb_decimal=2),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.MULTIPLY,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_num=1000,
+            ),
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=2,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=2,
+            ),
+        ],
+    )
+
+    col_frequence_sport_jour_semaine = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="frequence_sport_jour_semaine",
+        colonne_fichier="Workout_Frequency (days/week)",
+        in_file=True,
+        type_donnees=TypeDonnees.INT,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=0, nb_max=7, nb_decimal=0),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=0,
+            ),
+        ],
+    )
+
+    col_niveau_experience = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="niveau_experience",
+        colonne_fichier="Experience_Level",
+        in_file=True,
+        type_donnees=TypeDonnees.INT,
+        nullable=False,
+        valeur_defaut=0,
+        unique_constraint=False,
+        constraint=NumericConstraint(1, nb_min=0, nb_max=3, nb_decimal=0),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.ROUND,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_int=0,
+            ),
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.CLIP_MAX,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_num=3,
+            ),
+        ],
+    )
+
+    col_sexe = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="sexe",
+        colonne_fichier="Gender",
+        in_file=True,
+        type_donnees=TypeDonnees.STRING,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=StringConstraint(1, min_length=0, max_length=50),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.UPPER,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+            ),
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=2,
+                type_transformation=TypeTransformation.REPLACE,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_str="FEMALE",
+                value_str_2="F",
+                conditions=[
+                    ETLTransformationCondition(
+                        id_condition=1,
+                        id_transformation=5,
+                        groupe_code=1,
+                        operator=ConditionOperator.EQ,
+                        value_str="FEMALE",
+                    ),
+                    ETLTransformationCondition(
+                        id_condition=2,
+                        id_transformation=5,
+                        groupe_code=2,
+                        operator=ConditionOperator.EQ,
+                        value_str="MALE",
+                    ),
+                ],
+            ),
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=3,
+                type_transformation=TypeTransformation.REPLACE,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_str="MALE",
+                value_str_2="M",
+            ),
+        ],
+    )
+
+    col_type_sport = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="type_sport",
+        colonne_fichier="Workout_Type",
+        in_file=True,
+        type_donnees=TypeDonnees.STRING,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=StringConstraint(1, min_length=0, max_length=100),
+        transformations=[],
+    )
+
+    pipeline = PipelineETL(
+        id_etl_pipeline=1,
+        libelle="Import gym_members_exercise_tracking_synthetic_data",
+        table_nom="dataset_historique_seance_exercice",
+        dossier_emplacement="\\raw\\",
+        nom_fichier_fixe="gym_members_exercise_tracking_synthetic_data",
+        nom_fichier_variable="",
+        extension_fichier=ExtensionFichier.CSV,
+        dossier_clean_emplacement="/clean",
+        active=True,
+        colonnes=[
+            col_age,
+            col_poids_kg,
+            col_taille_cm,
+            col_bpm_max,
+            col_bpm_moyen,
+            col_bpm_repos,
+            col_duree_seance_minutes,
+            col_calories_brulees,
+            col_pourcentage_gras,
+            col_consommation_eau_ml,
+            col_frequence_sport_jour_semaine,
+            col_niveau_experience,
+            col_sexe,
+            col_type_sport,
+        ],
+    )
+
+    return execute_pipeline_etl(pipeline, override_path=file_path)
