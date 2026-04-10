@@ -9,9 +9,11 @@ from sqlalchemy import (
     ForeignKey,
     Text,
     Boolean,
+    Enum
 )
 from sqlalchemy.orm import relationship
 from src.data_pipeline.database import Base
+from enum import Enum as PyEnum
 
 # --- TABLES RÉFÉRENTIELS  ---
 
@@ -226,141 +228,25 @@ class LogSante(Base):
     utilisateur = relationship("Utilisateur", back_populates="sante_logs")
 
 
-# --- TABLES ANOMALIES D'IMPORT ---
+# --- TABLES etl_log ---
 
 
-class UtilisateurImportAnomalies(Base):
-    __tablename__ = "utilisateur_import_anomalies"
-
-    id = Column(Integer, primary_key=True, index=True)
-    nom = Column(String(1000), nullable=True)
-    prenom = Column(String(1000), nullable=True)
-    email = Column(String(1000), nullable=True)
-    date_de_naissance = Column(String(1000), nullable=True)
-    genre = Column(String(1000), nullable=True)
-    mot_de_passe_hash = Column(String(1000), nullable=True)
-    type_abonnement = Column(String(1000), nullable=True)
-    date_inscription = Column(String(1000), nullable=True)
-    erreur = Column(Text, nullable=False)
-    est_corrige = Column(Boolean, nullable=False, server_default=text("false"))
-    date_import = Column(
-        TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP")
-    )
+class StatutEtlEnum(str, PyEnum):
+    PENDING = "PENDING"
+    SUCCESS = "SUCCESS"
+    PARTIAL_FAILURE = "PARTIAL_FAILURE"
+    FAILURE = "FAILURE"
 
 
-class ProfilSanteImportAnomalies(Base):
-    __tablename__ = "profil_sante_import_anomalies"
+class EtlLog(Base):
+    __tablename__ = "etl_log"
 
-    id = Column(Integer, primary_key=True, index=True)
-    id_profil = Column(String(1000), nullable=True)
-    id_utilisateur = Column(String(1000), nullable=True)
-    poids_kg = Column(String(1000), nullable=True)
-    taille_cm = Column(String(1000), nullable=True)
-    imc = Column(String(1000), nullable=True)
-    niveau_activite = Column(String(1000), nullable=True)
-    type_maladie = Column(String(1000), nullable=True)
-    severite = Column(String(1000), nullable=True)
-    restrictions_alimentaires = Column(String(1000), nullable=True)
-    allergies = Column(String(1000), nullable=True)
-    objectif_principal = Column(String(1000), nullable=True)
-    experience_sportive = Column(String(1000), nullable=True)
-    frequence_entrainement = Column(String(1000), nullable=True)
-    erreur = Column(Text, nullable=False)
-    est_corrige = Column(Boolean, nullable=False, server_default=text("false"))
-    date_import = Column(
-        TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP")
-    )
-
-
-class AlimentImportAnomalies(Base):
-    __tablename__ = "aliment_import_anomalies"
-
-    id = Column(Integer, primary_key=True, index=True)
-    nom = Column(String(1000), nullable=True)
-    categorie = Column(String(1000), nullable=True)
-    type_repas = Column(String(1000), nullable=True)
-    calories = Column(String(1000), nullable=True)
-    proteines = Column(String(1000), nullable=True)
-    lipides = Column(String(1000), nullable=True)
-    glucides = Column(String(1000), nullable=True)
-    fibres = Column(String(1000), nullable=True)
-    sucres = Column(String(1000), nullable=True)
-    sodium_mg = Column(String(1000), nullable=True)
-    cholesterol_mg = Column(String(1000), nullable=True)
-    unite_mesure = Column(String(1000), nullable=True)
-    erreur = Column(Text, nullable=False)
-    est_corrige = Column(Boolean, nullable=False, server_default=text("false"))
-    date_import = Column(
-        TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP")
-    )
-
-
-class ExerciceImportAnomalies(Base):
-    __tablename__ = "exercice_import_anomalies"
-
-    id = Column(Integer, primary_key=True, index=True)
-    nom = Column(String(1000), nullable=True)
-    type_exercice = Column(String(1000), nullable=True)
-    muscle_cible = Column(String(1000), nullable=True)
-    equipement = Column(String(1000), nullable=True)
-    difficulte = Column(String(1000), nullable=True)
-    instructions = Column(String(1000), nullable=True)
-    erreur = Column(Text, nullable=False)
-    est_corrige = Column(Boolean, nullable=False, server_default=text("false"))
-    date_import = Column(
-        TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP")
-    )
-
-
-class DatasetRecommendationsRegimeImportAnomalies(Base):
-    __tablename__ = "dataset_recommendations_regime_import_anomalies"
-
-    id = Column(Integer, primary_key=True, index=True)
-    age = Column(String(1000), nullable=True)
-    sexe = Column(String(1000), nullable=True)
-    poids_kg = Column(String(1000), nullable=True)
-    taille_cm = Column(String(1000), nullable=True)
-    type_maladie = Column(String(1000), nullable=True)
-    gravite = Column(String(1000), nullable=True)
-    niveau_activite_physique = Column(String(1000), nullable=True)
-    apport_calorique_journalier = Column(String(1000), nullable=True)
-    cholesterol_mg_dl = Column(String(1000), nullable=True)
-    tension_arterielle_mmHg = Column(String(1000), nullable=True)
-    glucose_mg_dl = Column(String(1000), nullable=True)
-    restrictions_alimentaires = Column(String(1000), nullable=True)
-    allergies = Column(String(1000), nullable=True)
-    cuisine_preferee = Column(String(1000), nullable=True)
-    heures_exercice_semaine = Column(String(1000), nullable=True)
-    adherence_regime = Column(String(1000), nullable=True)
-    score_desiquilibre_nutriment = Column(String(1000), nullable=True)
-    recommendation_regime = Column(String(1000), nullable=True)
-    erreur = Column(Text, nullable=False)
-    est_corrige = Column(Boolean, nullable=False, server_default=text("false"))
-    date_import = Column(
-        TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP")
-    )
-
-
-class DatasetHistoriqueSeanceExerciceImportAnomalies(Base):
-    __tablename__ = "dataset_historique_seance_exercice_import_anomalies"
-
-    id = Column(Integer, primary_key=True, index=True)
-    age = Column(String(1000), nullable=True)
-    sexe = Column(String(1000), nullable=True)
-    poids_kg = Column(String(1000), nullable=True)
-    taille_cm = Column(String(1000), nullable=True)
-    bpm_max = Column(String(1000), nullable=True)
-    bpm_moyen = Column(String(1000), nullable=True)
-    bpm_repos = Column(String(1000), nullable=True)
-    duree_seance_minutes = Column(String(1000), nullable=True)
-    calories_brulees = Column(String(1000), nullable=True)
-    type_sport = Column(String(1000), nullable=True)
-    pourcentage_gras = Column(String(1000), nullable=True)
-    consommation_eau_ml = Column(String(1000), nullable=True)
-    frequence_sport_jour_semaine = Column(String(1000), nullable=True)
-    niveau_experience = Column(String(1000), nullable=True)
-    erreur = Column(Text, nullable=False)
-    est_corrige = Column(Boolean, nullable=False, server_default=text("false"))
-    date_import = Column(
-        TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP")
-    )
+    id_etl_log = Column(Integer, primary_key=True, index=True)
+    libelle_pipeline = Column(String(255), nullable=False)
+    fichier_nom = Column(String(255), nullable=False)
+    date_execution = Column(TIMESTAMP, server_default=text("CURRENT_TIMESTAMP"))
+    nb_lignes_total = Column(Integer)
+    nb_lignes_valides = Column(Integer)
+    nb_lignes_anomalies = Column(Integer)
+    statut = Column(Enum(StatutEtlEnum), nullable=True)
+    message = Column(Text, nullable=True)
