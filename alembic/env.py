@@ -22,13 +22,6 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 from src.data_pipeline.database import Base
-from src.data_pipeline.models import (
-    Aliment,
-    Exercice,
-    Utilisateur,
-    DatasetRecommendationsRegime,
-    DatasetHistoriqueSeanceExercice,
-)
 
 # for 'autogenerate' support
 # from myapp import mymodel
