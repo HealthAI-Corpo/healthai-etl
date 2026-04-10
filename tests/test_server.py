@@ -7,7 +7,6 @@ Le pipeline ETL est mocké pour éviter toute écriture disque ou DB.
 import io
 from unittest.mock import patch
 
-import pytest
 from fastapi.testclient import TestClient
 
 from src.server import app
@@ -70,6 +69,12 @@ def test_upload_exercises_reponse_contient_nom_fichier():
 
 def test_upload_exercises_csv_accepte():
     with patch(PIPELINE_TARGET, return_value=[]):
-        data = {"file": ("exercises.csv", io.BytesIO(b"name,type\nPush-up,strength"), "text/csv")}
+        data = {
+            "file": (
+                "exercises.csv",
+                io.BytesIO(b"name,type\nPush-up,strength"),
+                "text/csv",
+            )
+        }
         response = client.post("/upload/exercises", files=data)
     assert response.status_code == 202
