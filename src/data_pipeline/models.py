@@ -146,7 +146,7 @@ class DatasetHistoriqueSeanceExercice(Base):
     calories_brulees = Column(Numeric(6, 1))
     type_sport = Column(String(100))
     pourcentage_gras = Column(Numeric(4, 1))
-    consommation_eau_l = Column(Numeric(4, 1))
+    consommation_eau_ml = Column(Numeric(7, 2))
     frequence_sport_jour_semaine = Column(Integer)
     niveau_experience = Column(Integer)
 
@@ -213,7 +213,7 @@ class LogSante(Base):
     bpm_moyen_journee = Column(Integer)
     heures_sommeil = Column(Numeric(4, 2))
     nb_pas = Column(Integer, default=0)
-    hydratation_litres = Column(Numeric(4, 2))
+    hydratation_ml = Column(Numeric(7, 2))
 
     # Clé étrangère
     id_utilisateur = Column(
