@@ -9,7 +9,7 @@ from src.data_pipeline.pipeline import (
     execute_pipeline_diet_recommendations_dataset,
     execute_pipeline_exercisedb_hobby,
     execute_pipeline_dataset_historique_seance_exercice,
-    execute_pipeline_dataset_historique_seance_exercice_synthetic_data
+    execute_pipeline_dataset_historique_seance_exercice_synthetic_data,
 )
 
 load_dotenv()
@@ -55,7 +55,8 @@ async def upload_file(
         )
     elif pipeline_type == "historique_seance_synthetic":
         background_tasks.add_task(
-            execute_pipeline_dataset_historique_seance_exercice_synthetic_data, str(dest)
+            execute_pipeline_dataset_historique_seance_exercice_synthetic_data,
+            str(dest),
         )
     else:
         raise HTTPException(status_code=400, detail="Type de pipeline inconnu.")
