@@ -8,8 +8,7 @@ from sqlalchemy import (
     text,
     ForeignKey,
     Text,
-    Boolean,
-    Enum
+    Enum,
 )
 from sqlalchemy.orm import relationship
 from src.data_pipeline.database import Base

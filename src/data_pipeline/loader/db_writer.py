@@ -3,7 +3,6 @@ from datetime import datetime
 
 import pandas as pd
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import sessionmaker
 
 from src.data_pipeline.database import engine, SessionLocal
 from src.data_pipeline.models import EtlLog, StatutEtlEnum
@@ -83,11 +82,13 @@ def log_etl_execution(
     nb_lignes_total = len(df) + len(anomalies)
     nb_lignes_valides = len(df)
     nb_lignes_anomalies = len(anomalies)
-    
+
     # Calcul du pourcentage de réussite
-    pourcentage_reussite = (nb_lignes_valides / nb_lignes_total * 100) if nb_lignes_total > 0 else 0
+    pourcentage_reussite = (
+        (nb_lignes_valides / nb_lignes_total * 100) if nb_lignes_total > 0 else 0
+    )
     message = f"{pourcentage_reussite:.1f}% sont passés"
-    
+
     # Détermination du statut
     if nb_lignes_anomalies == 0:
         statut = StatutEtlEnum.SUCCESS
@@ -95,9 +96,9 @@ def log_etl_execution(
         statut = StatutEtlEnum.FAILURE
     else:
         statut = StatutEtlEnum.PARTIAL_FAILURE
-    
+
     fichier_nom_final = os.path.basename(source_path) if source_path else fichier_nom
-    
+
     session = SessionLocal()
     try:
         etl_log = EtlLog(
@@ -111,9 +112,7 @@ def log_etl_execution(
         )
         session.add(etl_log)
         session.commit()
-        print(
-            f"EtlLog enregistrée : {libelle_pipeline} - Statut: {statut.value}"
-        )
+        print(f"EtlLog enregistrée : {libelle_pipeline} - Statut: {statut.value}")
     except SQLAlchemyError as e:
         session.rollback()
         print(f"[ERROR] Impossible d'enregistrer l'EtlLog: {e}")
