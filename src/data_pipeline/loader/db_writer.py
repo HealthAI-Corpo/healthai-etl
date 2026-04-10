@@ -4,7 +4,8 @@ from datetime import datetime
 import pandas as pd
 from sqlalchemy.exc import SQLAlchemyError
 
-from src.data_pipeline.database import engine
+from src.data_pipeline.database import engine, SessionLocal
+from src.data_pipeline.models import EtlLog, StatutEtlEnum
 from src.data_pipeline.utils import PipelineETL, normalize_path
 
 
@@ -69,6 +70,56 @@ def mark_source_file_as_processed(file_path: str) -> str | None:
         return None
 
 
+def log_etl_execution(
+    libelle_pipeline: str,
+    fichier_nom: str,
+    df: pd.DataFrame,
+    anomalies: pd.DataFrame,
+    source_path: str | None = None,
+) -> None:
+    """Enregistre l'exécution du pipeline dans la table EtlLog."""
+    # Calcul des statistiques
+    nb_lignes_total = len(df) + len(anomalies)
+    nb_lignes_valides = len(df)
+    nb_lignes_anomalies = len(anomalies)
+
+    # Calcul du pourcentage de réussite
+    pourcentage_reussite = (
+        (nb_lignes_valides / nb_lignes_total * 100) if nb_lignes_total > 0 else 0
+    )
+    message = f"{pourcentage_reussite:.1f}% sont passés"
+
+    # Détermination du statut
+    if nb_lignes_anomalies == 0:
+        statut = StatutEtlEnum.SUCCESS
+    elif nb_lignes_valides == 0:
+        statut = StatutEtlEnum.FAILURE
+    else:
+        statut = StatutEtlEnum.PARTIAL_FAILURE
+
+    fichier_nom_final = os.path.basename(source_path) if source_path else fichier_nom
+
+    session = SessionLocal()
+    try:
+        etl_log = EtlLog(
+            libelle_pipeline=libelle_pipeline,
+            fichier_nom=fichier_nom_final,
+            nb_lignes_total=nb_lignes_total,
+            nb_lignes_valides=nb_lignes_valides,
+            nb_lignes_anomalies=nb_lignes_anomalies,
+            statut=statut,
+            message=message,
+        )
+        session.add(etl_log)
+        session.commit()
+        print(f"EtlLog enregistrée : {libelle_pipeline} - Statut: {statut.value}")
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"[ERROR] Impossible d'enregistrer l'EtlLog: {e}")
+    finally:
+        session.close()
+
+
 def loader_pipeline(
     df: pd.DataFrame,
     anomalies: pd.DataFrame,
@@ -97,5 +148,14 @@ def loader_pipeline(
     renamed_source = None
     if source_path and rename_source:
         renamed_source = mark_source_file_as_processed(source_path)
+
+    # Enregistrement de l'exécution du pipeline dans EtlLog
+    log_etl_execution(
+        libelle_pipeline=pipeline.table_nom,
+        fichier_nom=clean_file_name,
+        df=df,
+        anomalies=anomalies,
+        source_path=source_path,
+    )
 
     return path, renamed_source
