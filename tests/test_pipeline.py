@@ -126,8 +126,12 @@ def test_diet_colonnes_presentes():
     pipeline = capture_pipeline_arg(execute_pipeline_diet_recommendations_dataset)
     noms_bdd = [c.colonne_bdd for c in pipeline.colonnes]
     for attendu in (
-        "age", "poids_kg", "taille_cm", "sexe",
-        "recommendation_regime", "niveau_activite_physique",
+        "age",
+        "poids_kg",
+        "taille_cm",
+        "sexe",
+        "recommendation_regime",
+        "niveau_activite_physique",
     ):
         assert attendu in noms_bdd, f"Colonne manquante : {attendu}"
 
