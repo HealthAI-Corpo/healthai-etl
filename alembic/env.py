@@ -22,7 +22,14 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 from src.data_pipeline.database import Base
-from src.data_pipeline.models import Aliment, Exercice, Utilisateur, DatasetRecommendationsRegime, DatasetHistoriqueSeanceExercice
+from src.data_pipeline.models import (
+    Aliment,
+    Exercice,
+    Utilisateur,
+    DatasetRecommendationsRegime,
+    DatasetHistoriqueSeanceExercice,
+)
+
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
@@ -72,9 +79,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()
