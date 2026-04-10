@@ -26,7 +26,7 @@ def save_dataframe_to_csv(df: pd.DataFrame, folder_path: str, file_name: str) ->
     if os.path.exists(full_path):
         print(f"Fichier vérifié sur le disque : {full_path}")
     else:
-        print(f"ERREUR : Le fichier n'a pas été créé malgré to_csv !")
+        print("ERREUR : Le fichier n'a pas été créé malgré to_csv !")
 
     return full_path
 
@@ -77,11 +77,7 @@ def loader_pipeline(
     rename_source=True,
 ) -> tuple[str, str | None]:
     """Sauvegarde les fichiers clean/anomalies (nommés selon la table BDD) puis insère en base."""
-
-    # Sécurisation du chemin : on force l'utilisation du dossier 'data' à la racine du projet
-    # On enlève les slashes éventuels pour éviter les erreurs de chemin absolu/relatif
-    clean_subfolder = pipeline.dossier_clean_emplacement.strip("/\\")
-    normalized_folder = os.path.join(os.getcwd(), "data", clean_subfolder)
+    normalized_folder = normalize_path(pipeline.dossier_clean_emplacement)
 
     timestamp = datetime.now().strftime("_%Y%m%d_%H%M%S")
 

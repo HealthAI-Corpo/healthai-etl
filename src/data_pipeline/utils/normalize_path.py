@@ -1,9 +1,10 @@
 import os
+from pathlib import Path
 
-DATA_ROOT = "data"  # TODO: mettre en .env
+BASE_DATA_DIR = Path(os.getenv("DATA_DIR", "data"))
 
 
-def normalize_path(dossier_emplacement: str, data_root: str = DATA_ROOT) -> str:
+def normalize_path(dossier_emplacement: str, data_root: str = BASE_DATA_DIR) -> str:
     """Normalise un chemin relatif au dossier data."""
     dossier_emplacement = dossier_emplacement.replace("\\", "/").replace("//", "/")
     dossier_emplacement = dossier_emplacement.strip("/")
