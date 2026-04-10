@@ -1,10 +1,6 @@
-from src.data_pipeline.pipeline import (
-    execute_pipeline_exercisedb_hobby,
-    execute_pipeline_daily_food,
-    execute_pipeline_diet_recommendations_dataset,
-    execute_pipeline_dataset_historique_seance_exercice,
-    execute_pipeline_dataset_historique_seance_exercice_synthetic_data,
-)
+import os
+
+from src.data_pipeline.pipeline import execute_pipeline_exercisedb_hobby, execute_pipeline_daily_food, execute_pipeline_diet_recommendations_dataset
 from src.data_pipeline.database import engine, Base
 
 
@@ -55,6 +51,6 @@ def init_db():
 
 
 if __name__ == "__main__":
-    # Optionnel : réinitialisation de la DB pour tes tests
-    # init_db()
+    if os.getenv("ALLOW_INIT_DB", "false").lower() == "true":
+        init_db()
     run_all_pipelines()

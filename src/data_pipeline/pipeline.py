@@ -473,7 +473,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_poids_kg = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=2,
         colonne_bdd="poids_kg",
         colonne_fichier="Weight_kg",
         in_file=True,
@@ -495,7 +495,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_taille_cm = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=3,
         colonne_bdd="taille_cm",
         colonne_fichier="Height_cm",
         in_file=True,
@@ -517,7 +517,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_apport_calorique_journalier = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=4,
         colonne_bdd="apport_calorique_journalier",
         colonne_fichier="Daily_Caloric_Intake",
         in_file=True,
@@ -539,7 +539,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_cholesterol_mg_dl = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=5,
         colonne_bdd="cholesterol_mg_dl",
         colonne_fichier="Cholesterol_mg/dL",
         in_file=True,
@@ -561,7 +561,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_tension_arterielle_mmHg = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=6,
         colonne_bdd="tension_arterielle_mmHg",
         colonne_fichier="Blood_Pressure_mmHg",
         in_file=True,
@@ -583,7 +583,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_glucose_mg_dl = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=7,
         colonne_bdd="glucose_mg_dl",
         colonne_fichier="Glucose_mg/dL",
         in_file=True,
@@ -605,7 +605,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_heures_exercice_semaine = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=8,
         colonne_bdd="heures_exercice_semaine",
         colonne_fichier="Weekly_Exercise_Hours",
         in_file=True,
@@ -627,7 +627,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_adherence_regime = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=9,
         colonne_bdd="adherence_regime",
         colonne_fichier="Adherence_to_Diet_Plan",
         in_file=True,
@@ -649,7 +649,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_score_desiquilibre_nutriment = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=10,
         colonne_bdd="score_desiquilibre_nutriment",
         colonne_fichier="Dietary_Nutrient_Imbalance_Score",
         in_file=True,
@@ -671,7 +671,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_sexe = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=11,
         colonne_bdd="sexe",
         colonne_fichier="Gender",
         in_file=True,
@@ -726,7 +726,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_type_maladie = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=12,
         colonne_bdd="type_maladie",
         colonne_fichier="Disease_Type",
         in_file=True,
@@ -747,7 +747,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_gravite = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=13,
         colonne_bdd="gravite",
         colonne_fichier="Severity",
         in_file=True,
@@ -768,7 +768,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_restrictions_alimentaires = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=14,
         colonne_bdd="restrictions_alimentaires",
         colonne_fichier="Dietary_Restrictions",
         in_file=True,
@@ -789,7 +789,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_allergies = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=15,
         colonne_bdd="allergies",
         colonne_fichier="Allergies",
         in_file=True,
@@ -810,7 +810,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_cuisine_preferee = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=16,
         colonne_bdd="cuisine_preferee",
         colonne_fichier="Preferred_Cuisine",
         in_file=True,
@@ -831,7 +831,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_niveau_activite_physique = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=17,
         colonne_bdd="niveau_activite_physique",
         colonne_fichier="Physical_Activity_Level",
         in_file=True,
@@ -852,7 +852,7 @@ def execute_pipeline_diet_recommendations_dataset(
     )
 
     col_recommendation_regime = ETLColumnMapping(
-        id_etl_column_mapping=1,
+        id_etl_column_mapping=18,
         colonne_bdd="recommendation_regime",
         colonne_fichier="Diet_Recommendation",
         in_file=True,
