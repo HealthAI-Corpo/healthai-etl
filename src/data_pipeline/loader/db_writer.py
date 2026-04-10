@@ -23,6 +23,11 @@ def save_dataframe_to_csv(df: pd.DataFrame, folder_path: str, file_name: str) ->
     # Sauvegarde
     df.to_csv(full_path, index=False)
 
+    if os.path.exists(full_path):
+        print(f"Fichier vérifié sur le disque : {full_path}")
+    else:
+        print("ERREUR : Le fichier n'a pas été créé malgré to_csv !")
+
     return full_path
 
 
@@ -32,13 +37,14 @@ def ingest_cleaned_data(file_path: str, pipeline: PipelineETL) -> None:
     df = pd.read_csv(file_path)
 
     # 2. Envoyer dans la BDD
-    # 'name' doit correspondre au tablename du modèle (ex: "profil_sante")
     try:
         df.to_sql(name=pipeline.table_nom, con=engine, if_exists="append", index=False)
-        print(f"Ingestion réussie : {len(df)} lignes ajoutées.")
+        print(
+            f"Ingestion réussie : {len(df)} lignes ajoutées dans la table '{pipeline.table_nom}'."
+        )
 
     except SQLAlchemyError as e:
-        print("Erreur SQL :", e)
+        print(f"Erreur SQL sur la table '{pipeline.table_nom}':", e)
 
     except Exception as e:
         print("Erreur inattendue :", e)
@@ -68,29 +74,28 @@ def loader_pipeline(
     anomalies: pd.DataFrame,
     pipeline: PipelineETL,
     source_path: str | None = None,
+    rename_source=True,
 ) -> tuple[str, str | None]:
-    """Sauvegarde les fichiers clean/anomalies puis insere les donnees en base."""
+    """Sauvegarde les fichiers clean/anomalies (nommés selon la table BDD) puis insère en base."""
     normalized_folder = normalize_path(pipeline.dossier_clean_emplacement)
 
     timestamp = datetime.now().strftime("_%Y%m%d_%H%M%S")
-    clean_file_name = (
-        pipeline.nom_fichier_fixe + pipeline.nom_fichier_variable + timestamp
-    )
+
+    # --- CHANGEMENT ICI : On utilise pipeline.table_nom ---
+    clean_file_name = f"{pipeline.table_nom}{timestamp}"
+
     path = save_dataframe_to_csv(df, normalized_folder, clean_file_name)
 
-    # TEST POUR LES ANOMALIES
-    anomaly_file_name = (
-        pipeline.nom_fichier_fixe
-        + pipeline.nom_fichier_variable
-        + "_anomalies"
-        + timestamp
-    )
+    # TEST POUR LES ANOMALIES (Utilise aussi le nom de la table)
+    anomaly_file_name = f"{pipeline.table_nom}_anomalies{timestamp}"
     save_dataframe_to_csv(anomalies, normalized_folder, anomaly_file_name)
     # FIN TEST POUR LES ANOMALIES
 
     ingest_cleaned_data(path, pipeline)
 
-    # Le renommage du fichier source est centralise ici pour garder un flux ETL unique.
-    renamed_source = mark_source_file_as_processed(source_path) if source_path else None
+    # On ne renomme que si rename_source est True
+    renamed_source = None
+    if source_path and rename_source:
+        renamed_source = mark_source_file_as_processed(source_path)
 
     return path, renamed_source

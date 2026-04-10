@@ -4,7 +4,13 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, BackgroundTasks, HTTPException
 import shutil
 
-from src.data_pipeline.pipeline import execute_pipeline_exercisedb_hobby
+from src.data_pipeline.pipeline import (
+    execute_pipeline_daily_food,
+    execute_pipeline_diet_recommendations_dataset,
+    execute_pipeline_exercisedb_hobby,
+    execute_pipeline_dataset_historique_seance_exercice,
+    execute_pipeline_dataset_historique_seance_exercice_synthetic_data,
+)
 
 load_dotenv()
 
@@ -35,10 +41,23 @@ async def upload_file(
         raise HTTPException(status_code=500, detail=f"Erreur d'écriture : {e}")
 
     # selection du pipeline exercices ou les autres
-    if pipeline_type == "exercises":
+    if pipeline_type == "exercices":
         background_tasks.add_task(execute_pipeline_exercisedb_hobby, str(dest))
-    # elif pipeline_type == "nutrition":
-    # background_tasks.add_task(execute_pipeline_nutrition, str(dest))
+    elif pipeline_type == "aliments":
+        background_tasks.add_task(execute_pipeline_daily_food, str(dest))
+    elif pipeline_type == "recommendations":
+        background_tasks.add_task(
+            execute_pipeline_diet_recommendations_dataset, str(dest)
+        )
+    elif pipeline_type == "historique_seance":
+        background_tasks.add_task(
+            execute_pipeline_dataset_historique_seance_exercice, str(dest)
+        )
+    elif pipeline_type == "historique_seance_synthetic":
+        background_tasks.add_task(
+            execute_pipeline_dataset_historique_seance_exercice_synthetic_data,
+            str(dest),
+        )
     else:
         raise HTTPException(status_code=400, detail="Type de pipeline inconnu.")
 

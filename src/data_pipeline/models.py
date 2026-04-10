@@ -11,7 +11,7 @@ from sqlalchemy import (
     Boolean,
 )
 from sqlalchemy.orm import relationship
-from data_pipeline.database import Base
+from src.data_pipeline.database import Base
 
 # --- TABLES RÉFÉRENTIELS  ---
 
@@ -55,14 +55,13 @@ class ProfilSante(Base):
     poids_kg = Column(Numeric(5, 2), nullable=False)
     taille_cm = Column(Integer, nullable=False)
     imc = Column(Numeric(4, 1))
-    niveau_activite = Column(String(100))
     type_maladie = Column(String(255))
     severite = Column(String(50))
     restrictions_alimentaires = Column(Text)
     allergies = Column(Text)
-    objectif_principal = Column(String(200))
-    experience_sportive = Column(String(50))
-    frequence_entrainement = Column(Integer)
+    objectif_principal = Column(String(200), nullable=True)
+    experience_sportive = Column(String(100))
+    heures_entrainement_semaine = Column(Numeric(4, 1))
 
     # Relation
     utilisateur = relationship("Utilisateur", back_populates="profil_sante")
@@ -146,8 +145,8 @@ class DatasetHistoriqueSeanceExercice(Base):
     duree_seance_minutes = Column(Numeric(5, 1))
     calories_brulees = Column(Numeric(6, 1))
     type_sport = Column(String(100))
-    pourcentage_gras = Column(Numeric(4, 1))
-    consommation_eau_l = Column(Numeric(4, 1))
+    pourcentage_gras = Column(Numeric(5, 1))
+    consommation_eau_ml = Column(Numeric(7, 2))
     frequence_sport_jour_semaine = Column(Integer)
     niveau_experience = Column(Integer)
 
@@ -214,7 +213,7 @@ class LogSante(Base):
     bpm_moyen_journee = Column(Integer)
     heures_sommeil = Column(Numeric(4, 2))
     nb_pas = Column(Integer, default=0)
-    hydratation_litres = Column(Numeric(4, 2))
+    hydratation_ml = Column(Numeric(7, 2))
 
     # Clé étrangère
     id_utilisateur = Column(
@@ -357,7 +356,7 @@ class DatasetHistoriqueSeanceExerciceImportAnomalies(Base):
     calories_brulees = Column(String(1000), nullable=True)
     type_sport = Column(String(1000), nullable=True)
     pourcentage_gras = Column(String(1000), nullable=True)
-    consommation_eau_l = Column(String(1000), nullable=True)
+    consommation_eau_ml = Column(String(1000), nullable=True)
     frequence_sport_jour_semaine = Column(String(1000), nullable=True)
     niveau_experience = Column(String(1000), nullable=True)
     erreur = Column(Text, nullable=False)
