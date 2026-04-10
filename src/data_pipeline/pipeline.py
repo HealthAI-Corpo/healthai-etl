@@ -26,7 +26,8 @@ from src.data_pipeline.downloader.file_reader import read_single_file_with_panda
 
 
 def execute_pipeline_etl(
-    pipeline: PipelineETL, override_path: str = None, rename_source: bool = True
+    pipeline: PipelineETL,
+    override_path: str = None,
 ) -> list[str]:
     """Execute the ETL flow for a pipeline definition and return output clean file paths."""
     pipeline_column_mapping = pipeline.colonnes
@@ -67,7 +68,6 @@ def execute_pipeline_etl(
             anomalies,
             pipeline,
             source_path=source_path,
-            rename_source=rename_source,
         )
         output_paths.append(path)
 
@@ -448,7 +448,7 @@ def execute_pipeline_daily_food(file_path: str = None) -> list[str]:
 
 
 def execute_pipeline_diet_recommendations_dataset(
-    file_path: str = None, rename_source: bool = True
+    file_path: str = None,
 ) -> list[str]:
     """Execute la PipelineETL pour importer le csv diet_recommendations_dataset dans la table dataset_recommendations_regime"""
     col_age = ETLColumnMapping(
@@ -904,14 +904,10 @@ def execute_pipeline_diet_recommendations_dataset(
         ],
     )
 
-    return execute_pipeline_etl(
-        pipeline, override_path=file_path, rename_source=rename_source
-    )
+    return execute_pipeline_etl(pipeline, override_path=file_path)
 
 
-def execute_pipeline_profil_sante(
-    file_path: str = None, rename_source: bool = True
-) -> list[str]:
+def execute_pipeline_profil_sante(file_path: str = None) -> list[str]:
     """Execute la PipelineETL pour peupler la table profil_sante"""
 
     col_poids_kg = ETLColumnMapping(
@@ -1068,7 +1064,8 @@ def execute_pipeline_profil_sante(
     )
 
     return execute_pipeline_etl(
-        pipeline, override_path=file_path, rename_source=rename_source
+        pipeline,
+        override_path=file_path,
     )
 
 

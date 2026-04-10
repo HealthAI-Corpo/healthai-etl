@@ -57,6 +57,5 @@ def init_db():
 
 
 if __name__ == "__main__":
-    if os.getenv("ALLOW_INIT_DB", "false").lower() == "true":
-        init_db()
+    # init_db()
     run_all_pipelines()
