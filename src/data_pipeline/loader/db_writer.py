@@ -67,13 +67,13 @@ def loader_pipeline(
     rename_source=True,
 ) -> tuple[str, str | None]:
     """Sauvegarde les fichiers clean/anomalies puis insère en base."""
-    
+
     # 1. Gestion dynamique des dossiers via DATA_DIR
     data_root = os.getenv("DATA_DIR", "data")
-    
+
     # Dossier Clean (utilisant ton utilitaire de normalisation)
     normalized_clean_folder = normalize_path(pipeline.dossier_clean_emplacement)
-    
+
     # Dossier Anomalies forcé dans data/anomalies
     normalized_anomaly_folder = os.path.join(os.getcwd(), data_root, "anomalies")
 
@@ -99,6 +99,6 @@ def loader_pipeline(
     if source_path and rename_source:
         renamed_source = mark_source_file_as_processed(source_path)
         if renamed_source:
-             print(f"Fichier source archivé : {os.path.basename(renamed_source)}")
+            print(f"Fichier source archivé : {os.path.basename(renamed_source)}")
 
     return path, renamed_source

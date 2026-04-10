@@ -26,7 +26,8 @@ from src.data_pipeline.downloader.file_reader import read_single_file_with_panda
 
 
 def execute_pipeline_etl(
-    pipeline: PipelineETL, override_path: str = None,
+    pipeline: PipelineETL,
+    override_path: str = None,
 ) -> list[str]:
     """Execute the ETL flow for a pipeline definition and return output clean file paths."""
     pipeline_column_mapping = pipeline.colonnes
@@ -903,14 +904,10 @@ def execute_pipeline_diet_recommendations_dataset(
         ],
     )
 
-    return execute_pipeline_etl(
-        pipeline, override_path=file_path
-    )
+    return execute_pipeline_etl(pipeline, override_path=file_path)
 
 
-def execute_pipeline_profil_sante(
-    file_path: str = None
-) -> list[str]:
+def execute_pipeline_profil_sante(file_path: str = None) -> list[str]:
     """Execute la PipelineETL pour peupler la table profil_sante"""
 
     col_poids_kg = ETLColumnMapping(
@@ -1067,7 +1064,8 @@ def execute_pipeline_profil_sante(
     )
 
     return execute_pipeline_etl(
-        pipeline, override_path=file_path, 
+        pipeline,
+        override_path=file_path,
     )
 
 
