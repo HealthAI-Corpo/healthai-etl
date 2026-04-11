@@ -14,5 +14,5 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 COPY . .
 
 RUN mkdir -p data/raw data/clean logs
-
-CMD ["uv", "run", "python", "src/run_pipeline.py"]
+# On lance l'API, la commande sera ecrasé par le docker-compose pour le service cron ou etl 
+CMD ["uv", "run", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
