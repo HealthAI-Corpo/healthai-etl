@@ -16,7 +16,9 @@ services:
     depends_on:
       - db
     env_file: .env
-
+    environment:
+      - DATABASE_URL=postgresql://healthai:healthai_pass@db:5432/healthai_db
+      - POSTGRES_HOST=db
     command: uv run uvicorn src.main:app --host 0.0.0.0 --port 8000
     ports:
       - "8000:8000"
