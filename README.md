@@ -13,6 +13,7 @@ Ce repository contient le pipeline de données de l'écosystème **HealthAI**. S
 
 ## Structure du Projet
 
+```text
 ├── alembic/ # Scripts de migrations SQL
 ├── data/ # Stockage local des données (raw/clean)
 ├── src/
@@ -29,6 +30,7 @@ Ce repository contient le pipeline de données de l'écosystème **HealthAI**. S
 ├── .env # Variables d'environnement
 ├── docker-compose.yml # Infrastructure complète (App, DB, Metabase)
 └── pyproject.toml # Dépendances du projet (gérées par uv)
+```
 
 ## Workflow Developpement
 
@@ -67,9 +69,18 @@ docker-compose up -d --build
 
 Pour automatiser la récupération des données Kaggle sans avoir à gérer l'environnement Python du système hôte, des scripts universels sont disponibles à la racine cron_kaggle.bat (windows)cron_kaggle.sh(Linux). Ils lancent les commandes à l'intérieur du container Docker déjà existant.
 
-Sur windows il faut avoir un plannificateur de tâche -> Créer une tâche dans Windows -> Action : Démarrer un programme -> Script : Sélectionner cron_kaggle.bat -> attention: Dans "Démarrer dans", mettre le chemin racine du projet.
+Sur windows :
 
-Sur linux mac : Ajouter une ligne au crontab -> Script : ./cron_kaggle.sh.
+- il faut avoir un plannificateur de tâche
+- Créer une tâche dans Windows
+- Action : Démarrer un programme
+- Script : Sélectionner cron_kaggle.bat
+- attention: Dans "Démarrer dans", mettre le chemin racine du projet.
+
+Sur linux mac :
+
+- Ajouter une ligne au crontab
+- Script : ./cron_kaggle.sh.
 
 ### Exécuter le pipeline manuellement
 
@@ -83,7 +94,7 @@ Récupérer la clé API sur kaggle créer son compte et aller dans les paramètr
 Pour les exercices il faut créer un compte sur https://rapidapi.com/hub pour avoir une clé API (suivre le env.example)
 se rendre sur API EDB : https://rapidapi.com/ascendapi/api/edb-with-videos-and-images-by-ascendapi/playground/apiendpoint_bafbc96b-3f58-4a76-aad0-6f8bc44d3afb
 
-uv run python src/data_pipeline/downloader/api_client.py
+- uv run python src/data_pipeline/downloader/api_client.py
 
 ### Notebook
 
@@ -92,11 +103,12 @@ Selectionner le kernel en haut a droite python 3.13 (stable pour utiliser pandas
 
 ### Linter Ruff
 
-uv run ruff format --check -> check le format
-uv run ruff format . -> formate le code
-uv run pytest -> run les test
+- uv run ruff format --check -> check le format
+- uv run ruff format . -> formate le code
+- uv run ruff check -> check les erreurs
+- uv run pytest -> run les test
 
 ### Lancement du server fast api manuellement
 
-uv run uvicorn src.server:app --reload
-pour le swagger : http://127.0.0.1:8000/docs
+- uv run uvicorn src.server:app --reload
+- URL d'accès au swagger : http://127.0.0.1:8000/docs
