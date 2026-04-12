@@ -10,6 +10,21 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+  api:
+    build: .
+    container_name: healthai_api
+    depends_on:
+      - db
+    env_file: .env
+    environment:
+      - DATABASE_URL=postgresql://healthai:healthai_pass@db:5432/healthai_db
+      - POSTGRES_HOST=db
+      - UV_LINK_MODE=copy
+    command: uv run python -m uvicorn src.server:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
   metabase:
     image: metabase/metabase:latest
     container_name: healthai_metabase

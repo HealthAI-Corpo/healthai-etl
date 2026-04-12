@@ -2,6 +2,7 @@ import os
 import requests
 import kagglehub
 import json
+import shutil
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -16,9 +17,8 @@ DATA_RAW_DIR.mkdir(parents=True, exist_ok=True)
 def download_from_kaggle(dataset_handle: str):
     """Télécharge un dataset Kaggle avec gestion d'erreurs et de cache."""
     dataset_name = dataset_handle.split("/")[-1]
-    # Test inutile prcq les fichier ont pas le meme nom que dataset_handle
     existing_files = os.listdir(DATA_RAW_DIR)
-    print(dataset_name.split(".")[0])
+    
     if any(dataset_name.split(".")[0] in f for f in existing_files):
         print(f"[SKIP] {dataset_handle} est déjà présent.")
         return
@@ -26,7 +26,7 @@ def download_from_kaggle(dataset_handle: str):
     print(f"[KAGGLE] Tentative de récupération : {dataset_handle}...")
 
     try:
-        # Téléchargement via kagglehub
+        # Téléchargement via kagglehub (stocké dans /root/.cache/... en Docker)
         path = kagglehub.dataset_download(dataset_handle)
 
         # Envoie des fichiers vers data/raw
@@ -34,7 +34,9 @@ def download_from_kaggle(dataset_handle: str):
             src = os.path.join(path, file)
             dest = os.path.join(DATA_RAW_DIR, file)
             if os.path.isfile(src):
-                os.replace(src, dest)
+                # Utilisation de shutil.move au lieu de os.replace
+                # Gère automatiquement le transfert entre différents disques/volumes
+                shutil.move(src, dest) 
                 print(f"Fichier déplacé : {dest}")
 
     except Exception as e:
