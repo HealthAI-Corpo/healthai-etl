@@ -18,7 +18,7 @@ def download_from_kaggle(dataset_handle: str):
     """Télécharge un dataset Kaggle avec gestion d'erreurs et de cache."""
     dataset_name = dataset_handle.split("/")[-1]
     existing_files = os.listdir(DATA_RAW_DIR)
-    
+
     if any(dataset_name.split(".")[0] in f for f in existing_files):
         print(f"[SKIP] {dataset_handle} est déjà présent.")
         return
@@ -36,7 +36,7 @@ def download_from_kaggle(dataset_handle: str):
             if os.path.isfile(src):
                 # Utilisation de shutil.move au lieu de os.replace
                 # Gère automatiquement le transfert entre différents disques/volumes
-                shutil.move(src, dest) 
+                shutil.move(src, dest)
                 print(f"Fichier déplacé : {dest}")
 
     except Exception as e:
