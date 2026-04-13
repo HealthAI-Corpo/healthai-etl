@@ -13,6 +13,26 @@ from src.data_pipeline.utils import (
 )
 
 
+def _is_missing_default(value: object) -> bool:
+    """Retourne True si la valeur par défaut est absente/inutilisable."""
+    if value is None:
+        return True
+
+    if isinstance(value, str) and value.strip().lower() in {
+        "",
+        "null",
+        "none",
+        "nan",
+        "na",
+    }:
+        return True
+
+    try:
+        return bool(pd.isna(value))
+    except Exception:
+        return False
+
+
 def handle_missing_values(
     df: pd.DataFrame,
     anomaly_df: pd.DataFrame,
@@ -42,7 +62,7 @@ def handle_missing_values(
             # nullable = True → laisser pd.NA
             continue
 
-        if mapping.valeur_defaut not in ["", " ", None, "null", "NULL"]:
+        if not _is_missing_default(mapping.valeur_defaut):
             # nullable = False mais valeur par défaut définie → remplacer les NA
             df_clean[col] = df_clean[col].fillna(mapping.valeur_defaut)
         else:
@@ -148,7 +168,7 @@ def convert_column_type(
             df_clean[col] = converted
             continue
 
-        if mapping.valeur_defaut not in [None, ""]:
+        if not _is_missing_default(mapping.valeur_defaut):
             # Convertir valeur par défaut dans le bon type
             try:
                 if mapping.type_donnees == TypeDonnees.INT:
@@ -347,7 +367,7 @@ def check_column_constraint(
             continue
 
         # --- Étape 1 : Vérifier que la valeur par défaut respecte les contraintes ---
-        if mapping.valeur_defaut is not None and not mapping.nullable:
+        if not mapping.nullable and not _is_missing_default(mapping.valeur_defaut):
             if _check_constraint_violation(mapping.valeur_defaut, constraint):
                 print(
                     f"[ERREUR] Colonne '{col}': La valeur par défaut '{mapping.valeur_defaut}' "
@@ -382,14 +402,11 @@ def check_column_constraint(
 
         # --- Étape 3 : Traiter les lignes invalides ---
         if mask_invalid.any():
-            if mapping.nullable:
-                # Si nullable=True: mettre les lignes invalides en NaN
-                df_clean.loc[mask_invalid, col] = pd.NA
-            elif mapping.valeur_defaut is not None:
+            if not _is_missing_default(mapping.valeur_defaut):
                 # Si nullable=False et valeur_defaut existe: remplacer par la valeur par défaut
                 df_clean.loc[mask_invalid, col] = mapping.valeur_defaut
             else:
-                # Si nullable=False et pas de valeur_defaut: mettre en anomalies et supprimer
+                # Si pas de valeur_defaut: mettre en anomalies et supprimer
                 rows_with_error = df_clean.loc[mask_invalid].copy()
                 rows_with_error["erreur"] = (
                     f"La cellule {col} ne respecte pas les contraintes de la colonne"
