@@ -8,6 +8,7 @@ from .validators import (
     check_column_constraint,
     convert_column_type,
     handle_missing_values,
+    validate_and_clean_data,
 )
 
 __all__ = [
@@ -18,4 +19,5 @@ __all__ = [
     "convert_column_type",
     "generate_anomaly_dataframe",
     "handle_missing_values",
+    "validate_and_clean_data",
 ]
