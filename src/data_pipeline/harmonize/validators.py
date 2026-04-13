@@ -1,7 +1,6 @@
 import ast
 import json
 
-import numpy as np
 import pandas as pd
 
 from src.data_pipeline.utils import (
@@ -346,7 +345,7 @@ def check_column_constraint(
     mappings: list[ETLColumnMapping],
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Vérifie les contraintes métier sur les colonnes.
-    
+
     Logique:
     1. Vérifie que la valeur par défaut respecte les contraintes (si elle existe et n'est pas nullable)
     2. Pour chaque ligne invalide:
@@ -425,12 +424,12 @@ def validate_and_clean_data(
     mappings: list[ETLColumnMapping],
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Pipeline complet de validation et nettoyage des données.
-    
+
     Encapsule les étapes suivantes:
     1. Gestion des valeurs manquantes (handle_missing_values)
     2. Conversion vers les types cibles (convert_column_type)
     3. Vérification des contraintes métier (check_column_constraint)
-    
+
     Retourne le DataFrame nettoyé et le DataFrame des anomalies.
     """
     # Étape 1 : Gérer les valeurs manquantes
@@ -444,4 +443,3 @@ def validate_and_clean_data(
     df_clean, anomalies = check_column_constraint(df_clean, anomalies, mappings)
 
     return df_clean, anomalies
-
