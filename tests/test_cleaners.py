@@ -107,19 +107,22 @@ class TestColumnMapper:
 
 class TestGenerateAnomalyDataframe:
     def test_has_erreur_column(self):
-        mappings = [make_mapping("nom", "name"), make_mapping("type_exercice", "type")]
-        result = generate_anomaly_dataframe(mappings)
+        # Passer les colonnes du DataFrame original
+        columns = ["nom", "type_exercice"]
+        result = generate_anomaly_dataframe(columns)
         assert "erreur" in result.columns
 
     def test_has_all_bdd_columns(self):
-        mappings = [make_mapping("nom", "name"), make_mapping("type_exercice", "type")]
-        result = generate_anomaly_dataframe(mappings)
+        # Passer les colonnes du DataFrame original
+        columns = ["nom", "type_exercice"]
+        result = generate_anomaly_dataframe(columns)
         assert "nom" in result.columns
         assert "type_exercice" in result.columns
 
     def test_is_empty(self):
-        mappings = [make_mapping("nom", "name")]
-        result = generate_anomaly_dataframe(mappings)
+        # Passer les colonnes du DataFrame original
+        columns = ["nom", "type_exercice"]
+        result = generate_anomaly_dataframe(columns)
         assert len(result) == 0
 
 
@@ -140,10 +143,14 @@ class TestApplyTransformations:
         return make_mapping("nom", "nom", transformations=[transfo])
 
     def test_upper_transformation(self):
-        df = pd.DataFrame({"nom": ["push-up", "squat"]})
-        anomalies = generate_anomaly_dataframe([self._make_upper_mapping()])
+        df_original = pd.DataFrame({"nom": ["push-up", "squat"], "_row_id": [0, 1]})
+        df_clean = df_original.copy()
+
+        columns = df_original.columns.tolist()
+        anomalies = generate_anomaly_dataframe(columns)
+
         result_df, result_anom = apply_transformations(
-            df, anomalies, [self._make_upper_mapping()]
+            df_clean, anomalies, [self._make_upper_mapping()], df_original
         )
         assert result_df["nom"].tolist() == ["PUSH-UP", "SQUAT"]
         assert len(result_anom) == 0
@@ -157,9 +164,16 @@ class TestApplyTransformations:
             condition_fail_behavior=ConditionFailBehavior.ERROR,
         )
         mapping = make_mapping("nom", "nom", transformations=[transfo])
-        df = pd.DataFrame({"nom": ["PUSH-UP", "SQUAT"]})
-        anomalies = generate_anomaly_dataframe([mapping])
-        result_df, _ = apply_transformations(df, anomalies, [mapping])
+
+        df_original = pd.DataFrame({"nom": ["PUSH-UP", "SQUAT"], "_row_id": [0, 1]})
+        df_clean = df_original.copy()
+
+        columns = df_original.columns.tolist()
+        anomalies = generate_anomaly_dataframe(columns)
+
+        result_df, _ = apply_transformations(
+            df_clean, anomalies, [mapping], df_original
+        )
         assert result_df["nom"].tolist() == ["push-up", "squat"]
 
     def test_multiply_transformation(self):
@@ -182,9 +196,16 @@ class TestApplyTransformations:
             unique_constraint=False,
             transformations=[transfo],
         )
-        df = pd.DataFrame({"poids": ["10", "20", "30"]})
-        anomalies = generate_anomaly_dataframe([mapping])
-        result_df, result_anom = apply_transformations(df, anomalies, [mapping])
+
+        df_original = pd.DataFrame({"poids": ["10", "20", "30"], "_row_id": [0, 1, 2]})
+        df_clean = df_original.copy()
+
+        columns = df_original.columns.tolist()
+        anomalies = generate_anomaly_dataframe(columns)
+
+        result_df, result_anom = apply_transformations(
+            df_clean, anomalies, [mapping], df_original
+        )
         assert result_df["poids"].astype(float).tolist() == [20.0, 40.0, 60.0]
 
     def test_age_to_birthdate(self):
@@ -206,9 +227,16 @@ class TestApplyTransformations:
             unique_constraint=False,
             transformations=[transfo],
         )
-        df = pd.DataFrame({"date_naissance": ["25"]})
-        anomalies = generate_anomaly_dataframe([mapping])
-        result_df, _ = apply_transformations(df, anomalies, [mapping])
+
+        df_original = pd.DataFrame({"date_naissance": ["25"], "_row_id": [0]})
+        df_clean = df_original.copy()
+
+        columns = df_original.columns.tolist()
+        anomalies = generate_anomaly_dataframe(columns)
+
+        result_df, _ = apply_transformations(
+            df_clean, anomalies, [mapping], df_original
+        )
         # La valeur doit être une date au 1er janvier (format timestamp ou date)
         val = str(result_df["date_naissance"].iloc[0])
         assert "-01-01" in val
@@ -234,8 +262,14 @@ class TestApplyTransformations:
             transformations=[transfo],
         )
         # "abc" ne peut pas être converti en numérique → anomalie
-        df = pd.DataFrame({"val": ["10", "abc", "30"]})
-        anomalies = generate_anomaly_dataframe([mapping])
-        result_df, result_anom = apply_transformations(df, anomalies, [mapping])
+        df_original = pd.DataFrame({"val": ["10", "abc", "30"], "_row_id": [0, 1, 2]})
+        df_clean = df_original.copy()
+
+        columns = df_original.columns.tolist()
+        anomalies = generate_anomaly_dataframe(columns)
+
+        result_df, result_anom = apply_transformations(
+            df_clean, anomalies, [mapping], df_original
+        )
         assert len(result_df) == 2
         assert len(result_anom) == 1

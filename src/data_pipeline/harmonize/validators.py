@@ -41,7 +41,7 @@ def handle_missing_values(
     """Gere les valeurs nulles selon nullable et valeur_defaut."""
     df_clean = df.copy()
     anomalies = anomaly_df.copy()
-    
+
     # Si pas de df_original fourni, l'utiliser comme ref (colonnes mappées)
     if df_original is None:
         df_original = df.copy()
@@ -72,8 +72,10 @@ def handle_missing_values(
         else:
             # nullable = False et pas de valeur par défaut → ce sont des anomalies
             # Utiliser _row_id pour mapper les lignes vers df_original
-            row_ids_to_keep = df_clean.loc[mask_na, '_row_id'].values
-            rows_with_error = df_original.loc[df_original['_row_id'].isin(row_ids_to_keep)].copy()
+            row_ids_to_keep = df_clean.loc[mask_na, "_row_id"].values
+            rows_with_error = df_original.loc[
+                df_original["_row_id"].isin(row_ids_to_keep)
+            ].copy()
             rows_with_error["erreur"] = f"La cellule {col} est null"
             anomalies = pd.concat([anomalies, rows_with_error], ignore_index=True)
 
@@ -114,7 +116,7 @@ def convert_column_type(
     """Convertit les colonnes vers le type cible et deplace les erreurs en anomalies."""
     df_clean = df.copy()
     anomalies = anomaly_df.copy()
-    
+
     # Si pas de df_original fourni, l'utiliser comme ref (colonnes mappées)
     if df_original is None:
         df_original = df.copy()
@@ -208,8 +210,10 @@ def convert_column_type(
                 # Mettre à jour les valeurs valides
                 df_clean.loc[~mask_invalid, col] = converted.loc[~mask_invalid]
                 # Valeur par défaut invalide : toutes les lignes invalides deviennent anomalies
-                row_ids_to_keep = df_clean.loc[mask_invalid, '_row_id'].values
-                rows_with_error = df_original.loc[df_original['_row_id'].isin(row_ids_to_keep)].copy()
+                row_ids_to_keep = df_clean.loc[mask_invalid, "_row_id"].values
+                rows_with_error = df_original.loc[
+                    df_original["_row_id"].isin(row_ids_to_keep)
+                ].copy()
                 rows_with_error["erreur"] = (
                     f"La cellule {col} n'est pas convertible et la valeur par défaut '{mapping.valeur_defaut}' est invalide"
                 )
@@ -226,8 +230,10 @@ def convert_column_type(
             df_clean[col] = converted
 
             # Identifier les lignes invalides via _row_id
-            row_ids_to_keep = df_clean.loc[mask_invalid, '_row_id'].values
-            rows_with_error = df_original.loc[df_original['_row_id'].isin(row_ids_to_keep)].copy()
+            row_ids_to_keep = df_clean.loc[mask_invalid, "_row_id"].values
+            rows_with_error = df_original.loc[
+                df_original["_row_id"].isin(row_ids_to_keep)
+            ].copy()
             rows_with_error["erreur"] = (
                 f"La cellule {col} n'est pas convertible en {mapping.type_donnees.value}"
             )
@@ -369,7 +375,7 @@ def check_column_constraint(
     """
     df_clean = df.copy()
     anomalies = anomaly_df.copy()
-    
+
     # Si pas de df_original fourni, l'utiliser comme ref (colonnes mappées)
     if df_original is None:
         df_original = df.copy()
@@ -391,8 +397,10 @@ def check_column_constraint(
                     f"ne respecte pas les contraintes. Toutes les lignes de cette colonne concernées seront en anomalies."
                 )
                 # Mettre toutes les lignes en anomalies si la valeur par défaut est invalide
-                row_ids_to_keep = df_clean['_row_id'].values
-                rows_with_error = df_original.loc[df_original['_row_id'].isin(row_ids_to_keep)].copy()
+                row_ids_to_keep = df_clean["_row_id"].values
+                rows_with_error = df_original.loc[
+                    df_original["_row_id"].isin(row_ids_to_keep)
+                ].copy()
                 rows_with_error["erreur"] = (
                     f"La colonne {col} a une valeur par défaut invalide: '{mapping.valeur_defaut}'"
                 )
@@ -425,8 +433,10 @@ def check_column_constraint(
                 df_clean.loc[mask_invalid, col] = mapping.valeur_defaut
             else:
                 # Si pas de valeur_defaut: mettre en anomalies et supprimer
-                row_ids_to_keep = df_clean.loc[mask_invalid, '_row_id'].values
-                rows_with_error = df_original.loc[df_original['_row_id'].isin(row_ids_to_keep)].copy()
+                row_ids_to_keep = df_clean.loc[mask_invalid, "_row_id"].values
+                rows_with_error = df_original.loc[
+                    df_original["_row_id"].isin(row_ids_to_keep)
+                ].copy()
                 rows_with_error["erreur"] = (
                     f"La cellule {col} ne respecte pas les contraintes de la colonne"
                 )
@@ -456,15 +466,21 @@ def validate_and_clean_data(
     # Si pas de df_original fourni, l'utiliser comme ref (colonnes mappées)
     if df_original is None:
         df_original = df.copy()
-    
+
     # Étape 1 : Gérer les valeurs manquantes
     df_clean, anomalies = handle_missing_values(df, anomaly_df, mappings, df_original)
 
     # Étape 2 : Convertir les types
-    df_clean, anomalies = convert_column_type(df_clean, anomalies, mappings, df_original)
-    df_clean, anomalies = handle_missing_values(df_clean, anomalies, mappings, df_original)
+    df_clean, anomalies = convert_column_type(
+        df_clean, anomalies, mappings, df_original
+    )
+    df_clean, anomalies = handle_missing_values(
+        df_clean, anomalies, mappings, df_original
+    )
 
     # Étape 3 : Vérifier les contraintes
-    df_clean, anomalies = check_column_constraint(df_clean, anomalies, mappings, df_original)
+    df_clean, anomalies = check_column_constraint(
+        df_clean, anomalies, mappings, df_original
+    )
 
     return df_clean, anomalies

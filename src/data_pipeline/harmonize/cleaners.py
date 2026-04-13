@@ -30,7 +30,7 @@ def column_mapper(df: pd.DataFrame, mappings: list[ETLColumnMapping]) -> pd.Data
 def generate_anomaly_dataframe(columns) -> pd.DataFrame:
     """Construit le DataFrame standard d'anomalies avec les colonnes du fichier original + erreur."""
     anomaly_columns = list(columns) + ["erreur"]
-    
+
     return pd.DataFrame(columns=anomaly_columns)
 
 
@@ -119,8 +119,8 @@ def add_to_anomalies(
         return anomalies
 
     # Utiliser _row_id pour mapper df_clean vers df_original
-    row_ids_to_keep = df_clean.loc[mask, '_row_id'].values
-    rows = df_original.loc[df_original['_row_id'].isin(row_ids_to_keep)].copy()
+    row_ids_to_keep = df_clean.loc[mask, "_row_id"].values
+    rows = df_original.loc[df_original["_row_id"].isin(row_ids_to_keep)].copy()
     rows["erreur"] = message
     return pd.concat([anomalies, rows], ignore_index=True)
 
@@ -422,7 +422,10 @@ def convert_series(series: pd.Series, target_type: str) -> pd.Series:
 
 
 def apply_transformations(
-    df: pd.DataFrame, anomalies: pd.DataFrame, mappings: list[ETLColumnMapping], df_original: pd.DataFrame = None
+    df: pd.DataFrame,
+    anomalies: pd.DataFrame,
+    mappings: list[ETLColumnMapping],
+    df_original: pd.DataFrame = None,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Applique toutes les transformations définies dans les mappings sur un DataFrame.

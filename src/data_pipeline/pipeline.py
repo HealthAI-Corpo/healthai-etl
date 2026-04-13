@@ -49,18 +49,18 @@ def execute_pipeline_etl(
     for source_path, df in files_with_df:
         try:
             # Colonnes à exclure
-            cols_a_supprimer = ['_row_id', 'erreur']
+            cols_a_supprimer = ["_row_id", "erreur"]
 
             # Garder le DF original sans ces colonnes
-            df_original = df.drop(columns=cols_a_supprimer, errors='ignore').copy()
-            
+            df_original = df.drop(columns=cols_a_supprimer, errors="ignore").copy()
+
             # Ajouter une colonne de traçage pour maintenir l'alignement après reset_index()
-            df_original['_row_id'] = range(len(df_original))
-            
+            df_original["_row_id"] = range(len(df_original))
+
             df_clean = column_mapper(df, pipeline_column_mapping)
             # Ajouter la même colonne de traçage à df_clean
-            df_clean['_row_id'] = range(len(df_clean))
-            
+            df_clean["_row_id"] = range(len(df_clean))
+
             anomalies = generate_anomaly_dataframe(df_original.columns)
 
             df_clean = clean_txt(df_clean)
@@ -70,10 +70,10 @@ def execute_pipeline_etl(
             df_clean, anomalies = validate_and_clean_data(
                 df_clean, anomalies, pipeline_column_mapping, df_original
             )
-            
+
             # Enlever la colonne de traçage avant de sauvegarder
-            df_clean = df_clean.drop(columns=['_row_id'], errors='ignore')
-            anomalies = anomalies.drop(columns=['_row_id'], errors='ignore')
+            df_clean = df_clean.drop(columns=["_row_id"], errors="ignore")
+            anomalies = anomalies.drop(columns=["_row_id"], errors="ignore")
 
             path, _ = loader_pipeline(
                 df_clean,
@@ -83,8 +83,10 @@ def execute_pipeline_etl(
             )
             output_paths.append(path)
         except Exception as e:
-            logger.error(f"Erreur lors du traitement du fichier {source_path}: {type(e).__name__}: {str(e)}", exc_info=True)
-
+            logger.error(
+                f"Erreur lors du traitement du fichier {source_path}: {type(e).__name__}: {str(e)}",
+                exc_info=True,
+            )
 
     return output_paths
 
