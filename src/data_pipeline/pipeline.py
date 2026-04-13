@@ -1863,3 +1863,58 @@ def execute_pipeline_dataset_historique_seance_exercice_synthetic_data(
     )
 
     return execute_pipeline_etl(pipeline, override_path=file_path)
+
+
+def run_all_pipelines() -> dict:
+    """Execute tous les pipelines ETL disponibles et retourne les résultats."""
+    print("Démarrage de la suite ETL complète...")
+    results = {}
+
+    try:
+        results["exercices"] = execute_pipeline_exercisedb_hobby()
+        print(f"✅ Exercices traités : {results['exercices']}")
+    except Exception as e:
+        print(f"❌ Erreur pipeline exercices : {e}")
+        results["exercices"] = {"error": str(e)}
+
+    try:
+        results["diet_recommendations"] = (
+            execute_pipeline_diet_recommendations_dataset()
+        )
+        print(
+            f"✅ diet_recommendations_dataset traités : {results['diet_recommendations']}"
+        )
+    except Exception as e:
+        print(f"❌ Erreur pipeline diet_recommendations : {e}")
+        results["diet_recommendations"] = {"error": str(e)}
+
+    try:
+        results["daily_food"] = execute_pipeline_daily_food()
+        print(f"✅ pipeline_daily_food traités : {results['daily_food']}")
+    except Exception as e:
+        print(f"❌ Erreur pipeline daily_food : {e}")
+        results["daily_food"] = {"error": str(e)}
+
+    try:
+        results["historique_seance"] = (
+            execute_pipeline_dataset_historique_seance_exercice()
+        )
+        print(
+            f"✅ dataset_historique_seance_exercice traités : {results['historique_seance']}"
+        )
+    except Exception as e:
+        print(f"❌ Erreur pipeline historique_seance : {e}")
+        results["historique_seance"] = {"error": str(e)}
+
+    try:
+        results["historique_seance_synthetic"] = (
+            execute_pipeline_dataset_historique_seance_exercice_synthetic_data()
+        )
+        print(
+            f"✅ dataset_historique_seance_exercice_synthetic_data traités : {results['historique_seance_synthetic']}"
+        )
+    except Exception as e:
+        print(f"❌ Erreur pipeline historique_seance_synthetic : {e}")
+        results["historique_seance_synthetic"] = {"error": str(e)}
+
+    return results
