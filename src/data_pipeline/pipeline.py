@@ -1878,8 +1878,12 @@ def run_all_pipelines() -> dict:
         results["exercices"] = {"error": str(e)}
 
     try:
-        results["diet_recommendations"] = execute_pipeline_diet_recommendations_dataset()
-        print(f"✅ diet_recommendations_dataset traités : {results['diet_recommendations']}")
+        results["diet_recommendations"] = (
+            execute_pipeline_diet_recommendations_dataset()
+        )
+        print(
+            f"✅ diet_recommendations_dataset traités : {results['diet_recommendations']}"
+        )
     except Exception as e:
         print(f"❌ Erreur pipeline diet_recommendations : {e}")
         results["diet_recommendations"] = {"error": str(e)}
@@ -1892,8 +1896,12 @@ def run_all_pipelines() -> dict:
         results["daily_food"] = {"error": str(e)}
 
     try:
-        results["historique_seance"] = execute_pipeline_dataset_historique_seance_exercice()
-        print(f"✅ dataset_historique_seance_exercice traités : {results['historique_seance']}")
+        results["historique_seance"] = (
+            execute_pipeline_dataset_historique_seance_exercice()
+        )
+        print(
+            f"✅ dataset_historique_seance_exercice traités : {results['historique_seance']}"
+        )
     except Exception as e:
         print(f"❌ Erreur pipeline historique_seance : {e}")
         results["historique_seance"] = {"error": str(e)}

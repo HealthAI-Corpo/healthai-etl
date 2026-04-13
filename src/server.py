@@ -69,7 +69,7 @@ async def upload_file(
 async def run_pipeline(pipeline_type: str, background_tasks: BackgroundTasks):
     """Endpoint pour exécuter un pipeline spécifique sans fichier uploadé.
     Le pipeline scanera les fichiers du dossier raw selon sa configuration."""
-    
+
     if pipeline_type == "exercices":
         background_tasks.add_task(execute_pipeline_exercisedb_hobby)
     elif pipeline_type == "aliments":
@@ -85,12 +85,15 @@ async def run_pipeline(pipeline_type: str, background_tasks: BackgroundTasks):
     else:
         raise HTTPException(status_code=400, detail="Type de pipeline inconnu.")
 
-    return {"message": f"Exécution du pipeline '{pipeline_type}' lancée en arrière-plan"}
-
+    return {
+        "message": f"Exécution du pipeline '{pipeline_type}' lancée en arrière-plan"
+    }
 
 
 @app.post("/run-all", status_code=202)
 async def run_all_pipelines_endpoint(background_tasks: BackgroundTasks):
     """Endpoint pour exécuter tous les pipelines ETL en arrière-plan."""
     background_tasks.add_task(run_all_pipelines)
-    return {"message": "Exécution complète de tous les pipelines lancée en arrière-plan"}
+    return {
+        "message": "Exécution complète de tous les pipelines lancée en arrière-plan"
+    }
