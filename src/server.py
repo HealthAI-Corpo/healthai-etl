@@ -10,6 +10,7 @@ from src.data_pipeline.pipeline import (
     execute_pipeline_exercisedb_hobby,
     execute_pipeline_dataset_historique_seance_exercice,
     execute_pipeline_dataset_historique_seance_exercice_synthetic_data,
+    run_all_pipelines,
 )
 
 load_dotenv()
@@ -62,3 +63,34 @@ async def upload_file(
         raise HTTPException(status_code=400, detail="Type de pipeline inconnu.")
 
     return {"message": "Fichier reçu, traitement lancé", "file": file.filename}
+
+
+@app.post("/run/{pipeline_type}", status_code=202)
+async def run_pipeline(pipeline_type: str, background_tasks: BackgroundTasks):
+    """Endpoint pour exécuter un pipeline spécifique sans fichier uploadé.
+    Le pipeline scanera les fichiers du dossier raw selon sa configuration."""
+    
+    if pipeline_type == "exercices":
+        background_tasks.add_task(execute_pipeline_exercisedb_hobby)
+    elif pipeline_type == "aliments":
+        background_tasks.add_task(execute_pipeline_daily_food)
+    elif pipeline_type == "recommendations":
+        background_tasks.add_task(execute_pipeline_diet_recommendations_dataset)
+    elif pipeline_type == "historique_seance":
+        background_tasks.add_task(execute_pipeline_dataset_historique_seance_exercice)
+    elif pipeline_type == "historique_seance_synthetic":
+        background_tasks.add_task(
+            execute_pipeline_dataset_historique_seance_exercice_synthetic_data
+        )
+    else:
+        raise HTTPException(status_code=400, detail="Type de pipeline inconnu.")
+
+    return {"message": f"Exécution du pipeline '{pipeline_type}' lancée en arrière-plan"}
+
+
+
+@app.post("/run-all", status_code=202)
+async def run_all_pipelines_endpoint(background_tasks: BackgroundTasks):
+    """Endpoint pour exécuter tous les pipelines ETL en arrière-plan."""
+    background_tasks.add_task(run_all_pipelines)
+    return {"message": "Exécution complète de tous les pipelines lancée en arrière-plan"}
