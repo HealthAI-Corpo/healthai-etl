@@ -1,12 +1,10 @@
 from src.data_pipeline.downloader import get_df_matched_files
 from src.data_pipeline.harmonize import (
     apply_transformations,
-    check_column_constraint,
     clean_txt,
     column_mapper,
-    convert_column_type,
     generate_anomaly_dataframe,
-    handle_missing_values,
+    validate_and_clean_data,
 )
 from src.data_pipeline.loader import loader_pipeline
 from src.data_pipeline.utils import (
@@ -53,13 +51,7 @@ def execute_pipeline_etl(
         df_clean, anomalies = apply_transformations(
             df_clean, anomalies, pipeline_column_mapping
         )
-        df_clean, anomalies = handle_missing_values(
-            df_clean, anomalies, pipeline_column_mapping
-        )
-        df_clean, anomalies = convert_column_type(
-            df_clean, anomalies, pipeline_column_mapping
-        )
-        df_clean, anomalies = check_column_constraint(
+        df_clean, anomalies = validate_and_clean_data(
             df_clean, anomalies, pipeline_column_mapping
         )
 

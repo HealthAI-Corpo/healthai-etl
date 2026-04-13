@@ -42,7 +42,7 @@ def handle_missing_values(
             # nullable = True → laisser pd.NA
             continue
 
-        if mapping.valeur_defaut not in ["", " ", None, "null", "NULL", np.nan]:
+        if mapping.valeur_defaut not in ["", " ", None, "null", "NULL"]:
             # nullable = False mais valeur par défaut définie → remplacer les NA
             df_clean[col] = df_clean[col].fillna(mapping.valeur_defaut)
         else:
@@ -145,11 +145,10 @@ def convert_column_type(
         # Si valeur null ok alors ne rien faire de plus
         if mapping.nullable:
             # On laisse les NaN
-            print("On laisse les NaN")
             df_clean[col] = converted
             continue
 
-        if mapping.valeur_defaut not in [None, "", np.nan]:
+        if mapping.valeur_defaut not in [None, ""]:
             # Convertir valeur par défaut dans le bon type
             try:
                 if mapping.type_donnees == TypeDonnees.INT:
@@ -274,12 +273,67 @@ def _build_date_constraint_mask(
     return mask_invalid
 
 
+def _check_constraint_violation(
+    value: object, constraint: NumericConstraint | StringConstraint | DateConstraint
+) -> bool:
+    """Return TRUE si une valeur par défaut viole une contrainte"""
+    if isinstance(constraint, NumericConstraint):
+        try:
+            numeric_value = pd.to_numeric(value)
+        except (ValueError, TypeError):
+            return True
+
+        if constraint.nb_min is not None and numeric_value < constraint.nb_min:
+            return True
+        if constraint.nb_max is not None and numeric_value > constraint.nb_max:
+            return True
+        if constraint.nb_decimal is not None:
+            s = str(value).strip()
+            if "." in s:
+                if len(s.split(".")[-1]) > constraint.nb_decimal:
+                    return True
+        return False
+
+    elif isinstance(constraint, StringConstraint):
+        str_value = str(value)
+        str_len = len(str_value)
+        if constraint.min_length is not None and str_len < constraint.min_length:
+            return True
+        if constraint.max_length is not None and str_len > constraint.max_length:
+            return True
+        return False
+
+    elif isinstance(constraint, DateConstraint):
+        try:
+            dt_value = pd.to_datetime(value)
+        except (ValueError, TypeError):
+            return True
+
+        if constraint.date_min is not None:
+            if dt_value < pd.to_datetime(constraint.date_min):
+                return True
+        if constraint.date_max is not None:
+            if dt_value > pd.to_datetime(constraint.date_max):
+                return True
+        return False
+
+    return False
+
+
 def check_column_constraint(
     df: pd.DataFrame,
     anomaly_df: pd.DataFrame,
     mappings: list[ETLColumnMapping],
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Verifie les contraintes metier et deplace les lignes invalides en anomalies."""
+    """Vérifie les contraintes métier sur les colonnes.
+    
+    Logique:
+    1. Vérifie que la valeur par défaut respecte les contraintes (si elle existe et n'est pas nullable)
+    2. Pour chaque ligne invalide:
+       - Si nullable=True: remplace par pd.NA
+       - Si nullable=False et valeur_defaut existe: remplace par valeur_defaut
+       - Si nullable=False et pas de valeur_defaut: met en anomalies et supprimer du df_clean
+    """
     df_clean = df.copy()
     anomalies = anomaly_df.copy()
 
@@ -292,42 +346,85 @@ def check_column_constraint(
         if constraint is None:
             continue
 
-        # Série sur le DataFrame courant (qui peut changer après suppression de lignes)
+        # --- Étape 1 : Vérifier que la valeur par défaut respecte les contraintes ---
+        if mapping.valeur_defaut is not None and not mapping.nullable:
+            if _check_constraint_violation(mapping.valeur_defaut, constraint):
+                print(
+                    f"[ERREUR] Colonne '{col}': La valeur par défaut '{mapping.valeur_defaut}' "
+                    f"ne respecte pas les contraintes. Toutes les lignes de cette colonne concernées seront en anomalies."
+                )
+                # Mettre toutes les lignes en anomalies si la valeur par défaut est invalide
+                rows_with_error = df_clean.copy()
+                rows_with_error["erreur"] = (
+                    f"La colonne {col} a une valeur par défaut invalide: '{mapping.valeur_defaut}'"
+                )
+                anomalies = pd.concat([anomalies, rows_with_error], ignore_index=True)
+                df_clean = pd.DataFrame(columns=df_clean.columns)
+                continue
+
+        # --- Étape 2 : Construire le masque des lignes invalides ---
         series = df_clean[col]
 
-        # --- Contraintes NUMERIC (INT/DECIMAL) ---
         if isinstance(constraint, NumericConstraint):
             mask_invalid = _build_numeric_constraint_mask(
                 series, constraint, df_clean.index
             )
-
-        # --- Contraintes STRING / ARRAY stringifiées ---
         elif isinstance(constraint, StringConstraint):
             mask_invalid = _build_string_constraint_mask(
                 series, constraint, df_clean.index
             )
-
-        # --- Contraintes DATE/TIMESTAMP ---
         elif isinstance(constraint, DateConstraint):
             mask_invalid = _build_date_constraint_mask(
                 series, constraint, df_clean.index
             )
-
-        # BOOLEAN : pas de contrainte dédiée
         else:
             continue
 
+        # --- Étape 3 : Traiter les lignes invalides ---
         if mask_invalid.any():
-            rows_with_error = df_clean.loc[mask_invalid].copy()
-            rows_with_error["erreur"] = (
-                f"La cellule {col} ne respecte pas les contraintes de la colonne"
-            )
-            anomalies = pd.concat([anomalies, rows_with_error], ignore_index=True)
-
-            # Supprimer les lignes invalides
-            df_clean = df_clean.loc[~mask_invalid].copy()
-
+            if mapping.nullable:
+                # Si nullable=True: mettre les lignes invalides en NaN
+                df_clean.loc[mask_invalid, col] = pd.NA
+            elif mapping.valeur_defaut is not None:
+                # Si nullable=False et valeur_defaut existe: remplacer par la valeur par défaut
+                df_clean.loc[mask_invalid, col] = mapping.valeur_defaut
+            else:
+                # Si nullable=False et pas de valeur_defaut: mettre en anomalies et supprimer
+                rows_with_error = df_clean.loc[mask_invalid].copy()
+                rows_with_error["erreur"] = (
+                    f"La cellule {col} ne respecte pas les contraintes de la colonne"
+                )
+                anomalies = pd.concat([anomalies, rows_with_error], ignore_index=True)
+                df_clean = df_clean.loc[~mask_invalid].copy()
     df_clean.reset_index(drop=True, inplace=True)
     anomalies.reset_index(drop=True, inplace=True)
 
     return df_clean, anomalies
+
+
+def validate_and_clean_data(
+    df: pd.DataFrame,
+    anomaly_df: pd.DataFrame,
+    mappings: list[ETLColumnMapping],
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Pipeline complet de validation et nettoyage des données.
+    
+    Encapsule les étapes suivantes:
+    1. Gestion des valeurs manquantes (handle_missing_values)
+    2. Conversion vers les types cibles (convert_column_type)
+    3. Vérification des contraintes métier (check_column_constraint)
+    
+    Retourne le DataFrame nettoyé et le DataFrame des anomalies.
+    """
+    # Étape 1 : Gérer les valeurs manquantes
+    df_clean, anomalies = handle_missing_values(df, anomaly_df, mappings)
+
+    # Étape 2 : Convertir les types
+    df_clean, anomalies = convert_column_type(df_clean, anomalies, mappings)
+    df_clean, anomalies = handle_missing_values(df_clean, anomalies, mappings)
+
+    # Étape 3 : Vérifier les contraintes
+    df_clean, anomalies = check_column_constraint(df_clean, anomalies, mappings)
+
+    return df_clean, anomalies
+
