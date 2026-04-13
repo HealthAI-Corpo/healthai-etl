@@ -1,3 +1,4 @@
+import logging
 from src.data_pipeline.downloader import get_df_matched_files
 from src.data_pipeline.harmonize import (
     apply_transformations,
@@ -22,6 +23,8 @@ from src.data_pipeline.utils import (
 )
 from src.data_pipeline.downloader.file_reader import read_single_file_with_pandas
 
+logger = logging.getLogger(__name__)
+
 
 def execute_pipeline_etl(
     pipeline: PipelineETL,
@@ -44,24 +47,44 @@ def execute_pipeline_etl(
     output_paths: list[str] = []
 
     for source_path, df in files_with_df:
-        df_clean = column_mapper(df, pipeline_column_mapping)
-        anomalies = generate_anomaly_dataframe(pipeline_column_mapping)
+        try:
+            # Colonnes à exclure
+            cols_a_supprimer = ['_row_id', 'erreur']
 
-        df_clean = clean_txt(df_clean)
-        df_clean, anomalies = apply_transformations(
-            df_clean, anomalies, pipeline_column_mapping
-        )
-        df_clean, anomalies = validate_and_clean_data(
-            df_clean, anomalies, pipeline_column_mapping
-        )
+            # Garder le DF original sans ces colonnes
+            df_original = df.drop(columns=cols_a_supprimer, errors='ignore').copy()
+            
+            # Ajouter une colonne de traçage pour maintenir l'alignement après reset_index()
+            df_original['_row_id'] = range(len(df_original))
+            
+            df_clean = column_mapper(df, pipeline_column_mapping)
+            # Ajouter la même colonne de traçage à df_clean
+            df_clean['_row_id'] = range(len(df_clean))
+            
+            anomalies = generate_anomaly_dataframe(df_original.columns)
 
-        path, _ = loader_pipeline(
-            df_clean,
-            anomalies,
-            pipeline,
-            source_path=source_path,
-        )
-        output_paths.append(path)
+            df_clean = clean_txt(df_clean)
+            df_clean, anomalies = apply_transformations(
+                df_clean, anomalies, pipeline_column_mapping, df_original
+            )
+            df_clean, anomalies = validate_and_clean_data(
+                df_clean, anomalies, pipeline_column_mapping, df_original
+            )
+            
+            # Enlever la colonne de traçage avant de sauvegarder
+            df_clean = df_clean.drop(columns=['_row_id'], errors='ignore')
+            anomalies = anomalies.drop(columns=['_row_id'], errors='ignore')
+
+            path, _ = loader_pipeline(
+                df_clean,
+                anomalies,
+                pipeline,
+                source_path=source_path,
+            )
+            output_paths.append(path)
+        except Exception as e:
+            logger.error(f"Erreur lors du traitement du fichier {source_path}: {type(e).__name__}: {str(e)}", exc_info=True)
+
 
     return output_paths
 
