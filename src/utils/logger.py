@@ -41,3 +41,5 @@ def configure_logging():
             )
 
     logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
+
+all = ["configure_logging", "logger"]
