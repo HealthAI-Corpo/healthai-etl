@@ -13,6 +13,7 @@ from src.data_pipeline.pipeline import (
     execute_pipeline_dataset_historique_seance_exercice_synthetic_data,
     run_all_pipelines,
 )
+from src.data_pipeline.downloader.api_client import run_downloader
 from src.utils.logger import configure_logging, logger
 
 load_dotenv()
@@ -89,6 +90,20 @@ async def upload_file(
         )
         raise HTTPException(status_code=400, detail="Format non supporté.")
 
+    # Dictionnaire des pipelines disponibles
+    pipelines = {
+        "exercices": execute_pipeline_exercisedb_hobby,
+        "aliments": execute_pipeline_daily_food,
+        "recommendations": execute_pipeline_diet_recommendations_dataset,
+        "historique_seance": execute_pipeline_dataset_historique_seance_exercice,
+        "historique_seance_synthetic": execute_pipeline_dataset_historique_seance_exercice_synthetic_data,
+    }
+
+    # validation du type de pipeline AVANT la sauvegarde
+    if pipeline_type not in pipelines:
+        logger.warning("Type de pipeline inconnu | Type : {}", pipeline_type)
+        raise HTTPException(status_code=400, detail="Type de pipeline inconnu.")
+
     # sauvegarde du fichier
     dest = DATA_RAW_DIR / file.filename
     try:
@@ -104,45 +119,13 @@ async def upload_file(
         )
         raise HTTPException(status_code=500, detail=f"Erreur d'écriture : {e}")
 
-    # selection du pipeline exercices ou les autres
-    if pipeline_type == "exercices":
-        background_tasks.add_task(execute_pipeline_exercisedb_hobby, str(dest))
-        logger.info(
-            "Pipeline 'exercices' lancé en arrière-plan | Fichier : {}", file.filename
-        )
-    elif pipeline_type == "aliments":
-        background_tasks.add_task(execute_pipeline_daily_food, str(dest))
-        logger.info(
-            "Pipeline 'aliments' lancé en arrière-plan | Fichier : {}", file.filename
-        )
-    elif pipeline_type == "recommendations":
-        background_tasks.add_task(
-            execute_pipeline_diet_recommendations_dataset, str(dest)
-        )
-        logger.info(
-            "Pipeline 'recommendations' lancé en arrière-plan | Fichier : {}",
-            file.filename,
-        )
-    elif pipeline_type == "historique_seance":
-        background_tasks.add_task(
-            execute_pipeline_dataset_historique_seance_exercice, str(dest)
-        )
-        logger.info(
-            "Pipeline 'historique_seance' lancé en arrière-plan | Fichier : {}",
-            file.filename,
-        )
-    elif pipeline_type == "historique_seance_synthetic":
-        background_tasks.add_task(
-            execute_pipeline_dataset_historique_seance_exercice_synthetic_data,
-            str(dest),
-        )
-        logger.info(
-            "Pipeline 'historique_seance_synthetic' lancé en arrière-plan | Fichier : {}",
-            file.filename,
-        )
-    else:
-        logger.warning("Type de pipeline inconnu | Type : {}", pipeline_type)
-        raise HTTPException(status_code=400, detail="Type de pipeline inconnu.")
+    # Exécution du pipeline
+    background_tasks.add_task(pipelines[pipeline_type], str(dest))
+    logger.info(
+        "Pipeline '{}' lancé en arrière-plan | Fichier : {}",
+        pipeline_type,
+        file.filename,
+    )
 
     return {"message": "Fichier reçu, traitement lancé", "file": file.filename}
 
@@ -187,3 +170,11 @@ async def run_all_pipelines_endpoint(background_tasks: BackgroundTasks):
     return {
         "message": "Exécution complète de tous les pipelines lancée en arrière-plan"
     }
+
+
+@app.post("/run-download", status_code=202)
+async def run_download(background_tasks: BackgroundTasks):
+    """Endpoint pour exécuter la phase EXTRACT (téléchargement des données)."""
+    logger.info("Exécution du téléchargement des données lancée")
+    background_tasks.add_task(run_downloader)
+    return {"message": "Exécution du téléchargement des données lancée en arrière-plan"}

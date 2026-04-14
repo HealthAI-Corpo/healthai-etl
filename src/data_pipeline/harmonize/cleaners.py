@@ -14,6 +14,25 @@ from src.data_pipeline.utils import (
 )
 
 
+def validate_required_columns(
+    df: pd.DataFrame, mappings: list[ETLColumnMapping]
+) -> tuple[bool, list[str]]:
+    """
+    Valide que toutes les colonnes obligatoires (in_file=True) existent dans le fichier.
+
+    Retourne:
+        - (True, []) si toutes les colonnes obligatoires existent
+        - (False, [liste_colonnes_manquantes]) sinon
+    """
+    missing_columns = []
+
+    for mapping in mappings:
+        if mapping.in_file and mapping.colonne_fichier not in df.columns:
+            missing_columns.append(mapping.colonne_fichier)
+
+    return len(missing_columns) == 0, missing_columns
+
+
 def column_mapper(df: pd.DataFrame, mappings: list[ETLColumnMapping]) -> pd.DataFrame:
     """Projette et renomme les colonnes selon le mapping de pipeline."""
     result = pd.DataFrame()
