@@ -1,3 +1,5 @@
+import os
+
 from src.data_pipeline.downloader import get_df_matched_files
 from src.data_pipeline.harmonize import (
     apply_transformations,
@@ -5,8 +7,9 @@ from src.data_pipeline.harmonize import (
     column_mapper,
     generate_anomaly_dataframe,
     validate_and_clean_data,
+    validate_required_columns,
 )
-from src.data_pipeline.loader import loader_pipeline
+from src.data_pipeline.loader import loader_pipeline, log_etl_validation_error
 from src.data_pipeline.utils import (
     ConditionFailBehavior,
     ETLColumnMapping,
@@ -46,6 +49,17 @@ def execute_pipeline_etl(
 
     for source_path, df in files_with_df:
         try:
+            # VALIDATION: Vérifier que toutes les colonnes obligatoires existent
+            is_valid, missing_columns = validate_required_columns(
+                df, pipeline_column_mapping
+            )
+            if not is_valid:
+                error_msg = (
+                    f"Colonnes obligatoires manquantes dans le fichier {source_path}: "
+                    f"{', '.join(missing_columns)}"
+                )
+                raise ValueError(error_msg)
+
             # Colonnes à exclure
             cols_a_supprimer = ["_row_id", "erreur"]
 
@@ -80,6 +94,16 @@ def execute_pipeline_etl(
                 source_path=source_path,
             )
             output_paths.append(path)
+        except ValueError as e:
+            # Erreur de validation (ex: colonnes manquantes)
+            error_msg = str(e)
+            logger.error(error_msg)
+            log_etl_validation_error(
+                libelle_pipeline=pipeline.libelle,
+                fichier_nom=os.path.basename(source_path) if source_path else "unknown",
+                error_message=error_msg,
+                source_path=source_path,
+            )
         except Exception:
             logger.exception(f"Erreur lors du traitement du fichier {source_path}")
 

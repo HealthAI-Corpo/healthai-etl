@@ -3,6 +3,7 @@ from .cleaners import (
     clean_txt,
     column_mapper,
     generate_anomaly_dataframe,
+    validate_required_columns,
 )
 from .validators import (
     check_column_constraint,
@@ -20,4 +21,5 @@ __all__ = [
     "generate_anomaly_dataframe",
     "handle_missing_values",
     "validate_and_clean_data",
+    "validate_required_columns",
 ]

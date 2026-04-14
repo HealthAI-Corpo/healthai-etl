@@ -131,6 +131,44 @@ def log_etl_execution(
         session.close()
 
 
+def log_etl_validation_error(
+    libelle_pipeline: str,
+    fichier_nom: str,
+    error_message: str,
+    source_path: str | None = None,
+) -> None:
+    """Enregistre une erreur de validation du pipeline dans la table EtlLog."""
+    fichier_nom_final = os.path.basename(source_path) if source_path else fichier_nom
+
+    session = SessionLocal()
+    try:
+        etl_log = EtlLog(
+            libelle_pipeline=libelle_pipeline,
+            fichier_nom=fichier_nom_final,
+            nb_lignes_total=0,
+            nb_lignes_valides=0,
+            nb_lignes_anomalies=0,
+            statut=StatutEtlEnum.FAILURE,
+            message=error_message,
+        )
+        session.add(etl_log)
+        session.commit()
+        logger.info(
+            "Erreur de validation enregistrée en EtlLog | Pipeline : {} | Message : {}",
+            libelle_pipeline,
+            error_message,
+        )
+    except SQLAlchemyError as e:
+        session.rollback()
+        logger.error(
+            "Impossible d'enregistrer l'erreur de validation en EtlLog | Pipeline : {} | Erreur : {}",
+            libelle_pipeline,
+            str(e),
+        )
+    finally:
+        session.close()
+
+
 def loader_pipeline(
     df: pd.DataFrame,
     anomalies: pd.DataFrame,

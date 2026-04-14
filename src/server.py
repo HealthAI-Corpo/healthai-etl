@@ -122,7 +122,9 @@ async def upload_file(
     # Exécution du pipeline
     background_tasks.add_task(pipelines[pipeline_type], str(dest))
     logger.info(
-        "Pipeline '{}' lancé en arrière-plan | Fichier : {}", pipeline_type, file.filename
+        "Pipeline '{}' lancé en arrière-plan | Fichier : {}",
+        pipeline_type,
+        file.filename,
     )
 
     return {"message": "Fichier reçu, traitement lancé", "file": file.filename}
