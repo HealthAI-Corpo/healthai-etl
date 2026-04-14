@@ -1,4 +1,3 @@
-import logging
 from src.data_pipeline.downloader import get_df_matched_files
 from src.data_pipeline.harmonize import (
     apply_transformations,
@@ -22,8 +21,7 @@ from src.data_pipeline.utils import (
     ConditionOperator,
 )
 from src.data_pipeline.downloader.file_reader import read_single_file_with_pandas
-
-logger = logging.getLogger(__name__)
+from src.utils.logger import logger
 
 
 def execute_pipeline_etl(
@@ -82,11 +80,8 @@ def execute_pipeline_etl(
                 source_path=source_path,
             )
             output_paths.append(path)
-        except Exception as e:
-            logger.error(
-                f"Erreur lors du traitement du fichier {source_path}: {type(e).__name__}: {str(e)}",
-                exc_info=True,
-            )
+        except Exception:
+            logger.exception(f"Erreur lors du traitement du fichier {source_path}")
 
     return output_paths
 
@@ -1884,54 +1879,27 @@ def execute_pipeline_dataset_historique_seance_exercice_synthetic_data(
 
 def run_all_pipelines() -> dict:
     """Execute tous les pipelines ETL disponibles et retourne les résultats."""
-    print("Démarrage de la suite ETL complète...")
+
+    logger.info("Démarrage de la suite ETL complète...")
+
     results = {}
 
-    try:
-        results["exercices"] = execute_pipeline_exercisedb_hobby()
-        print(f"✅ Exercices traités : {results['exercices']}")
-    except Exception as e:
-        print(f"❌ Erreur pipeline exercices : {e}")
-        results["exercices"] = {"error": str(e)}
+    pipelines = {
+        "exercices": execute_pipeline_exercisedb_hobby,
+        "diet_recommendations": execute_pipeline_diet_recommendations_dataset,
+        "daily_food": execute_pipeline_daily_food,
+        "historique_seance": execute_pipeline_dataset_historique_seance_exercice,
+        "historique_seance_synthetic": execute_pipeline_dataset_historique_seance_exercice_synthetic_data,
+    }
 
-    try:
-        results["diet_recommendations"] = (
-            execute_pipeline_diet_recommendations_dataset()
-        )
-        print(
-            f"✅ diet_recommendations_dataset traités : {results['diet_recommendations']}"
-        )
-    except Exception as e:
-        print(f"❌ Erreur pipeline diet_recommendations : {e}")
-        results["diet_recommendations"] = {"error": str(e)}
+    for name, func in pipelines.items():
+        try:
+            results[name] = func()
+            logger.info(f"Pipeline {name} terminé avec succès → {results[name]}")
+        except Exception:
+            logger.exception(f"Erreur pipeline {name}")
+            results[name] = {"error": True}
 
-    try:
-        results["daily_food"] = execute_pipeline_daily_food()
-        print(f"✅ pipeline_daily_food traités : {results['daily_food']}")
-    except Exception as e:
-        print(f"❌ Erreur pipeline daily_food : {e}")
-        results["daily_food"] = {"error": str(e)}
-
-    try:
-        results["historique_seance"] = (
-            execute_pipeline_dataset_historique_seance_exercice()
-        )
-        print(
-            f"✅ dataset_historique_seance_exercice traités : {results['historique_seance']}"
-        )
-    except Exception as e:
-        print(f"❌ Erreur pipeline historique_seance : {e}")
-        results["historique_seance"] = {"error": str(e)}
-
-    try:
-        results["historique_seance_synthetic"] = (
-            execute_pipeline_dataset_historique_seance_exercice_synthetic_data()
-        )
-        print(
-            f"✅ dataset_historique_seance_exercice_synthetic_data traités : {results['historique_seance_synthetic']}"
-        )
-    except Exception as e:
-        print(f"❌ Erreur pipeline historique_seance_synthetic : {e}")
-        results["historique_seance_synthetic"] = {"error": str(e)}
+    logger.info("Suite ETL complète terminée")
 
     return results
