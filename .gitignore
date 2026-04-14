@@ -26,7 +26,6 @@ build/
 notebooks/.ipynb_checkpoints/
 
 # Données (gitignored sauf .gitkeep)
-data/*
 data/raw/*
 !data/raw/.gitkeep
 data/clean/*

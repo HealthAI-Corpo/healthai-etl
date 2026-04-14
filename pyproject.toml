@@ -15,6 +15,7 @@ dependencies = [
     "python-multipart>=0.0.22",
     "kagglehub>=1.0.0",
     "requests>=2.33.0",
+    "loguru>=0.7.2",
 ]
 
 [dependency-groups]

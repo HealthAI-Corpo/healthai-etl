@@ -1,17 +1,25 @@
-from src.data_pipeline.pipeline import (
-    run_all_pipelines,
-)
+from src.data_pipeline.pipeline import run_all_pipelines
 from src.data_pipeline.database import engine, Base
+from src.utils.logger import configure_logging, logger
+
+# Configuration du logging au démarrage
+configure_logging()
 
 
 def init_db():
-    print("♻️ Réinitialisation de la base de données...")
+    logger.info("Réinitialisation de la base de données...")
 
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
-    print("Base de données prête (tables vides).")
+    logger.info("Base de données prête (tables vides)")
 
 
 if __name__ == "__main__":
-    # init_db()
-    run_all_pipelines()
+    logger.info("Démarrage de l'application ETL")
+    try:
+        # init_db()
+        run_all_pipelines()
+        logger.info("Exécution complète des pipelines terminée")
+    except Exception as e:
+        logger.error("Erreur fatale lors de l'exécution des pipelines : {}", str(e), exc_info=True)
+        raise
