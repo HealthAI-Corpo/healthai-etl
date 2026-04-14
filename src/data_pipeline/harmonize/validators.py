@@ -10,6 +10,7 @@ from src.data_pipeline.utils import (
     StringConstraint,
     TypeDonnees,
 )
+from src.utils.logger import logger
 
 
 def _is_missing_default(value: object) -> bool:
@@ -392,9 +393,10 @@ def check_column_constraint(
         # --- Étape 1 : Vérifier que la valeur par défaut respecte les contraintes ---
         if not mapping.nullable and not _is_missing_default(mapping.valeur_defaut):
             if _check_constraint_violation(mapping.valeur_defaut, constraint):
-                print(
-                    f"[ERREUR] Colonne '{col}': La valeur par défaut '{mapping.valeur_defaut}' "
-                    f"ne respecte pas les contraintes. Toutes les lignes de cette colonne concernées seront en anomalies."
+                logger.error(
+                    "Contrainte de colonne viole par la valeur par défaut | Colonne : {} | Valeur par défaut : {} | Toutes les lignes seront ignorées",
+                    col,
+                    mapping.valeur_defaut,
                 )
                 # Mettre toutes les lignes en anomalies si la valeur par défaut est invalide
                 row_ids_to_keep = df_clean["_row_id"].values

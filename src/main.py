@@ -21,5 +21,9 @@ if __name__ == "__main__":
         run_all_pipelines()
         logger.info("Exécution complète des pipelines terminée")
     except Exception as e:
-        logger.error("Erreur fatale lors de l'exécution des pipelines : {}", str(e), exc_info=True)
+        logger.error(
+            "Erreur fatale lors de l'exécution des pipelines : {}",
+            str(e),
+            exc_info=True,
+        )
         raise

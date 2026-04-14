@@ -7,6 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from src.data_pipeline.database import engine, SessionLocal
 from src.data_pipeline.models import EtlLog, StatutEtlEnum
 from src.data_pipeline.utils import PipelineETL, normalize_path
+from src.utils.logger import logger
 
 
 def save_dataframe_to_csv(df: pd.DataFrame, folder_path: str, file_name: str) -> str:
@@ -20,9 +21,11 @@ def save_dataframe_to_csv(df: pd.DataFrame, folder_path: str, file_name: str) ->
     df.to_csv(full_path, index=False)
 
     if os.path.exists(full_path):
-        print(f"Fichier vérifié sur le disque : {full_path}")
+        logger.debug("Fichier CSV vérifié sur le disque | Chemin : {}", full_path)
     else:
-        print("ERREUR : Le fichier n'a pas été créé malgré to_csv !")
+        logger.error(
+            "Le fichier n'a pas été créé malgré to_csv | Chemin : {}", full_path
+        )
 
     return full_path
 
@@ -32,13 +35,19 @@ def ingest_cleaned_data(file_path: str, pipeline: PipelineETL) -> None:
     df = pd.read_csv(file_path)
     try:
         df.to_sql(name=pipeline.table_nom, con=engine, if_exists="append", index=False)
-        print(
-            f"Ingestion réussie : {len(df)} lignes ajoutées dans la table '{pipeline.table_nom}'."
+        logger.info(
+            "Ingestion en base de données réussie | Table : {} | Lignes ajoutées : {}",
+            pipeline.table_nom,
+            len(df),
         )
     except SQLAlchemyError as e:
-        print(f"Erreur SQL sur la table '{pipeline.table_nom}':", e)
+        logger.error(
+            "Erreur SQL lors de l'ingestion en base | Table : {} | Erreur : {}",
+            pipeline.table_nom,
+            str(e),
+        )
     except Exception as e:
-        print("Erreur inattendue :", e)
+        logger.error("Erreur inattendue lors de l'ingestion | Erreur : {}", str(e))
 
 
 def mark_source_file_as_processed(file_path: str) -> str | None:
@@ -56,7 +65,11 @@ def mark_source_file_as_processed(file_path: str) -> str | None:
         os.replace(file_path, new_path)
         return new_path
     except Exception as e:
-        print(f"[ERROR] Impossible de renommer le fichier source '{file_path}': {e}")
+        logger.error(
+            "Impossible de renommer le fichier source | Fichier : {} | Erreur : {}",
+            file_path,
+            str(e),
+        )
         return None
 
 
@@ -102,10 +115,18 @@ def log_etl_execution(
         )
         session.add(etl_log)
         session.commit()
-        print(f"EtlLog enregistrée : {libelle_pipeline} - Statut: {statut.value}")
+        logger.info(
+            "EtlLog enregistrée en base | Pipeline : {} | Statut : {}",
+            libelle_pipeline,
+            statut.value,
+        )
     except SQLAlchemyError as e:
         session.rollback()
-        print(f"[ERROR] Impossible d'enregistrer l'EtlLog: {e}")
+        logger.error(
+            "Impossible d'enregistrer l'EtlLog | Pipeline : {} | Erreur : {}",
+            libelle_pipeline,
+            str(e),
+        )
     finally:
         session.close()
 
@@ -138,9 +159,13 @@ def loader_pipeline(
     if not anomalies.empty:
         anomaly_file_name = f"{pipeline.table_nom}_anomalies{timestamp}"
         save_dataframe_to_csv(anomalies, normalized_anomaly_folder, anomaly_file_name)
-        print(f"{len(anomalies)} anomalies détectées et sauvegardées dans /anomalies.")
+        logger.warning(
+            "Anomalies détectées et sauvegardées | Pipeline : {} | Nombre d'anomalies : {}",
+            pipeline.table_nom,
+            len(anomalies),
+        )
     else:
-        print("Aucune anomalie détectée.")
+        logger.debug("Aucune anomalie détectée | Pipeline : {}", pipeline.table_nom)
 
     # --- INGESTION EN BASE ---
     ingest_cleaned_data(path, pipeline)
@@ -150,7 +175,10 @@ def loader_pipeline(
     if source_path and rename_source:
         renamed_source = mark_source_file_as_processed(source_path)
         if renamed_source:
-            print(f"Fichier source archivé : {os.path.basename(renamed_source)}")
+            logger.info(
+                "Fichier source archivé après traitement | Fichier : {}",
+                os.path.basename(renamed_source),
+            )
 
     # Enregistrement de l'exécution du pipeline dans EtlLog
     log_etl_execution(

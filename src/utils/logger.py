@@ -2,6 +2,7 @@ from loguru import logger
 import sys
 import os
 
+
 def configure_logging():
     logger.remove()
 

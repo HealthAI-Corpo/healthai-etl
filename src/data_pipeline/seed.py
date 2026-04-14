@@ -1,13 +1,14 @@
 from decimal import Decimal
 from src.data_pipeline.database import SessionLocal
 from src.data_pipeline.models import Utilisateur, ProfilSante
+from src.utils.logger import logger
 
 
 def seed_test_data():
     """Génère des données de test cohérentes pour le développement du Front"""
     db = SessionLocal()
     if not db:
-        print("Erreur : La session de base de données n'est pas initialisée.")
+        logger.error("Erreur : La session de base de données n'est pas initialisée.")
         return
 
     try:
@@ -15,7 +16,7 @@ def seed_test_data():
         # ProfilSante dépend d'Utilisateur
         db.query(ProfilSante).delete()
         db.query(Utilisateur).delete()
-        print(" Anciennes données de test supprimées.")
+        logger.info("Anciennes données de test supprimées")
 
         # ---  CRÉATION DES UTILISATEURS ---
         users = [
@@ -71,10 +72,15 @@ def seed_test_data():
 
         db.add_all(profils)
         db.commit()
-        print(f"Seeding réussi : {len(users)} utilisateurs et profils créés.")
+        logger.info(
+            "Seeding en base de données réussi | Utilisateurs/Profils créés : {}",
+            len(users),
+        )
 
     except Exception as e:
         db.rollback()
-        print(f"Erreur lors du seeding : {str(e)}")
+        logger.error(
+            "Erreur lors du seeding dans la base de données | Erreur : {}", str(e)
+        )
     finally:
         db.close()

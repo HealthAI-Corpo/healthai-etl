@@ -1,4 +1,3 @@
-import logging
 from src.data_pipeline.downloader import get_df_matched_files
 from src.data_pipeline.harmonize import (
     apply_transformations,
@@ -81,10 +80,8 @@ def execute_pipeline_etl(
                 source_path=source_path,
             )
             output_paths.append(path)
-        except Exception as e:
-            logger.exception(
-                f"Erreur lors du traitement du fichier {source_path}"
-            )
+        except Exception:
+            logger.exception(f"Erreur lors du traitement du fichier {source_path}")
 
     return output_paths
 

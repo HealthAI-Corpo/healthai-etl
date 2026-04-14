@@ -37,25 +37,25 @@ app = FastAPI()
 async def log_requests(request: Request, call_next):
     """Middleware pour logger les détails des requêtes et réponses HTTP."""
     start_time = time()
-    
+
     logger.info(
         "Requête HTTP reçue | Méthode : {} | Chemin : {} | IP client : {}",
         request.method,
         request.url.path,
         request.client.host if request.client else "unknown",
     )
-    
+
     try:
         response = await call_next(request)
         process_time = time() - start_time
-        
+
         logger.info(
             "Réponse HTTP envoyée | Statut : {} | Durée : {:.3f}s | Chemin : {}",
             response.status_code,
             process_time,
             request.url.path,
         )
-        
+
         response.headers["X-Process-Time"] = str(process_time)
         return response
     except Exception as e:
@@ -75,13 +75,18 @@ async def upload_file(
     pipeline_type: str, file: UploadFile, background_tasks: BackgroundTasks
 ):
     """Endpoint pour télécharger et traiter un fichier CSV ou JSON."""
-    
-    logger.info("Upload de fichier reçu | Type : {} | Nom : {}", pipeline_type, file.filename)
-    
+
+    logger.info(
+        "Upload de fichier reçu | Type : {} | Nom : {}", pipeline_type, file.filename
+    )
+
     # validation de l'extension
     if not file.filename.endswith((".csv", ".json")):
-        logger.warning("Format de fichier non supporté | Nom : {} | Extension : {}", 
-                       file.filename, file.filename.split('.')[-1])
+        logger.warning(
+            "Format de fichier non supporté | Nom : {} | Extension : {}",
+            file.filename,
+            file.filename.split(".")[-1],
+        )
         raise HTTPException(status_code=400, detail="Format non supporté.")
 
     # sauvegarde du fichier
@@ -91,33 +96,50 @@ async def upload_file(
             shutil.copyfileobj(file.file, buffer)
         logger.info("Fichier sauvegardé avec succès | Destination : {}", dest)
     except Exception as e:
-        logger.error("Erreur lors de la sauvegarde du fichier | Destination : {} | Erreur : {}", 
-                     dest, str(e), exc_info=True)
+        logger.error(
+            "Erreur lors de la sauvegarde du fichier | Destination : {} | Erreur : {}",
+            dest,
+            str(e),
+            exc_info=True,
+        )
         raise HTTPException(status_code=500, detail=f"Erreur d'écriture : {e}")
 
     # selection du pipeline exercices ou les autres
     if pipeline_type == "exercices":
         background_tasks.add_task(execute_pipeline_exercisedb_hobby, str(dest))
-        logger.info("Pipeline 'exercices' lancé en arrière-plan | Fichier : {}", file.filename)
+        logger.info(
+            "Pipeline 'exercices' lancé en arrière-plan | Fichier : {}", file.filename
+        )
     elif pipeline_type == "aliments":
         background_tasks.add_task(execute_pipeline_daily_food, str(dest))
-        logger.info("Pipeline 'aliments' lancé en arrière-plan | Fichier : {}", file.filename)
+        logger.info(
+            "Pipeline 'aliments' lancé en arrière-plan | Fichier : {}", file.filename
+        )
     elif pipeline_type == "recommendations":
         background_tasks.add_task(
             execute_pipeline_diet_recommendations_dataset, str(dest)
         )
-        logger.info("Pipeline 'recommendations' lancé en arrière-plan | Fichier : {}", file.filename)
+        logger.info(
+            "Pipeline 'recommendations' lancé en arrière-plan | Fichier : {}",
+            file.filename,
+        )
     elif pipeline_type == "historique_seance":
         background_tasks.add_task(
             execute_pipeline_dataset_historique_seance_exercice, str(dest)
         )
-        logger.info("Pipeline 'historique_seance' lancé en arrière-plan | Fichier : {}", file.filename)
+        logger.info(
+            "Pipeline 'historique_seance' lancé en arrière-plan | Fichier : {}",
+            file.filename,
+        )
     elif pipeline_type == "historique_seance_synthetic":
         background_tasks.add_task(
             execute_pipeline_dataset_historique_seance_exercice_synthetic_data,
             str(dest),
         )
-        logger.info("Pipeline 'historique_seance_synthetic' lancé en arrière-plan | Fichier : {}", file.filename)
+        logger.info(
+            "Pipeline 'historique_seance_synthetic' lancé en arrière-plan | Fichier : {}",
+            file.filename,
+        )
     else:
         logger.warning("Type de pipeline inconnu | Type : {}", pipeline_type)
         raise HTTPException(status_code=400, detail="Type de pipeline inconnu.")
@@ -128,7 +150,7 @@ async def upload_file(
 @app.post("/run/{pipeline_type}", status_code=202)
 async def run_pipeline(pipeline_type: str, background_tasks: BackgroundTasks):
     """Endpoint pour exécuter une pipeline spécifique sans fichier uploadé."""
-    
+
     logger.info("Exécution d'un pipeline demandée | Type : {}", pipeline_type)
 
     if pipeline_type == "exercices":
