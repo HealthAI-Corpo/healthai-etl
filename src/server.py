@@ -13,6 +13,7 @@ from src.data_pipeline.pipeline import (
     execute_pipeline_dataset_historique_seance_exercice_synthetic_data,
     run_all_pipelines,
 )
+from src.data_pipeline.downloader.api_client import run_downloader
 from src.utils.logger import configure_logging, logger
 
 load_dotenv()
@@ -187,3 +188,11 @@ async def run_all_pipelines_endpoint(background_tasks: BackgroundTasks):
     return {
         "message": "Exécution complète de tous les pipelines lancée en arrière-plan"
     }
+
+
+@app.post("/run-download", status_code=202)
+async def run_download(background_tasks: BackgroundTasks):
+    """Endpoint pour exécuter la phase EXTRACT (téléchargement des données)."""
+    logger.info("Exécution du téléchargement des données lancée")
+    background_tasks.add_task(run_downloader)
+    return {"message": "Exécution du téléchargement des données lancée en arrière-plan"}
