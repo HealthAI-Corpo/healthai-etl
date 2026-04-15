@@ -1,6 +1,10 @@
 from src.data_pipeline.pipeline import run_all_pipelines
 from src.data_pipeline.database import engine, Base
 from src.utils.logger import configure_logging, logger
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Configuration du logging au démarrage
 configure_logging()

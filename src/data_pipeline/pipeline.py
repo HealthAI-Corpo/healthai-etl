@@ -1,5 +1,7 @@
 import os
 
+from src.data_pipeline.downloader.api_client import run_downloader
+
 from src.data_pipeline.downloader import get_df_matched_files
 from src.data_pipeline.harmonize import (
     apply_transformations,
@@ -131,10 +133,10 @@ def execute_pipeline_exercisedb_hobby(file_path: str = None) -> list[str]:
         colonne_fichier="exerciseType",
         in_file=True,
         type_donnees=TypeDonnees.STRING,
-        nullable=False,
+        nullable=True,
         valeur_defaut=None,
         unique_constraint=False,
-        constraint=StringConstraint(2, min_length=0, max_length=100),
+        constraint=StringConstraint(4, min_length=0, max_length=500),
         transformations=[],
     )
 
@@ -144,10 +146,10 @@ def execute_pipeline_exercisedb_hobby(file_path: str = None) -> list[str]:
         colonne_fichier="targetMuscles",
         in_file=True,
         type_donnees=TypeDonnees.ARRAY_DELIMITED_JSON,
-        nullable=False,
+        nullable=True,
         valeur_defaut=None,
         unique_constraint=False,
-        constraint=StringConstraint(3, min_length=0, max_length=100),
+        constraint=StringConstraint(4, min_length=0, max_length=1500),
         transformations=[
             ETLColumnTransformation(
                 id_transformation=1,
@@ -165,10 +167,10 @@ def execute_pipeline_exercisedb_hobby(file_path: str = None) -> list[str]:
         colonne_fichier="secondaryMuscles",
         in_file=True,
         type_donnees=TypeDonnees.ARRAY_DELIMITED_JSON,
-        nullable=False,
+        nullable=True,
         valeur_defaut=None,
         unique_constraint=False,
-        constraint=StringConstraint(4, min_length=0, max_length=100),
+        constraint=StringConstraint(2, min_length=0, max_length=1500),
         transformations=[
             ETLColumnTransformation(
                 id_transformation=2,
@@ -186,10 +188,10 @@ def execute_pipeline_exercisedb_hobby(file_path: str = None) -> list[str]:
         colonne_fichier="equipments",
         in_file=True,
         type_donnees=TypeDonnees.ARRAY_DELIMITED_JSON,
-        nullable=False,
+        nullable=True,
         valeur_defaut=None,
         unique_constraint=False,
-        constraint=StringConstraint(5, min_length=0, max_length=100),
+        constraint=StringConstraint(5, min_length=0, max_length=1500),
         transformations=[
             ETLColumnTransformation(
                 id_transformation=3,
@@ -1904,8 +1906,13 @@ def execute_pipeline_dataset_historique_seance_exercice_synthetic_data(
 def run_all_pipelines() -> dict:
     """Execute tous les pipelines ETL disponibles et retourne les résultats."""
 
-    logger.info("Démarrage de la suite ETL complète...")
-
+    try:
+        logger.info("Démarrage de la suite ETL complète...")
+        run_downloader()
+    except Exception:
+        logger.exception("Erreur lors du téléchargement des données sources")
+        # On continue quand même : si le téléchargement échoue,
+        # on peut toujours traiter ce qui est déjà présent dans data/raw
     results = {}
 
     pipelines = {

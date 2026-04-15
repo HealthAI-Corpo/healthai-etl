@@ -25,6 +25,7 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
+      - /app/.venv
   metabase:
     image: metabase/metabase:latest
     container_name: healthai_metabase
