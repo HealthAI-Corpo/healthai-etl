@@ -10,8 +10,6 @@ sys.path.insert(0, abspath(dirname(dirname(__file__))))
 
 # Import de ta Base
 from src.data_pipeline.database import Base
-from src.data_pipeline.models import DatasetHistoriqueSeanceExercice, Utilisateur, ProfilSante, Aliment, Exercice, DatasetRecommendationsRegime, LogAliment, LogSeance, LogSante, EtlLog
-
 
 
 config = context.config
@@ -50,7 +48,7 @@ def run_migrations_offline() -> None:
 def run_migrations_online() -> None:
     # On récupère la section de config habituelle
     section = config.get_section(config.config_ini_section, {})
-    
+
     # ON FORCE L'URL : Si DATABASE_URL existe (Docker), on écrase celle du .ini
     env_url = os.getenv("DATABASE_URL")
     if env_url:

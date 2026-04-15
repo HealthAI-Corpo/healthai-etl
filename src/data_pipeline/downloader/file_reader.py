@@ -88,25 +88,28 @@ def get_df_matched_files(pipeline: PipelineETL) -> list[FileWithDataFrame]:
         pipeline.nom_fichier_variable,
         pipeline.extension_fichier.value,  # Enum → string
     )
-    
+
     # --- FILTRAGE VIA LA TABLE ETL_LOG ---
     all_matched_paths = find_matching_files(normalized_folder, pattern)
     files_to_process = []
-    
+
     with SessionLocal() as session:
         for file_path in all_matched_paths:
             file_name = os.path.basename(file_path)
-            
+
             # On vérifie si un log "SUCCESS" existe déjà pour ce nom de fichier
-            already_done = session.query(EtlLog).filter(
-                EtlLog.fichier_nom == file_name,
-                EtlLog.statut == "SUCCESS"
-            ).first()
+            already_done = (
+                session.query(EtlLog)
+                .filter(EtlLog.fichier_nom == file_name, EtlLog.statut == "SUCCESS")
+                .first()
+            )
 
             if not already_done:
                 files_to_process.append(file_path)
             else:
-                logger.info(f"[SKIP] Le fichier {file_name} a déjà été intégré avec succès.")
+                logger.info(
+                    f"[SKIP] Le fichier {file_name} a déjà été intégré avec succès."
+                )
 
     # 3. Recherche des fichiers
     matched_files_path = find_matching_files(normalized_folder, pattern)

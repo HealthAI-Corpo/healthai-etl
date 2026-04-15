@@ -1911,8 +1911,8 @@ def run_all_pipelines() -> dict:
         run_downloader()
     except Exception:
         logger.exception("Erreur lors du téléchargement des données sources")
-        # On continue quand même : si le téléchargement échoue, 
-        # on peut toujours traiter ce qui est déjà présent dans data/raw    
+        # On continue quand même : si le téléchargement échoue,
+        # on peut toujours traiter ce qui est déjà présent dans data/raw
     results = {}
 
     pipelines = {
