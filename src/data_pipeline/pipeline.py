@@ -598,7 +598,7 @@ def execute_pipeline_diet_recommendations_dataset(
 
     col_tension_arterielle_mmHg = ETLColumnMapping(
         id_etl_column_mapping=6,
-        colonne_bdd="tension_arterielle_mmHg",
+        colonne_bdd="tension_arterielle_mmhg",
         colonne_fichier="Blood_Pressure_mmHg",
         in_file=True,
         type_donnees=TypeDonnees.DECIMAL,

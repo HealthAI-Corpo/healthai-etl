@@ -15,4 +15,4 @@ COPY . .
 
 RUN mkdir -p data/raw data/clean logs
 # On lance l'API, la commande sera ecrasé par le docker-compose pour le service cron ou etl 
-CMD ["uv", "run", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uv", "run", "uvicorn", "src.server:app", "--host", "0.0.0.0", "--port", "8000"]
