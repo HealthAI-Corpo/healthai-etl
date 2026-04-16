@@ -29,7 +29,9 @@ notebooks/.ipynb_checkpoints/
 data/raw/*
 !data/raw/.gitkeep
 data/clean/*
+data/anomalies/*
 !data/clean/.gitkeep
+!data/anomalies/.gitkeep
 logs/*
 !logs/.gitkeep
 
@@ -41,3 +43,11 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+.env
+alembic/__pycache__/

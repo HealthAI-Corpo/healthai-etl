@@ -4,7 +4,7 @@ import json
 import numpy as np
 import pandas as pd
 
-from data_pipeline.utils import (
+from src.data_pipeline.utils import (
     ConditionFailBehavior,
     ConditionOperator,
     ETLColumnMapping,
@@ -12,6 +12,25 @@ from data_pipeline.utils import (
     ETLTransformationCondition,
     TypeTransformation,
 )
+
+
+def validate_required_columns(
+    df: pd.DataFrame, mappings: list[ETLColumnMapping]
+) -> tuple[bool, list[str]]:
+    """
+    Valide que toutes les colonnes obligatoires (in_file=True) existent dans le fichier.
+
+    Retourne:
+        - (True, []) si toutes les colonnes obligatoires existent
+        - (False, [liste_colonnes_manquantes]) sinon
+    """
+    missing_columns = []
+
+    for mapping in mappings:
+        if mapping.in_file and mapping.colonne_fichier not in df.columns:
+            missing_columns.append(mapping.colonne_fichier)
+
+    return len(missing_columns) == 0, missing_columns
 
 
 def column_mapper(df: pd.DataFrame, mappings: list[ETLColumnMapping]) -> pd.DataFrame:
@@ -27,10 +46,11 @@ def column_mapper(df: pd.DataFrame, mappings: list[ETLColumnMapping]) -> pd.Data
     return result.astype(str)
 
 
-def generate_anomaly_dataframe(mappings: list[ETLColumnMapping]) -> pd.DataFrame:
-    """Construit le DataFrame standard d'anomalies."""
-    columns = [mapping.colonne_bdd for mapping in mappings] + ["erreur"]
-    return pd.DataFrame(columns=columns)
+def generate_anomaly_dataframe(columns) -> pd.DataFrame:
+    """Construit le DataFrame standard d'anomalies avec les colonnes du fichier original + erreur."""
+    anomaly_columns = list(columns) + ["erreur"]
+
+    return pd.DataFrame(columns=anomaly_columns)
 
 
 def clean_txt(df: pd.DataFrame) -> pd.DataFrame:
@@ -107,21 +127,25 @@ def evaluate_conditions(
 
 
 def add_to_anomalies(
+    df_clean: pd.DataFrame,
     df_original: pd.DataFrame,
     anomalies: pd.DataFrame,
     mask: pd.Series,
     message: str,
 ) -> pd.DataFrame:
-    """Ajoute dans le DataFrame anomalies les lignes ciblées par le masque."""
+    """Ajoute dans le DataFrame anomalies les lignes ciblées par le masque, en utilisant _row_id pour l'alignement."""
     if not mask.any():
         return anomalies
 
-    rows = df_original.loc[mask].copy()
+    # Utiliser _row_id pour mapper df_clean vers df_original
+    row_ids_to_keep = df_clean.loc[mask, "_row_id"].values
+    rows = df_original.loc[df_original["_row_id"].isin(row_ids_to_keep)].copy()
     rows["erreur"] = message
     return pd.concat([anomalies, rows], ignore_index=True)
 
 
 def handle_condition_failure(
+    df_clean: pd.DataFrame,
     df_original: pd.DataFrame,
     anomalies: pd.DataFrame,
     transformation: ETLColumnTransformation,
@@ -146,6 +170,7 @@ def handle_condition_failure(
     if transformation.condition_fail_behavior == ConditionFailBehavior.ERROR:
         # Les lignes en échec deviennent anomalies
         anomalies = add_to_anomalies(
+            df_clean,
             df_original,
             anomalies,
             fail_mask,
@@ -416,7 +441,10 @@ def convert_series(series: pd.Series, target_type: str) -> pd.Series:
 
 
 def apply_transformations(
-    df: pd.DataFrame, anomalies: pd.DataFrame, mappings: list[ETLColumnMapping]
+    df: pd.DataFrame,
+    anomalies: pd.DataFrame,
+    mappings: list[ETLColumnMapping],
+    df_original: pd.DataFrame = None,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Applique toutes les transformations définies dans les mappings sur un DataFrame.
@@ -436,7 +464,8 @@ def apply_transformations(
     df_clean = df.copy()
 
     # Copie originale pour log anomalies (important : jamais modifiée)
-    df_original = df.copy()
+    if df_original is None:
+        df_original = df.copy()
 
     # Masque global des lignes déjà en erreur (exclues du pipeline)
     error_mask_global = pd.Series(False, index=df_clean.index)
@@ -486,6 +515,7 @@ def apply_transformations(
 
             if conversion_error_mask.any():
                 anomalies = add_to_anomalies(
+                    df_clean,
                     df_original,
                     anomalies,
                     conversion_error_mask,
@@ -517,6 +547,7 @@ def apply_transformations(
             # Gestion comportement (SKIP / STOP / ERROR)
             active_mask, error_mask_global, anomalies = handle_condition_failure(
                 df_clean,
+                df_original,
                 anomalies,
                 transformation,
                 col,
@@ -560,6 +591,7 @@ def apply_transformations(
 
             if new_error_mask.any():
                 anomalies = add_to_anomalies(
+                    df_clean,
                     df_original,
                     anomalies,
                     new_error_mask,

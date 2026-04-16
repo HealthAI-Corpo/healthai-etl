@@ -15,4 +15,4 @@ COPY . .
 
 RUN mkdir -p data/raw data/clean logs
 
-CMD ["uv", "run", "python", "src/run_pipeline.py"]
+CMD ["uv", "run", "uvicorn", "src.server:app", "--host", "0.0.0.0", "--port", "8000"]
