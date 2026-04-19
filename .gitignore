@@ -44,10 +44,4 @@ Thumbs.db
 .vscode/
 *.swp
 
-__pycache__/
-*.pyc
-*.pyo
-*.egg-info/
-.venv/
-.env
 alembic/__pycache__/
