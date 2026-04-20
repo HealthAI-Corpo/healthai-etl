@@ -119,7 +119,7 @@ class DatasetRecommendationsRegime(Base):
     niveau_activite_physique = Column(String(100))
     apport_calorique_journalier = Column(Integer)
     cholesterol_mg_dl = Column(Numeric(6, 2))
-    tension_arterielle_mmHg = Column(Numeric(6, 2))
+    tension_arterielle_mmhg = Column(Numeric(6, 2))
     glucose_mg_dl = Column(Numeric(6, 2))
     restrictions_alimentaires = Column(String(255))
     allergies = Column(String(255))

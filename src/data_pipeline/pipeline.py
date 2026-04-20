@@ -598,10 +598,10 @@ def execute_pipeline_diet_recommendations_dataset(
         ],
     )
 
-    col_tension_arterielle_mmHg = ETLColumnMapping(
+    col_tension_arterielle_mmhg = ETLColumnMapping(
         id_etl_column_mapping=6,
-        colonne_bdd="tension_arterielle_mmHg",
-        colonne_fichier="Blood_Pressure_mmHg",
+        colonne_bdd="tension_arterielle_mmhg",
+        colonne_fichier="Blood_Pressure_mmhg",
         in_file=True,
         type_donnees=TypeDonnees.DECIMAL,
         nullable=False,
@@ -926,7 +926,7 @@ def execute_pipeline_diet_recommendations_dataset(
             col_taille_cm,
             col_apport_calorique_journalier,
             col_cholesterol_mg_dl,
-            col_tension_arterielle_mmHg,
+            col_tension_arterielle_mmhg,
             col_glucose_mg_dl,
             col_heures_exercice_semaine,
             col_adherence_regime,
