@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, BackgroundTasks, HTTPException, Request
 import shutil
 from time import time
+from fastapi.middleware.cors import CORSMiddleware
+
 
 from src.data_pipeline.pipeline import (
     execute_pipeline_daily_food,
@@ -32,6 +34,12 @@ logger.info("Application démarrée | Dossier de données : {}", DATA_RAW_DIR)
 Le fichier est sauvegardé dans data/raw et un traitement de base est lancé en arrière-plan."""
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:4005"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Middleware pour logger les requêtes HTTP
 @app.middleware("http")
