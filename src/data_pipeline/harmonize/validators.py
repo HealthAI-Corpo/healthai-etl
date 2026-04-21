@@ -71,6 +71,9 @@ def handle_missing_values(
             # nullable = False mais valeur par défaut définie → remplacer les NA
             df_clean[col] = df_clean[col].fillna(mapping.valeur_defaut)
         else:
+            print(f"COL :  {col} : ")
+            print(f"_is_missing_default(mapping.valeur_defaut) :  {_is_missing_default(mapping.valeur_defaut)}")
+            print(f"valeur par defaut {mapping.valeur_defaut}")
             # nullable = False et pas de valeur par défaut → ce sont des anomalies
             # Utiliser _row_id pour mapper les lignes vers df_original
             row_ids_to_keep = df_clean.loc[mask_na, "_row_id"].values

@@ -1361,7 +1361,7 @@ def execute_pipeline_dataset_historique_seance_exercice(
         in_file=True,
         type_donnees=TypeDonnees.INT,
         nullable=False,
-        valeur_defaut=None,
+        valeur_defaut="0",
         unique_constraint=False,
         constraint=NumericConstraint(1, nb_min=0, nb_max=7, nb_decimal=0),
         transformations=[
@@ -1522,8 +1522,17 @@ def execute_pipeline_dataset_historique_seance_exercice_synthetic_data(
         transformations=[
             ETLColumnTransformation(
                 id_transformation=5,
-                id_etl_column_mapping=3,
+                id_etl_column_mapping=1,
                 ordre=1,
+                type_transformation=TypeTransformation.REGEX_REPLACE,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_str=r"(?:\\[tnr]|[\t\n\r])+",
+                value_str_2="",
+            ),
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=2,
                 type_transformation=TypeTransformation.FLOOR,
                 condition_fail_behavior=ConditionFailBehavior.ERROR,
             ),
@@ -1595,8 +1604,17 @@ def execute_pipeline_dataset_historique_seance_exercice_synthetic_data(
         transformations=[
             ETLColumnTransformation(
                 id_transformation=5,
-                id_etl_column_mapping=3,
+                id_etl_column_mapping=1,
                 ordre=1,
+                type_transformation=TypeTransformation.REGEX_REPLACE,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_str=r"(?:\\[tnr]|[\t\n\r])+",
+                value_str_2="",
+            ),
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=3,
+                ordre=2,
                 type_transformation=TypeTransformation.ROUND,
                 condition_fail_behavior=ConditionFailBehavior.ERROR,
                 value_int=0,
@@ -1759,7 +1777,7 @@ def execute_pipeline_dataset_historique_seance_exercice_synthetic_data(
         in_file=True,
         type_donnees=TypeDonnees.INT,
         nullable=False,
-        valeur_defaut=None,
+        valeur_defaut="0",
         unique_constraint=False,
         constraint=NumericConstraint(1, nb_min=0, nb_max=7, nb_decimal=0),
         transformations=[
@@ -1869,7 +1887,17 @@ def execute_pipeline_dataset_historique_seance_exercice_synthetic_data(
         valeur_defaut=None,
         unique_constraint=False,
         constraint=StringConstraint(1, min_length=0, max_length=100),
-        transformations=[],
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=1,
+                ordre=1,
+                type_transformation=TypeTransformation.REGEX_REPLACE,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_str=r"(?:\\[tnr]|[\t\n\r])+",
+                value_str_2="",
+            ),
+        ],
     )
 
     pipeline = PipelineETL(
