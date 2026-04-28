@@ -40,6 +40,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Middleware pour logger les requêtes HTTP
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
