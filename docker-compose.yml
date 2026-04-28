@@ -1,46 +1,70 @@
 services:
+  # --- BASE DE DONNÉES RELATIONNELLE ---
   db:
     image: postgres:15
     container_name: healthai_db_dev
     environment:
-      POSTGRES_DB: healthai_db
-      POSTGRES_USER: healthai
-      POSTGRES_PASSWORD: healthai_pass
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  # --- BASE DE DONNÉES NOSQL ---
+  mongodb:
+    image: mongo:latest
+    container_name: healthai_mongodb
+    environment:
+      # MongoDB utilise des variables spécifiques pour l'init
+      MONGO_INITDB_ROOT_USERNAME: ${POSTGRES_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  # --- MICRO-SERVICE ETL / ADMIN ---
   api:
     build: .
     container_name: healthai_api
     depends_on:
       - db
+      - rabbitmq
     env_file: .env
     environment:
-      - DATABASE_URL=postgresql://healthai:healthai_pass@db:5432/healthai_db
-      - POSTGRES_HOST=db
-      - UV_LINK_MODE=copy
-    command: uv run python -m uvicorn src.server:app --host 0.0.0.0 --port 8000
+      - DATABASE_URL=${DATABASE_URL}
     ports:
       - "8000:8000"
     volumes:
       - .:/app
-      - /app/.venv
-  metabase:
-    image: metabase/metabase:latest
-    container_name: healthai_metabase
-    restart: unless-stopped
+      - ${DATA_DIR}:/app/data
+
+  # --- MICRO-SERVICE IA ---
+  ai_service:
+    build: ./services/ai_service
+    container_name: healthai_ai_service
     depends_on:
-      - db
+      - mongodb
+      - rabbitmq
+    env_file: .env
     environment:
-      MB_DB_TYPE: postgres
-      MB_DB_HOST: db
-      MB_DB_PORT: 5432
-      MB_DB_DBNAME: ${POSTGRES_DB}
-      MB_DB_USER: ${POSTGRES_USER}
-      MB_DB_PASS: ${POSTGRES_PASSWORD}
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_DB=${MONGO_DB}
     ports:
-      - "3000:3000"
+      - "8001:8001"
+    volumes:
+      - ./services/ai_service:/app
+
+  # --- MESSAGERIE ---
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: healthai_rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
 
 volumes:
   postgres_data:
+  mongo_data:
