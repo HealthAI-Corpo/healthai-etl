@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, BackgroundTasks, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 import shutil
 from time import time
 
@@ -32,6 +33,12 @@ logger.info("Application démarrée | Dossier de données : {}", DATA_RAW_DIR)
 Le fichier est sauvegardé dans data/raw et un traitement de base est lancé en arrière-plan."""
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://localhost:3001"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Middleware pour logger les requêtes HTTP
 @app.middleware("http")
@@ -69,6 +76,11 @@ async def log_requests(request: Request, call_next):
             exc_info=True,
         )
         raise
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
 
 
 @app.post("/upload/{pipeline_type}", status_code=202)
