@@ -9,7 +9,17 @@ from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
+from src.auth.dependencies import require_auth
 from src.server import app
+
+
+def setup_module():
+    app.dependency_overrides[require_auth] = lambda: {"sub": "test-user"}
+
+
+def teardown_module():
+    app.dependency_overrides.pop(require_auth, None)
+
 
 client = TestClient(app)
 

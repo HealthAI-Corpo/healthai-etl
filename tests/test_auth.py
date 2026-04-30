@@ -104,6 +104,7 @@ def client(rsa_private_key, jwk_public, monkeypatch):
 
     # Vide le cache JWKS entre les tests
     import src.auth.jwks as jwks_module
+
     jwks_module._cache.clear()
 
     with patch("src.auth.jwks.fetch_jwks", return_value=[jwk_public]):
@@ -112,6 +113,7 @@ def client(rsa_private_key, jwk_public, monkeypatch):
             p.start()
 
         from src.server import app
+
         with TestClient(app, raise_server_exceptions=False) as c:
             yield c
 
@@ -192,9 +194,7 @@ def test_run_all_invalid_token_returns_401(client):
 
 
 def test_run_all_expired_token_returns_401(client, expired_token):
-    resp = client.post(
-        "/run-all", headers={"Authorization": f"Bearer {expired_token}"}
-    )
+    resp = client.post("/run-all", headers={"Authorization": f"Bearer {expired_token}"})
     assert resp.status_code == 401
 
 
@@ -226,6 +226,7 @@ def test_jwks_unavailable_returns_503(monkeypatch, rsa_private_key):
     monkeypatch.setenv("JWT_AUDIENCE", TEST_AUDIENCE)
 
     import src.auth.jwks as jwks_module
+
     jwks_module._cache.clear()
 
     with patch(
@@ -233,6 +234,7 @@ def test_jwks_unavailable_returns_503(monkeypatch, rsa_private_key):
         side_effect=req_lib.ConnectionError("ZITADEL unreachable"),
     ):
         from src.server import app
+
         with TestClient(app, raise_server_exceptions=False) as c:
             token = _sign_token(rsa_private_key)
             resp = c.post("/run-all", headers={"Authorization": f"Bearer {token}"})
@@ -244,6 +246,7 @@ def test_jwks_unavailable_returns_503(monkeypatch, rsa_private_key):
 
 def test_upload_no_token_returns_401(client):
     import io
+
     resp = client.post(
         "/upload/aliments",
         files={"file": ("test.csv", io.BytesIO(b"a,b\n1,2"), "text/csv")},
@@ -253,6 +256,7 @@ def test_upload_no_token_returns_401(client):
 
 def test_upload_valid_token_accepted(client, valid_token):
     import io
+
     resp = client.post(
         "/upload/aliments",
         files={"file": ("test.csv", io.BytesIO(b"a,b\n1,2"), "text/csv")},

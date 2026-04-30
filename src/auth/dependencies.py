@@ -38,7 +38,9 @@ async def require_auth(
     issuer = _issuer()
     audience = _audience()
     if not issuer or not audience:
-        logger.error("Configuration auth manquante | ZITADEL_ISSUER ou JWT_AUDIENCE non défini")
+        logger.error(
+            "Configuration auth manquante | ZITADEL_ISSUER ou JWT_AUDIENCE non défini"
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Configuration auth manquante",
