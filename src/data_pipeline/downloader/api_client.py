@@ -180,7 +180,7 @@ def fetch_exercisedb_data_rapid_api():
 
 def fetch_exercisedb_data():
     """Récupère les exercices via l'API ExerciseDB avec gestion d'erreurs."""
-    output_path = os.path.join(DATA_RAW_DIR, "exercisedb_v1.json")
+    output_path = os.path.join(DATA_RAW_DIR, "exercisedb_hobby_v1.json")
 
     # Cache: on skip si un fichier de type exercisedb_hobby_v1.*.json existe deja.
     existing_files = os.listdir(DATA_RAW_DIR)
