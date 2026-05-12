@@ -311,6 +311,132 @@ def fetch_exercisedb_data():
             "Erreur inconnue lors de l'appel API ExerciseDB_V1 | Erreur : {}", str(e)
         )
 
+def fetch_exerciseWGER_data():
+    """Récupère les exercices via l'API wger avec gestion d'erreurs."""
+    output_path = os.path.join(DATA_RAW_DIR, "exercise_wger.json")
+
+    # Cache: on skip si un fichier de type exercise_wger.*.json existe deja.
+    existing_files = os.listdir(DATA_RAW_DIR)
+    has_versioned_cache = any(
+        filename.startswith("exercise_wger.") and filename.endswith(".json")
+        for filename in existing_files
+    )
+
+    if has_versioned_cache:
+        logger.info("Cache local trouvé pour exercise_wger, téléchargement ignoré")
+        return
+
+    base_url = "https://wger.de/api/v2/exerciseinfo"
+
+    logger.info("Appel de l'API exercise_wger en cours (pagination)")
+
+    max_pages = int(os.getenv("EXERCISE_WGER_MAX_PAGES", "100"))
+    all_rows: list[dict] = []
+    next_url: str | None = None
+    used_urls: list[str] = []
+
+    try:
+        for page_index in range(max_pages):
+            # Premier appel ou récupération de la suite via next_url
+            if next_url:
+                url = next_url
+                params: dict[str, int] = {}
+            else:
+                url = base_url
+                params = {"limit": 1000}
+
+            prepared_request = requests.Request(
+                method="GET", url=url, params=params
+            ).prepare()
+            logger.debug(
+                "ExerciseWGER request | URL : {}",
+                prepared_request.url,
+            )
+
+            # On utilise le timeout pour éviter que le script ne bloque indéfiniment
+            response = requests.get(url, params=params, timeout=30)
+
+            # Verification du code HTTP si différent de 200-99 -> except
+            response.raise_for_status()
+
+            payload = response.json() or {}
+            page_data = payload.get("results")
+            next_page = payload.get("next")
+
+            if not isinstance(page_data, list):
+                logger.warning(
+                    "Format inattendu de la réponse ExerciseWGER (results non-liste), arrêt de la récupération."
+                )
+                break
+
+            if not page_data:
+                if page_index == 0:
+                    logger.warning(
+                        "Réponse API ExerciseWGER vide, aucune donnée à enregistrer"
+                    )
+                    return
+                logger.info(
+                    "Page ExerciseWGER vide rencontrée, arrêt pagination | Page : {}",
+                    page_index + 1,
+                )
+                break
+
+            all_rows.extend(page_data)
+
+            logger.info(
+                "Page ExerciseWGER récupérée | Page : {} | Lignes : {} | Total cumulé : {}",
+                page_index + 1,
+                len(page_data),
+                len(all_rows),
+            )
+
+            # Vérification du lien next pour la pagination
+            if not next_page:
+                logger.info("Fin de la pagination ExerciseWGER (next=null)")
+                break
+
+            # Vérifier que le next_url commence par la bonne base_url pour sécurité
+            if not next_page.startswith(base_url):
+                logger.warning(
+                    "ExerciseWGER - URL next invalide, arrêt pagination | next : {}",
+                    next_page,
+                )
+                break
+
+            # Détection des boucles : on vérifie qu'on n'a pas déjà utilisé cette URL
+            if next_page in used_urls:
+                logger.warning(
+                    "ExerciseWGER - URL déjà utilisée (boucle détectée), arrêt pagination | URL : {}",
+                    next_page,
+                )
+                break
+
+            used_urls.append(next_page)
+            next_url = next_page
+
+        if not all_rows:
+            logger.warning("Aucune donnée ExerciseWGER à enregistrer")
+            return
+
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(all_rows, f, indent=4, ensure_ascii=False)
+        
+        logger.info("Données ExerciseWGER enregistrées | Fichier : {} | Lignes : {}", output_path, len(all_rows))
+
+    except requests.exceptions.HTTPError as http_err:
+        logger.error(
+            "Erreur HTTP lors de l'appel API ExerciseWGER | Erreur : {}", str(http_err)
+        )
+    except requests.exceptions.ConnectionError:
+        logger.error(
+            "Erreur de connexion lors de l'appel API ExerciseWGER, vérifiez votre accès internet"
+        )
+    except Exception as e:
+        logger.error(
+            "Erreur inconnue lors de l'appel API ExerciseWGER | Erreur : {}", str(e)
+        )
+        
+
 
 def run_downloader():
     """Point d'entrée principal de l'extraction."""
@@ -330,6 +456,7 @@ def run_downloader():
     # On finit par les APIs d'exercice
     fetch_exercisedb_data()
     fetch_exercisedb_data_rapid_api()
+    fetch_exerciseWGER_data()
 
     logger.info("Fin de la phase EXTRACT")
 
