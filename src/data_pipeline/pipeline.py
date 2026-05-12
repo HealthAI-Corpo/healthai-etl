@@ -460,7 +460,16 @@ def execute_pipeline_exerciseWGER(file_path: str = None) -> list[str]:
                 ordre=1,
                 type_transformation=TypeTransformation.ARRAY_UNIQUE,
                 condition_fail_behavior=ConditionFailBehavior.ERROR,
-            )
+            ),
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=6,
+                ordre=2,
+                type_transformation=TypeTransformation.REGEX_REPLACE,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_str=r"none \(bodyweight exercise\)",
+                value_str_2="BODY WEIGHT",
+            ),
         ],
     )
 
