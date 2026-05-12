@@ -311,6 +311,80 @@ def fetch_exercisedb_data():
             "Erreur inconnue lors de l'appel API ExerciseDB_V1 | Erreur : {}", str(e)
         )
 
+def transform_exerciseWGER_raw_to_flat(exercise: dict) -> dict | None:
+    """
+    Aplatiit un exercice wger brut en structure compatible avec le pipeline ETL.
+    
+    Extrait:
+    - name: de translations avec language==2
+    - instructions: de description_source (translations, language==2)
+    - muscles: liste des noms de muscles principaux
+    - muscles_secondary: liste des noms de muscles secondaires
+    - equipment: liste des noms d'équipements
+    
+    Retourne None si la donnée obligatoire (translation language==2) est manquante.
+    """
+    try:
+        # Extraction de la traduction anglaise (language==2)
+        translations = exercise.get("translations") or []
+        en_translation = None
+        for trans in translations:
+            if trans.get("language") == 2:
+                en_translation = trans
+                break
+        
+        if not en_translation:
+            logger.warning(
+                "ExerciseWGER - Translation language==2 manquante pour exercice ID: {}",
+                exercise.get("id"),
+            )
+            return None
+        
+        # Extraction du nom
+        name = en_translation.get("name", "").strip()
+        if not name:
+            logger.warning(
+                "ExerciseWGER - Nom vide pour exercice ID: {}", exercise.get("id")
+            )
+            return None
+        
+        # Extraction des instructions
+        instructions = en_translation.get("description_source", "").strip()
+        
+        # Extraction des muscles principaux
+        muscles = exercise.get("muscles") or []
+        muscles_list = [m.get("name", "").strip() for m in muscles if m.get("name")]
+        
+        # Extraction des muscles secondaires
+        muscles_secondary = exercise.get("muscles_secondary") or []
+        muscles_secondary_list = [m.get("name", "").strip() for m in muscles_secondary if m.get("name")]
+        
+        # Extraction des équipements
+        equipment = exercise.get("equipment") or []
+        equipment_list = [e.get("name", "").strip() for e in equipment if e.get("name")]
+        
+        # Extraction de la catégorie
+        category = exercise.get("category") or {}
+        category_name = category.get("name", "UNKNOWN").strip()
+        
+        return {
+            "name": name,
+            "instructions": instructions,
+            "muscles": muscles_list,
+            "muscles_secondary": muscles_secondary_list,
+            "equipment": equipment_list,
+            "category_name": category_name,
+        }
+    
+    except Exception as e:
+        logger.error(
+            "ExerciseWGER - Erreur lors de la transformation exercice ID: {} | Erreur: {}",
+            exercise.get("id"),
+            str(e),
+        )
+        return None
+
+
 def fetch_exerciseWGER_data():
     """Récupère les exercices via l'API wger avec gestion d'erreurs."""
     output_path = os.path.join(DATA_RAW_DIR, "exercise_wger.json")
@@ -418,10 +492,29 @@ def fetch_exerciseWGER_data():
             logger.warning("Aucune donnée ExerciseWGER à enregistrer")
             return
 
-        with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(all_rows, f, indent=4, ensure_ascii=False)
+        # Transformation du JSON brut en format aplatit compatible ETL
+        flattened_rows = []
+        skipped_count = 0
+        for raw_exercise in all_rows:
+            flattened = transform_exerciseWGER_raw_to_flat(raw_exercise)
+            if flattened:
+                flattened_rows.append(flattened)
+            else:
+                skipped_count += 1
         
-        logger.info("Données ExerciseWGER enregistrées | Fichier : {} | Lignes : {}", output_path, len(all_rows))
+        if not flattened_rows:
+            logger.warning("Aucune donnée ExerciseWGER à enregistrer après transformation")
+            return
+
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(flattened_rows, f, indent=4, ensure_ascii=False)
+        
+        logger.info(
+            "Données ExerciseWGER enregistrées | Fichier : {} | Lignes : {} | Lignes ignorées : {}",
+            output_path,
+            len(flattened_rows),
+            skipped_count,
+        )
 
     except requests.exceptions.HTTPError as http_err:
         logger.error(
