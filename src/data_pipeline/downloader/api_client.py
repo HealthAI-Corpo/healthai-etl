@@ -3,6 +3,7 @@ import requests
 import kagglehub
 import json
 import shutil
+import time
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -51,7 +52,7 @@ def download_from_kaggle(dataset_handle: str):
         )
 
 
-def fetch_exercisedb_data():
+def fetch_exercisedb_data_rapid_api():
     """Récupère les exercices via l'API ExerciseDB avec gestion d'erreurs."""
     output_path = os.path.join(DATA_RAW_DIR, "exercisedb_hobby.json")
 
@@ -77,31 +78,92 @@ def fetch_exercisedb_data():
         "X-RapidAPI-Host": "edb-with-videos-and-images-by-ascendapi.p.rapidapi.com",
     }
 
-    logger.info("Appel de l'API ExerciseDB en cours")
+    logger.info("Appel de l'API ExerciseDB rapid api en cours (pagination)")
+
+    max_pages = int(os.getenv("EXERCISE_DB_MAX_PAGES", "120"))
+    all_rows: list[dict] = []
+    after_cursor: str | None = None
+    used_cursors: list[str] = []
 
     try:
-        # On utilise le timeout pour éviter que le script ne bloque indéfiniment
-        response = requests.get(
-            base_url, headers=headers, params={"limit": 200}, timeout=30
-        )
+        for page_index in range(max_pages):
+            params: dict[str, str | int] = {"limit": 100}
+            if after_cursor:
+                params["after"] = after_cursor
 
-        # Verification du code HTTP si différent de 200-99 -> except
-        response.raise_for_status()
+            prepared_request = requests.Request(
+                method="GET", url=base_url, params=params
+            ).prepare()
+            logger.debug(
+                "ExerciseDB request | URL : {}",
+                prepared_request.url,
+            )
 
-        data = response.json()["data"]
+            # On utilise le timeout pour éviter que le script ne bloque indéfiniment
+            response = requests.get(base_url, headers=headers, params=params, timeout=30)
 
-        if not data:
-            logger.warning("Réponse API ExerciseDB vide, aucune donnée à enregistrer")
+            # Verification du code HTTP si différent de 200-99 -> except
+            response.raise_for_status()
+
+            payload = response.json() or {}
+            page_data = payload.get("data")
+            meta = payload.get("meta") or {}
+
+            if not isinstance(page_data, list):
+                logger.warning(
+                    "Format inattendu de la réponse ExerciseDB (data non-liste), arrêt de la récupération de ExerciseDB."
+                )
+                break
+
+            if not page_data:
+                if page_index == 0:
+                    logger.warning(
+                        "Réponse API ExerciseDB vide, aucune donnée à enregistrer"
+                    )
+                    return
+                logger.info(
+                    "Page ExerciseDB vide rencontrée, arrêt pagination | Page : {}",
+                    page_index + 1,
+                )
+                break
+
+            all_rows.extend(page_data)
+
+            has_next_page = bool(meta.get("hasNextPage"))
+            next_cursor = meta.get("nextCursor")
+
+            logger.info(
+                "Page ExerciseDB récupérée | Page : {} | Lignes : {} | Total cumulé : {}",
+                page_index + 1,
+                len(page_data),
+                len(all_rows),
+            )
+
+            if not has_next_page:
+                break
+
+            if not next_cursor:
+                logger.warning(
+                    "ExerciseDB - hasNextPage=true mais nextCursor absent, arrêt pagination."
+                )
+                break
+
+            if next_cursor in used_cursors:
+                logger.warning(
+                    "ExerciseDB - Cursor déjà utilisé (boucle détectée), arrêt pagination | Cursor : {}",
+                    next_cursor,
+                )
+                break
+
+            used_cursors.append(next_cursor)
+            after_cursor = next_cursor
+
+        if not all_rows:
+            logger.warning("Aucune donnée ExerciseDB à enregistrer")
             return
 
         with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=4, ensure_ascii=False)
-
-        logger.info(
-            "Exercices sauvegardés depuis l'API ExerciseDB | Nombre : {} | Fichier : {}",
-            len(data),
-            output_path,
-        )
+            json.dump(all_rows, f, indent=4, ensure_ascii=False)
 
     except requests.exceptions.HTTPError as http_err:
         logger.error(
@@ -115,6 +177,358 @@ def fetch_exercisedb_data():
         logger.error(
             "Erreur inconnue lors de l'appel API ExerciseDB | Erreur : {}", str(e)
         )
+
+def fetch_exercisedb_data():
+    """Récupère les exercices via l'API ExerciseDB avec gestion d'erreurs."""
+    output_path = os.path.join(DATA_RAW_DIR, "exercisedb_hobby_v1.json")
+
+    # Cache: on skip si un fichier de type exercisedb_hobby_v1.*.json existe deja.
+    existing_files = os.listdir(DATA_RAW_DIR)
+    has_versioned_cache = any(
+        filename.startswith("exercisedb_hobby_v1.") and filename.endswith(".json")
+        for filename in existing_files
+    )
+
+    if has_versioned_cache:
+        logger.info("Cache local trouvé pour ExerciseDB V1, téléchargement ignoré")
+        return
+
+    base_url = "https://oss.exercisedb.dev/api/v1/exercises"
+
+    logger.info("Appel de l'API ExerciseDB_V1 en cours (pagination)")
+
+    max_pages = int(os.getenv("EXERCISE_DB_MAX_PAGES", "1000"))
+    all_rows: list[dict] = []
+    after_cursor: str | None = None
+    used_cursors: list[str] = []
+
+    try:
+        for page_index in range(max_pages):
+            params: dict[str, str | int] = {"limit": 100}
+            if after_cursor:
+                params["after"] = after_cursor
+
+            prepared_request = requests.Request(
+                method="GET", url=base_url, params=params
+            ).prepare()
+            logger.debug(
+                "ExerciseDB_V1 request | URL : {}",
+                prepared_request.url,
+            )
+
+            # On utilise le timeout pour éviter que le script ne bloque indéfiniment.
+            # Retry simple en cas de 429 (2 retries max, attente 5s).
+            response: requests.Response | None = None
+            for attempt_index in range(3):
+                response = requests.get(base_url, params=params, timeout=30)
+
+                if response.status_code == 429 and attempt_index < 2:
+                    logger.warning(
+                        "ExerciseDB_V1 - 429 Too Many Requests, attente 10s puis retry | Tentative : {}/3",
+                        attempt_index + 1,
+                    )
+                    time.sleep(10)
+                    continue
+
+                break
+
+            if response is None:
+                raise RuntimeError("Aucune réponse HTTP reçue depuis ExerciseDB_V1")
+
+            # Verification du code HTTP si différent de 200-99 -> except
+            response.raise_for_status()
+
+            payload = response.json() or {}
+            page_data = payload.get("data")
+            meta = payload.get("meta") or {}
+
+            if not isinstance(page_data, list):
+                logger.warning(
+                    "Format inattendu de la réponse ExerciseDB_V1 (data non-liste), arrêt de la récupération de ExerciseDB_V1."
+                )
+                break
+
+            if not page_data:
+                if page_index == 0:
+                    logger.warning(
+                        "Réponse API ExerciseDB_V1 vide, aucune donnée à enregistrer"
+                    )
+                    return
+                logger.info(
+                    "Page ExerciseDB_V1 vide rencontrée, arrêt pagination | Page : {}",
+                    page_index + 1,
+                )
+                break
+
+            all_rows.extend(page_data)
+
+            has_next_page = bool(meta.get("hasNextPage"))
+            next_cursor = meta.get("nextCursor")
+
+            logger.info(
+                "Page ExerciseDB_V1 récupérée | Page : {} | Lignes : {} | Total cumulé : {}",
+                page_index + 1,
+                len(page_data),
+                len(all_rows),
+            )
+
+            if not has_next_page:
+                break
+
+            if not next_cursor:
+                logger.warning(
+                    "ExerciseDB_V1 - hasNextPage=true mais nextCursor absent, arrêt pagination."
+                )
+                break
+
+            if next_cursor in used_cursors:
+                logger.warning(
+                    "ExerciseDB_V1 - Cursor déjà utilisé (boucle détectée), arrêt pagination | Cursor : {}",
+                    next_cursor,
+                )
+                break
+
+            used_cursors.append(next_cursor)
+            after_cursor = next_cursor
+
+        if not all_rows:
+            logger.warning("Aucune donnée ExerciseDB_V1 à enregistrer")
+            return
+
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(all_rows, f, indent=4, ensure_ascii=False)
+
+    except requests.exceptions.HTTPError as http_err:
+        logger.error(
+            "Erreur HTTP lors de l'appel API ExerciseDB_V1 | Erreur : {}", str(http_err)
+        )
+    except requests.exceptions.ConnectionError:
+        logger.error(
+            "Erreur de connexion lors de l'appel API ExerciseDB_V1, vérifiez votre accès internet"
+        )
+    except Exception as e:
+        logger.error(
+            "Erreur inconnue lors de l'appel API ExerciseDB_V1 | Erreur : {}", str(e)
+        )
+
+def transform_exerciseWGER_raw_to_flat(exercise: dict) -> dict | None:
+    """
+    Aplatiit un exercice wger brut en structure compatible avec le pipeline ETL.
+    
+    Extrait:
+    - name: de translations avec language==2
+    - instructions: de description_source (translations, language==2)
+    - muscles: liste des noms de muscles principaux
+    - muscles_secondary: liste des noms de muscles secondaires
+    - equipment: liste des noms d'équipements
+    
+    Retourne None si la donnée obligatoire (translation language==2) est manquante.
+    """
+    try:
+        # Extraction de la traduction anglaise (language==2)
+        translations = exercise.get("translations") or []
+        en_translation = None
+        for trans in translations:
+            if trans.get("language") == 2:
+                en_translation = trans
+                break
+        
+        if not en_translation:
+            logger.warning(
+                "ExerciseWGER - Translation language==2 manquante pour exercice ID: {}",
+                exercise.get("id"),
+            )
+            return None
+        
+        # Extraction du nom
+        name = en_translation.get("name", "").strip()
+        if not name:
+            logger.warning(
+                "ExerciseWGER - Nom vide pour exercice ID: {}", exercise.get("id")
+            )
+            return None
+        
+        # Extraction des instructions
+        instructions = en_translation.get("description_source", "").strip()
+        
+        # Extraction des muscles principaux
+        muscles = exercise.get("muscles") or []
+        muscles_list = [m.get("name", "").strip() for m in muscles if m.get("name")]
+        
+        # Extraction des muscles secondaires
+        muscles_secondary = exercise.get("muscles_secondary") or []
+        muscles_secondary_list = [m.get("name", "").strip() for m in muscles_secondary if m.get("name")]
+        
+        # Extraction des équipements
+        equipment = exercise.get("equipment") or []
+        equipment_list = [e.get("name", "").strip() for e in equipment if e.get("name")]
+        
+        # Extraction de la catégorie
+        category = exercise.get("category") or {}
+        category_name = category.get("name", "UNKNOWN").strip()
+        
+        return {
+            "name": name,
+            "instructions": instructions,
+            "muscles": muscles_list,
+            "muscles_secondary": muscles_secondary_list,
+            "equipment": equipment_list,
+            "category_name": category_name,
+        }
+    
+    except Exception as e:
+        logger.error(
+            "ExerciseWGER - Erreur lors de la transformation exercice ID: {} | Erreur: {}",
+            exercise.get("id"),
+            str(e),
+        )
+        return None
+
+
+def fetch_exerciseWGER_data():
+    """Récupère les exercices via l'API wger avec gestion d'erreurs."""
+    output_path = os.path.join(DATA_RAW_DIR, "exercise_wger.json")
+
+    # Cache: on skip si un fichier de type exercise_wger.*.json existe deja.
+    existing_files = os.listdir(DATA_RAW_DIR)
+    has_versioned_cache = any(
+        filename.startswith("exercise_wger.") and filename.endswith(".json")
+        for filename in existing_files
+    )
+
+    if has_versioned_cache:
+        logger.info("Cache local trouvé pour exercise_wger, téléchargement ignoré")
+        return
+
+    base_url = "https://wger.de/api/v2/exerciseinfo"
+
+    logger.info("Appel de l'API exercise_wger en cours (pagination)")
+
+    max_pages = int(os.getenv("EXERCISE_WGER_MAX_PAGES", "100"))
+    all_rows: list[dict] = []
+    next_url: str | None = None
+    used_urls: list[str] = []
+
+    try:
+        for page_index in range(max_pages):
+            # Premier appel ou récupération de la suite via next_url
+            if next_url:
+                url = next_url
+                params: dict[str, int] = {}
+            else:
+                url = base_url
+                params = {"limit": 1000}
+
+            prepared_request = requests.Request(
+                method="GET", url=url, params=params
+            ).prepare()
+            logger.debug(
+                "ExerciseWGER request | URL : {}",
+                prepared_request.url,
+            )
+
+            # On utilise le timeout pour éviter que le script ne bloque indéfiniment
+            response = requests.get(url, params=params, timeout=30)
+
+            # Verification du code HTTP si différent de 200-99 -> except
+            response.raise_for_status()
+
+            payload = response.json() or {}
+            page_data = payload.get("results")
+            next_page = payload.get("next")
+
+            if not isinstance(page_data, list):
+                logger.warning(
+                    "Format inattendu de la réponse ExerciseWGER (results non-liste), arrêt de la récupération."
+                )
+                break
+
+            if not page_data:
+                if page_index == 0:
+                    logger.warning(
+                        "Réponse API ExerciseWGER vide, aucune donnée à enregistrer"
+                    )
+                    return
+                logger.info(
+                    "Page ExerciseWGER vide rencontrée, arrêt pagination | Page : {}",
+                    page_index + 1,
+                )
+                break
+
+            all_rows.extend(page_data)
+
+            logger.info(
+                "Page ExerciseWGER récupérée | Page : {} | Lignes : {} | Total cumulé : {}",
+                page_index + 1,
+                len(page_data),
+                len(all_rows),
+            )
+
+            # Vérification du lien next pour la pagination
+            if not next_page:
+                logger.info("Fin de la pagination ExerciseWGER (next=null)")
+                break
+
+            # Vérifier que le next_url commence par la bonne base_url pour sécurité
+            if not next_page.startswith(base_url):
+                logger.warning(
+                    "ExerciseWGER - URL next invalide, arrêt pagination | next : {}",
+                    next_page,
+                )
+                break
+
+            # Détection des boucles : on vérifie qu'on n'a pas déjà utilisé cette URL
+            if next_page in used_urls:
+                logger.warning(
+                    "ExerciseWGER - URL déjà utilisée (boucle détectée), arrêt pagination | URL : {}",
+                    next_page,
+                )
+                break
+
+            used_urls.append(next_page)
+            next_url = next_page
+
+        if not all_rows:
+            logger.warning("Aucune donnée ExerciseWGER à enregistrer")
+            return
+
+        # Transformation du JSON brut en format aplatit compatible ETL
+        flattened_rows = []
+        skipped_count = 0
+        for raw_exercise in all_rows:
+            flattened = transform_exerciseWGER_raw_to_flat(raw_exercise)
+            if flattened:
+                flattened_rows.append(flattened)
+            else:
+                skipped_count += 1
+        
+        if not flattened_rows:
+            logger.warning("Aucune donnée ExerciseWGER à enregistrer après transformation")
+            return
+
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(flattened_rows, f, indent=4, ensure_ascii=False)
+        
+        logger.info(
+            "Données ExerciseWGER enregistrées | Fichier : {} | Lignes : {} | Lignes ignorées : {}",
+            output_path,
+            len(flattened_rows),
+            skipped_count,
+        )
+
+    except requests.exceptions.HTTPError as http_err:
+        logger.error(
+            "Erreur HTTP lors de l'appel API ExerciseWGER | Erreur : {}", str(http_err)
+        )
+    except requests.exceptions.ConnectionError:
+        logger.error(
+            "Erreur de connexion lors de l'appel API ExerciseWGER, vérifiez votre accès internet"
+        )
+    except Exception as e:
+        logger.error(
+            "Erreur inconnue lors de l'appel API ExerciseWGER | Erreur : {}", str(e)
+        )
+        
 
 
 def run_downloader():
@@ -132,8 +546,10 @@ def run_downloader():
     for ds in kaggle_datasets:
         download_from_kaggle(ds)
 
-    # On finit par l'API
+    # On finit par les APIs d'exercice
     fetch_exercisedb_data()
+    fetch_exercisedb_data_rapid_api()
+    fetch_exerciseWGER_data()
 
     logger.info("Fin de la phase EXTRACT")
 

@@ -224,6 +224,277 @@ def execute_pipeline_exercisedb_hobby(file_path: str = None) -> list[str]:
 
     return execute_pipeline_etl(pipeline, override_path=file_path)
 
+def execute_pipeline_exercisedb_hobby_v1(file_path: str = None) -> list[str]:
+    """Build a PipelineETL config for exercisedb_hobby import."""
+    col_nom = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="nom",
+        colonne_fichier="name",
+        in_file=True,
+        type_donnees=TypeDonnees.STRING,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=StringConstraint(1, min_length=0, max_length=150),
+        transformations=[],
+    )
+
+    col_exercise_type = ETLColumnMapping(
+        id_etl_column_mapping=2,
+        colonne_bdd="type_exercice",
+        colonne_fichier="exerciseType",
+        in_file=False,
+        type_donnees=TypeDonnees.STRING,
+        nullable=None,
+        valeur_defaut="UNKNOWN",
+        unique_constraint=False,
+        constraint=StringConstraint(4, min_length=0, max_length=500),
+        transformations=[],
+    )
+
+    col_muscles_principaux = ETLColumnMapping(
+        id_etl_column_mapping=3,
+        colonne_bdd="muscles_principaux",
+        colonne_fichier="targetMuscles",
+        in_file=True,
+        type_donnees=TypeDonnees.ARRAY_DELIMITED_JSON,
+        nullable=True,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=StringConstraint(4, min_length=0, max_length=1500),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=1,
+                id_etl_column_mapping=3,
+                ordre=1,
+                type_transformation=TypeTransformation.ARRAY_UNIQUE,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+            )
+        ],
+    )
+
+    col_muscles_secondaires = ETLColumnMapping(
+        id_etl_column_mapping=4,
+        colonne_bdd="muscles_secondaires",
+        colonne_fichier="secondaryMuscles",
+        in_file=True,
+        type_donnees=TypeDonnees.ARRAY_DELIMITED_JSON,
+        nullable=True,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=StringConstraint(2, min_length=0, max_length=1500),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=2,
+                id_etl_column_mapping=4,
+                ordre=1,
+                type_transformation=TypeTransformation.ARRAY_UNIQUE,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+            )
+        ],
+    )
+
+    col_equipement = ETLColumnMapping(
+        id_etl_column_mapping=5,
+        colonne_bdd="equipement",
+        colonne_fichier="equipments",
+        in_file=True,
+        type_donnees=TypeDonnees.ARRAY_DELIMITED_JSON,
+        nullable=True,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=StringConstraint(5, min_length=0, max_length=1500),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=3,
+                id_etl_column_mapping=5,
+                ordre=1,
+                type_transformation=TypeTransformation.ARRAY_UNIQUE,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+            )
+        ],
+    )
+
+    col_instructions = ETLColumnMapping(
+        id_etl_column_mapping=5,
+        colonne_bdd="instructions",
+        colonne_fichier="instructions",
+        in_file=True,
+        type_donnees=TypeDonnees.ARRAY_DELIMITED_JSON,
+        nullable=True,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=StringConstraint(5, min_length=0, max_length=3000),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=3,
+                id_etl_column_mapping=5,
+                ordre=1,
+                type_transformation=TypeTransformation.ARRAY_UNIQUE,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+            )
+        ],
+    )
+
+    pipeline = PipelineETL(
+        id_etl_pipeline=10,
+        libelle="Import exercisedb_hobby_v1",
+        table_nom="exercice",
+        dossier_emplacement="raw",
+        nom_fichier_fixe="exercisedb_hobby_v1",
+        nom_fichier_variable="",
+        extension_fichier=ExtensionFichier.JSON,
+        dossier_clean_emplacement="clean",
+        active=True,
+        colonnes=[
+            col_nom,
+            col_exercise_type,
+            col_muscles_principaux,
+            col_equipement,
+            col_muscles_secondaires,
+            col_instructions,
+        ],
+    )
+
+    return execute_pipeline_etl(pipeline, override_path=file_path)
+
+
+def execute_pipeline_exerciseWGER(file_path: str = None) -> list[str]:
+    """Build a PipelineETL config for exercise_wger import (après transformation aplatiie en API)."""
+    
+    col_nom = ETLColumnMapping(
+        id_etl_column_mapping=1,
+        colonne_bdd="nom",
+        colonne_fichier="name",
+        in_file=True,
+        type_donnees=TypeDonnees.STRING,
+        nullable=False,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=StringConstraint(1, min_length=0, max_length=150),
+        transformations=[],
+    )
+
+    col_exercise_type = ETLColumnMapping(
+        id_etl_column_mapping=2,
+        colonne_bdd="type_exercice",
+        colonne_fichier="category_name",
+        in_file=True,
+        type_donnees=TypeDonnees.STRING,
+        nullable=True,
+        valeur_defaut="UNKNOWN",
+        unique_constraint=False,
+        constraint=StringConstraint(4, min_length=0, max_length=500),
+        transformations=[],
+    )
+
+    col_instructions = ETLColumnMapping(
+        id_etl_column_mapping=3,
+        colonne_bdd="instructions",
+        colonne_fichier="instructions",
+        in_file=True,
+        type_donnees=TypeDonnees.STRING,
+        nullable=True,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=StringConstraint(5, min_length=0, max_length=3000),
+        transformations=[],
+    )
+
+    col_muscles_principaux = ETLColumnMapping(
+        id_etl_column_mapping=4,
+        colonne_bdd="muscles_principaux",
+        colonne_fichier="muscles",
+        in_file=True,
+        type_donnees=TypeDonnees.ARRAY_DELIMITED_JSON,
+        nullable=True,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=StringConstraint(4, min_length=0, max_length=1500),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=1,
+                id_etl_column_mapping=4,
+                ordre=1,
+                type_transformation=TypeTransformation.ARRAY_UNIQUE,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+            )
+        ],
+    )
+
+    col_muscles_secondaires = ETLColumnMapping(
+        id_etl_column_mapping=5,
+        colonne_bdd="muscles_secondaires",
+        colonne_fichier="muscles_secondary",
+        in_file=True,
+        type_donnees=TypeDonnees.ARRAY_DELIMITED_JSON,
+        nullable=True,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=StringConstraint(2, min_length=0, max_length=1500),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=2,
+                id_etl_column_mapping=5,
+                ordre=1,
+                type_transformation=TypeTransformation.ARRAY_UNIQUE,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+            )
+        ],
+    )
+
+    col_equipement = ETLColumnMapping(
+        id_etl_column_mapping=6,
+        colonne_bdd="equipement",
+        colonne_fichier="equipment",
+        in_file=True,
+        type_donnees=TypeDonnees.ARRAY_DELIMITED_JSON,
+        nullable=True,
+        valeur_defaut=None,
+        unique_constraint=False,
+        constraint=StringConstraint(5, min_length=0, max_length=1500),
+        transformations=[
+            ETLColumnTransformation(
+                id_transformation=3,
+                id_etl_column_mapping=6,
+                ordre=1,
+                type_transformation=TypeTransformation.ARRAY_UNIQUE,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+            ),
+            ETLColumnTransformation(
+                id_transformation=5,
+                id_etl_column_mapping=6,
+                ordre=2,
+                type_transformation=TypeTransformation.REGEX_REPLACE,
+                condition_fail_behavior=ConditionFailBehavior.ERROR,
+                value_str=r"none \(bodyweight exercise\)",
+                value_str_2="BODY WEIGHT",
+            ),
+        ],
+    )
+
+    pipeline = PipelineETL(
+        id_etl_pipeline=11,
+        libelle="Import exercise_wger",
+        table_nom="exercice",
+        dossier_emplacement="raw",
+        nom_fichier_fixe="exercise_wger",
+        nom_fichier_variable="",
+        extension_fichier=ExtensionFichier.JSON,
+        dossier_clean_emplacement="clean",
+        active=True,
+        colonnes=[
+            col_nom,
+            col_exercise_type,
+            col_instructions,
+            col_muscles_principaux,
+            col_muscles_secondaires,
+            col_equipement,
+        ],
+    )
+
+    return execute_pipeline_etl(pipeline, override_path=file_path)
+
 
 def execute_pipeline_daily_food(file_path: str = None) -> list[str]:
     """Build a PipelineETL config with ALL columns from daily_food_nutrition_dataset.csv."""
@@ -1944,7 +2215,9 @@ def run_all_pipelines() -> dict:
     results = {}
 
     pipelines = {
-        "exercices": execute_pipeline_exercisedb_hobby,
+        "exercicesdb_V2": execute_pipeline_exercisedb_hobby,
+        "exercicesdb_V1": execute_pipeline_exercisedb_hobby_v1,
+        "exercise_wger": execute_pipeline_exerciseWGER,
         "diet_recommendations": execute_pipeline_diet_recommendations_dataset,
         "daily_food": execute_pipeline_daily_food,
         "historique_seance": execute_pipeline_dataset_historique_seance_exercice,
