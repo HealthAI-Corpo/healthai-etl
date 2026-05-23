@@ -224,6 +224,7 @@ def execute_pipeline_exercisedb_hobby(file_path: str = None) -> list[str]:
 
     return execute_pipeline_etl(pipeline, override_path=file_path)
 
+
 def execute_pipeline_exercisedb_hobby_v1(file_path: str = None) -> list[str]:
     """Build a PipelineETL config for exercisedb_hobby import."""
     col_nom = ETLColumnMapping(
@@ -361,7 +362,7 @@ def execute_pipeline_exercisedb_hobby_v1(file_path: str = None) -> list[str]:
 
 def execute_pipeline_exerciseWGER(file_path: str = None) -> list[str]:
     """Build a PipelineETL config for exercise_wger import (après transformation aplatiie en API)."""
-    
+
     col_nom = ETLColumnMapping(
         id_etl_column_mapping=1,
         colonne_bdd="nom",
