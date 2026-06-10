@@ -36,9 +36,9 @@ services:
       MB_DB_TYPE: postgres
       MB_DB_HOST: db
       MB_DB_PORT: 5432
-      MB_DB_DBNAME: ${POSTGRES_DB}
-      MB_DB_USER: ${POSTGRES_USER}
-      MB_DB_PASS: ${POSTGRES_PASSWORD}
+      MB_DB_DBNAME: ${POSTGRES_DB:-healthai_db}
+      MB_DB_USER: ${POSTGRES_USER:-healthai}
+      MB_DB_PASS: ${POSTGRES_PASSWORD:-healthai_pass}
     ports:
       - "3000:3000"
 

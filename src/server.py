@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from prometheus_fastapi_instrumentator import Instrumentator
 from fastapi import (
     FastAPI,
     UploadFile,
@@ -212,3 +213,6 @@ async def run_download(
     logger.info("Exécution du téléchargement des données lancée")
     background_tasks.add_task(run_downloader)
     return {"message": "Exécution du téléchargement des données lancée en arrière-plan"}
+
+
+Instrumentator().instrument(app).expose(app)
