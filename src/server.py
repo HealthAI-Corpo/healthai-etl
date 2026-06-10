@@ -214,4 +214,5 @@ async def run_download(
     background_tasks.add_task(run_downloader)
     return {"message": "Exécution du téléchargement des données lancée en arrière-plan"}
 
+
 Instrumentator().instrument(app).expose(app)
