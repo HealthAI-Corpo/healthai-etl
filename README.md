@@ -1,161 +1,264 @@
-# HealthAI - Module ETL (Extract, Transform, Load)
+<div align="center">
 
-Ce repository contient le pipeline de données de l'écosystème **HealthAI**. Son rôle est de récupérer les données de santé (APIs externes, fichiers JSON/CSV), de les normaliser et de les injecter dans la base de données PostgreSQL commune.
+# HealthAI ETL
 
-## Stack Technique
+**Pipeline de données de l'écosystème HealthAI Coach** — extraction des sources externes, harmonisation et chargement dans PostgreSQL.
 
-- **Langage :** Python 3.12+
-- **Gestionnaire de paquets :** [uv](https://docs.astral.sh/uv/) (Ultra-rapide, remplace pip/poetry)
-- **ORM :** SQLAlchemy 2.0 (Mapping Objet-Relationnel)
-- **Migrations :** Alembic (Versionnage du schéma de base de données)
-- **Environnement :** Docker & Docker-Compose
-- **API :** FastAPI (Serveur uvicorn)
+[![CI](https://github.com/HealthAI-Corpo/healthai-etl/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/HealthAI-Corpo/healthai-etl/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/Python-3.12+-3776AB?logo=python&logoColor=white)](https://www.python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0-D71F00?logo=sqlalchemy&logoColor=white)](https://www.sqlalchemy.org)
+[![uv](https://img.shields.io/badge/uv-package%20manager-DE5FE9?logo=uv&logoColor=white)](https://docs.astral.sh/uv/)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-FE5196?logo=conventionalcommits&logoColor=white)](https://www.conventionalcommits.org)
 
-## Structure du Projet
+[Architecture](#architecture) · [Démarrage rapide](#démarrage-rapide) · [API](#api) · [Authentification](#authentification) · [Automatisation](#automatisation-cron)
 
-```text
-├── alembic/ # Scripts de migrations SQL
-├── data/ # Stockage local des données (raw/clean)
-├── src/
-│ ├── data_pipeline/
-│ │ ├── downloader/ # Récupération des données sources
-│ │ ├── harmonize/ # Nettoyage et transformation (Logique métier)
-│ │ ├── loader/ # Insertion en base de données
-│ │ ├── database.py # Configuration de la connexion SQLAlchemy
-│ │ └── models.py # Définition des tables (Modèles ORM)
-│ ├── main.py # Point d'entrée du pipeline
-│ └── server.py # Serveur FastAPI (API)
-├── cron_kaggle.bat # Automatisation Windows (Planificateur de tâches)
-├── cron_kaggle.sh # Automatisation Unix (Linux/Mac)
-├── .env # Variables d'environnement
-├── docker-compose.yml # Infrastructure complète (App, DB, Metabase)
-└── pyproject.toml # Dépendances du projet (gérées par uv)
+</div>
+
+---
+
+## Sommaire
+
+- [Architecture](#architecture)
+- [Stack technique](#stack-technique)
+- [Démarrage rapide](#démarrage-rapide)
+- [Variables d'environnement](#variables-denvironnement)
+- [API](#api)
+- [Authentification](#authentification)
+- [Automatisation (cron)](#automatisation-cron)
+- [Qualité & tests](#qualité--tests)
+- [Structure du projet](#structure-du-projet)
+
+---
+
+## Architecture
+
+```mermaid
+flowchart LR
+    subgraph SOURCES["Sources externes"]
+        KAGGLE["Kaggle\ndatasets santé"]
+        EDB["ExerciseDB\nRapidAPI"]
+        FILES["Fichiers\nCSV / JSON"]
+    end
+
+    subgraph ETL["healthai-etl (ce repo)"]
+        DL["downloader\nextraction"]
+        HZ["harmonize\nnettoyage · normalisation"]
+        LD["loader\ninsertion SQLAlchemy"]
+        API["FastAPI\n/upload · /run · /run-all"]
+    end
+
+    DB[("PostgreSQL\nbase commune")]
+    META["Metabase\ndataviz"]
+
+    KAGGLE --> DL
+    EDB --> DL
+    FILES --> API
+    API --> HZ
+    DL --> HZ --> LD --> DB
+    DB --> META
 ```
 
-## Workflow Developpement
+Chaque pipeline suit le même cycle **extract → transform → load** : les données brutes atterrissent dans `data/raw`, sont harmonisées (types, doublons, valeurs aberrantes) puis chargées dans la base PostgreSQL partagée avec [healthai-api](https://github.com/HealthAI-Corpo/healthai-api).
 
-1. **Dev Local** En gros on taff en local pour tester rapidement avec uv sur nos machines pour coder et tester, la base de données est sur docker.
+---
 
-2. **Livraison** Lorsque c'est validé -> création et déploiement d'une image de L'ETL.
+## Stack technique
 
-## Installation et Démarrage.
+| Couche | Technologie |
+|---|---|
+| Langage | Python 3.12+ |
+| Paquets | [uv](https://docs.astral.sh/uv/) |
+| API | FastAPI · Uvicorn |
+| ORM | SQLAlchemy 2.0 |
+| Migrations | Alembic |
+| Identité | Zitadel — JWT RS256 (JWKS) · M2M JWT Profile |
+| Dataviz | Metabase (docker-compose) |
+| Qualité | Ruff (lint + format) · pytest |
+| Conteneurs | Docker · docker-compose |
 
-### prérequis
+---
 
-Installer UV sur la machine :
-powershell -ExecutionPolicy ByPass -c "irm [https://astral.sh/uv/install.ps1](https://astral.sh/uv/install.ps1) | iex
+## Démarrage rapide
 
-### configuration
+### Prérequis
 
-Créez un fichier .env  
-avec les variables d'environnement pour la connexion à la base de données :
-Note : Le docker-compose.yml est configuré pour écraser automatiquement les variables de connexion afin de s'adapter au réseau Docker sans modifier votre .env local.
+- [uv](https://docs.astral.sh/uv/getting-started/installation/) installé
+- Docker (pour la base de données)
 
-### Lancement hybride (Développement)
+### Installation
 
-Pour travailler en local il est conseillé de lancer la base de donnée via docker (docker desktop) ou commande Docker-compose up -d db
+```bash
+# 1. Dépendances
+uv sync
 
-- Installer les dépendances : uv sync
+# 2. Configuration
+cp .env.example .env        # puis éditer les valeurs
 
-- Appliquer les migrations : ```bash
-  uv run alembic revision --autogenerate -m "description_du_changement"
-  uv run alembic upgrade head grâce à la config dans env.py il adapte les types
+# 3. Base de données (Docker)
+docker-compose up -d db
 
-### Lancer l'infrastructure complète
+# 4. Migrations
+uv run alembic upgrade head
 
+# 5. Serveur FastAPI
+uv run uvicorn src.server:app --reload
+# → http://127.0.0.1:8000/docs  (Swagger UI)
+```
+
+### Infrastructure complète (app + BDD + Metabase)
+
+```bash
 docker-compose up -d --build
-
-### Automatisation de l'ingestion des données sources via CRON
-
-Pour automatiser la récupération des données Kaggle sans avoir à gérer l'environnement Python du système hôte, des scripts universels sont disponibles à la racine cron_kaggle.bat (windows)cron_kaggle.sh(Linux). Ils lancent les commandes à l'intérieur du container Docker déjà existant.
-
-Sur windows :
-
-- il faut avoir un plannificateur de tâche
-- Créer une tâche dans Windows
-- Action : Démarrer un programme
-- Script : Sélectionner cron_kaggle.bat
-- attention: Dans "Démarrer dans", mettre le chemin racine du projet.
-
-Sur linux mac :
-
-- Ajouter une ligne au crontab
-- Script : ./cron_kaggle.sh.
+```
 
 ### Exécuter le pipeline manuellement
 
-Avant d'exécuter la ligne suivante entrer dans le terminal -> $env:PYTHONPATH = "."
+```bash
+uv run python src/main.py                                    # pipeline complet
+uv run python src/data_pipeline/downloader/api_client.py     # téléchargements seuls
+```
 
-uv run python src/main.py
+---
 
-### Pour le Downloader
+## Variables d'environnement
 
-Récupérer la clé API sur kaggle créer son compte et aller dans les paramètres , récupérer également son username placer les crédentials dans .env
-Pour les exercices il faut créer un compte sur https://rapidapi.com/hub pour avoir une clé API (suivre le env.example)
-se rendre sur API EDB : https://rapidapi.com/ascendapi/api/edb-with-videos-and-images-by-ascendapi/playground/apiendpoint_bafbc96b-3f58-4a76-aad0-6f8bc44d3afb
+| Variable | Requis | Description |
+|---|:---:|---|
+| `DATABASE_URL` | ✅ | Connexion PostgreSQL (SQLAlchemy) |
+| `ZITADEL_ISSUER` | ✅ | URL de l'instance Zitadel (sans slash final) |
+| `JWT_AUDIENCE` | ✅ | **Project ID** du projet Zitadel — même valeur que côté healthai-api |
+| `USERNAME` / `APIKEY` | ✅ | Credentials [Kaggle](https://www.kaggle.com/settings) (section API) |
+| `EXERCISE_DB_API_KEY` | ✅ | Clé [RapidAPI](https://rapidapi.com/hub) pour ExerciseDB |
+| `ZITADEL_PROJECT_ID` | M2M | Project ID (scope d'audience du token machine) |
+| `ZITADEL_M2M_KEY_FILE` | M2M | Chemin de la clé machine JSON (jamais commitée — `secrets/` est ignoré) |
+| `LOG_LEVEL` / `LOG_DIR` / … | — | Configuration Loguru (voir `.env.example`) |
 
-- uv run python src/data_pipeline/downloader/api_client.py
+Modèle complet : [`.env.example`](.env.example).
 
-### Notebook
+---
 
-Pour lire les données recueillies dans Raw et faire une analyse
-Selectionner le kernel en haut a droite python 3.13 (stable pour utiliser pandas etc) pour pouvoir activer les cellules. UV nous a proposé directement la version 3.14 de python mais elle n'est pas stable je m'en suis rendu compte j'ai utiliser la commande : uv python pin 3.13 fermé vscode et ouvert et selectionné le kernel 3.13
+## API
 
-### Linter Ruff
+Documentation interactive sur **`/docs`** (Swagger UI).
 
-- uv run ruff format --check -> check le format
-- uv run ruff format . -> formate le code
-- uv run ruff check -> check les erreurs
-- uv run pytest -> run les test
+| Endpoint | Méthode | Accès | Description |
+|---|---|---|---|
+| `/health` | GET | Public | Statut du service |
+| `/upload/{pipeline}` | POST | **admin** | Upload d'un CSV/JSON puis traitement |
+| `/run/{pipeline}` | POST | **admin** | Exécute un pipeline précis |
+| `/run-all` | POST | **admin** | Exécute tous les pipelines |
+| `/run-download` | POST | **admin** | Télécharge les sources externes |
 
-### Lancement du server fast api manuellement
+Pipelines disponibles : `exercices` · `aliments` · `recommendations` · `historique_seance` · `historique_seance_synthetic`
 
-- uv run uvicorn src.server:app --reload
-- URL d'accès au swagger : http://127.0.0.1:8000/docs
+---
 
 ## Authentification
 
-Tous les endpoints pipeline (`/upload/*`, `/run/*`, `/run-all`, `/run-download`) exigent un
-JWT Zitadel valide **portant le rôle `admin`** — seul `/health` est public.
-Deux types d'appelants :
+Tous les endpoints pipeline exigent un JWT Zitadel valide **portant le rôle `admin`** — seul `/health` est public.
 
-| Appelant | Flux | Rôle requis |
+```
+Requête entrante
+  ↓ Validation JWT     signature RS256 (JWKS) · issuer · audience
+  ↓ Vérification rôle  claim du token, ou userinfo pour les tokens M2M
+  ↓ Endpoint           202 — sinon 401 (token) / 403 (rôle)
+```
+
+| Appelant | Flux | Rôles lus depuis |
 |---|---|---|
-| Humain (dashboard admin) | OIDC via le front Next.js | `admin` |
-| Machine (cron, CI, scripts) | **Client Credentials (M2M)** | `admin` |
+| Humain (dashboard admin) | OIDC via le front Next.js | le token directement |
+| Machine (cron, CI, scripts) | **JWT Profile** (clé machine) | le userinfo Zitadel¹ |
 
-### Configurer le M2M dans Zitadel (clé machine JSON)
+> ¹ Zitadel n'asserte pas les rôles dans l'access token des service users — `require_admin` interroge automatiquement le userinfo avec le même token.
+
+### Configurer le M2M dans Zitadel
 
 1. **Users → New → Service User** — nom : `etl-service`, Access Token Type : **JWT**
 2. Fiche du service user → **Keys → New** → **Download** le fichier JSON
-   (clé privée, affichée une seule fois — à stocker hors git, ex. `./secrets/`)
+   (clé privée, affichée une seule fois — à stocker dans `./secrets/`, hors git)
 3. Projet **Frontend** → **Role Assignments** → assigner le rôle **`admin`** au service user
 
 ### Obtenir un token M2M
 
-Le client `src/auth/m2m.py` signe une assertion JWT avec la clé du fichier
-JSON (flux *JWT Profile*) et l'échange contre un access token — avec cache
-jusqu'à expiration. Variables requises :
-
-```env
-ZITADEL_ISSUER=https://auth-zitadel.harmel.me
-ZITADEL_PROJECT_ID=375235925845737475
-ZITADEL_M2M_KEY_FILE=./secrets/etl-service-key.json
-```
+Le client [`src/auth/m2m.py`](src/auth/m2m.py) signe une assertion JWT avec la clé privée du fichier JSON (flux *JWT Profile*) et l'échange contre un access token — mis en cache jusqu'à expiration.
 
 ```bash
-# En CLI (pratique pour un cron)
+# CLI (pratique pour un cron)
 TOKEN=$(uv run python -m src.auth.m2m)
-curl -X POST https://ton-etl/run-all -H "Authorization: Bearer $TOKEN"
+curl -X POST https://etl.example.com/run-all -H "Authorization: Bearer $TOKEN"
 ```
 
 ```python
-# En Python
+# Python
 from src.auth.m2m import get_m2m_token
 token = get_m2m_token()
 ```
 
-Le token demandé porte deux scopes indispensables :
-- `urn:zitadel:iam:org:project:id:<PROJECT_ID>:aud` → audience du projet
-  (sans lui, la validation `JWT_AUDIENCE` échoue → 401)
-- `urn:zitadel:iam:org:projects:roles` → claim de rôles (sans lui → 403)
+Le token est demandé avec deux scopes indispensables :
+
+| Scope | Rôle | Sans lui |
+|---|---|---|
+| `urn:zitadel:iam:org:project:id:<PROJECT_ID>:aud` | Audience du projet dans le token | 401 |
+| `urn:zitadel:iam:org:projects:roles` | Assertion des rôles | 403 |
+
+---
+
+## Automatisation (cron)
+
+Les scripts `cron_kaggle.sh` (Unix) et `cron_kaggle.bat` (Windows) lancent l'ingestion Kaggle **dans le conteneur Docker existant** — aucun environnement Python requis sur l'hôte.
+
+**Linux / macOS** — ajouter au crontab :
+
+```cron
+0 3 * * * /chemin/vers/healthai-etl/cron_kaggle.sh
+```
+
+**Windows** — Planificateur de tâches :
+- Action : *Démarrer un programme* → `cron_kaggle.bat`
+- ⚠️ « Démarrer dans » : le chemin racine du projet
+
+---
+
+## Qualité & tests
+
+```bash
+uv run ruff check            # lint
+uv run ruff format           # formatage
+uv run pytest                # tests (auth, M2M, pipelines, validation)
+```
+
+La CI (GitHub Actions) exécute ruff + pytest sur chaque PR — le status check `CI` est requis pour merger. Les PRs vers `main` doivent provenir de `develop` (`check-source-branch`).
+
+---
+
+## Structure du projet
+
+```
+├── alembic/                  # Migrations du schéma (versionnées)
+├── data/                     # Données locales (raw / clean)
+├── notebooks/                # Analyse exploratoire (kernel Python 3.13)
+├── secrets/                  # Clés machine Zitadel (gitignoré)
+├── src/
+│   ├── auth/
+│   │   ├── dependencies.py   # require_auth · require_admin (FastAPI)
+│   │   ├── jwks.py           # Cache des clés publiques Zitadel
+│   │   └── m2m.py            # Client M2M JWT Profile (+ CLI)
+│   ├── data_pipeline/
+│   │   ├── downloader/       # Extraction (Kaggle, RapidAPI)
+│   │   ├── harmonize/        # Nettoyage et transformation
+│   │   ├── loader/           # Insertion en base
+│   │   ├── database.py       # Connexion SQLAlchemy
+│   │   └── models.py         # Modèles ORM
+│   ├── main.py               # Point d'entrée du pipeline complet
+│   └── server.py             # API FastAPI
+├── tests/                    # pytest (78 tests)
+├── cron_kaggle.{sh,bat}      # Ingestion planifiée via Docker
+└── docker-compose.yml        # App + PostgreSQL + Metabase
+```
+
+---
+
+<div align="center">
+<sub>HealthAI Coach — projet MSPR · <a href="https://github.com/HealthAI-Corpo">HealthAI-Corpo</a></sub>
+</div>
