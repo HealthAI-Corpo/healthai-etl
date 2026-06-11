@@ -121,9 +121,22 @@ def client(rsa_private_key, jwk_public, monkeypatch):
             p.stop()
 
 
+ROLES_CLAIM = "urn:zitadel:iam:org:project:roles"
+
+
 @pytest.fixture
 def valid_token(rsa_private_key):
+    """Token valide SANS rôle admin (simple utilisateur connecté)."""
     return _sign_token(rsa_private_key)
+
+
+@pytest.fixture
+def admin_token(rsa_private_key):
+    """Token valide AVEC le rôle admin (humain admin ou service user M2M)."""
+    return _sign_token(
+        rsa_private_key,
+        extra_claims={ROLES_CLAIM: {"admin": {"375235925845737475": "org"}}},
+    )
 
 
 @pytest.fixture
@@ -161,26 +174,44 @@ def test_protected_route_no_token_returns_401(client, method, url):
     assert resp.status_code == 401
 
 
-# ── Tests : token valide (202) ────────────────────────────────────────────────
+# ── Tests : token admin (202) ─────────────────────────────────────────────────
 
 
-def test_run_all_valid_token(client, valid_token):
-    resp = client.post("/run-all", headers={"Authorization": f"Bearer {valid_token}"})
+def test_run_all_admin_token(client, admin_token):
+    resp = client.post("/run-all", headers={"Authorization": f"Bearer {admin_token}"})
     assert resp.status_code == 202
 
 
-def test_run_pipeline_valid_token(client, valid_token):
+def test_run_pipeline_admin_token(client, admin_token):
     resp = client.post(
-        "/run/exercices", headers={"Authorization": f"Bearer {valid_token}"}
+        "/run/exercices", headers={"Authorization": f"Bearer {admin_token}"}
     )
     assert resp.status_code == 202
 
 
-def test_run_download_valid_token(client, valid_token):
+def test_run_download_admin_token(client, admin_token):
     resp = client.post(
-        "/run-download", headers={"Authorization": f"Bearer {valid_token}"}
+        "/run-download", headers={"Authorization": f"Bearer {admin_token}"}
     )
     assert resp.status_code == 202
+
+
+# ── Tests : token valide mais sans rôle admin (403) ──────────────────────────
+
+
+@pytest.mark.parametrize("url", ["/run-all", "/run/exercices", "/run-download"])
+def test_valid_token_without_admin_role_returns_403(client, valid_token, url):
+    resp = client.post(url, headers={"Authorization": f"Bearer {valid_token}"})
+    assert resp.status_code == 403
+
+
+def test_token_with_other_role_returns_403(client, rsa_private_key):
+    token = _sign_token(
+        rsa_private_key,
+        extra_claims={ROLES_CLAIM: {"user": {"375235925845737475": "org"}}},
+    )
+    resp = client.post("/run-all", headers={"Authorization": f"Bearer {token}"})
+    assert resp.status_code == 403
 
 
 # ── Tests : token invalide (401) ──────────────────────────────────────────────
@@ -254,7 +285,18 @@ def test_upload_no_token_returns_401(client):
     assert resp.status_code == 401
 
 
-def test_upload_valid_token_accepted(client, valid_token):
+def test_upload_admin_token_accepted(client, admin_token):
+    import io
+
+    resp = client.post(
+        "/upload/aliments",
+        files={"file": ("test.csv", io.BytesIO(b"a,b\n1,2"), "text/csv")},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert resp.status_code == 202
+
+
+def test_upload_without_admin_role_returns_403(client, valid_token):
     import io
 
     resp = client.post(
@@ -262,4 +304,4 @@ def test_upload_valid_token_accepted(client, valid_token):
         files={"file": ("test.csv", io.BytesIO(b"a,b\n1,2"), "text/csv")},
         headers={"Authorization": f"Bearer {valid_token}"},
     )
-    assert resp.status_code == 202
+    assert resp.status_code == 403

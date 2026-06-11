@@ -112,3 +112,41 @@ Selectionner le kernel en haut a droite python 3.13 (stable pour utiliser pandas
 
 - uv run uvicorn src.server:app --reload
 - URL d'accès au swagger : http://127.0.0.1:8000/docs
+
+## Authentification
+
+Tous les endpoints pipeline (`/upload/*`, `/run/*`, `/run-all`, `/run-download`) exigent un
+JWT Zitadel valide **portant le rôle `admin`** — seul `/health` est public.
+Deux types d'appelants :
+
+| Appelant | Flux | Rôle requis |
+|---|---|---|
+| Humain (dashboard admin) | OIDC via le front Next.js | `admin` |
+| Machine (cron, CI, scripts) | **Client Credentials (M2M)** | `admin` |
+
+### Configurer le M2M dans Zitadel
+
+1. **Users → New → Service User** — nom : `etl-service`, Access Token Type : **JWT**
+2. Onglet **Actions** du service user → **Generate Client Secret** — note le `client_id` + `client_secret`
+3. Projet **Frontend** → **Role Assignments** → assigner le rôle **`admin`** au service user
+
+### Obtenir un token M2M
+
+```bash
+curl -s -X POST https://auth-zitadel.harmel.me/oauth/v2/token \
+  -d grant_type=client_credentials \
+  -d client_id="$ETL_CLIENT_ID" \
+  -d client_secret="$ETL_CLIENT_SECRET" \
+  -d scope="openid urn:zitadel:iam:org:project:id:375235925845737475:aud urn:zitadel:iam:org:projects:roles"
+```
+
+- le scope `…:project:id:<PROJECT_ID>:aud` ajoute l'audience du projet au token
+  (sans lui, la validation `JWT_AUDIENCE` échoue → 401)
+- le scope `…:projects:roles` injecte le claim de rôles (sans lui → 403)
+
+### Appeler l'ETL avec le token
+
+```bash
+TOKEN=$(curl -s ... | jq -r .access_token)
+curl -X POST https://ton-etl/run-all -H "Authorization: Bearer $TOKEN"
+```

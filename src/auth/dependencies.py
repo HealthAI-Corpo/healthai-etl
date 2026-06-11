@@ -77,3 +77,25 @@ async def require_auth(
             detail=str(exc),
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+
+# Claim Zitadel contenant les rôles du projet (assertion activée dans la
+# console). Présent pour les utilisateurs ET les service users M2M.
+ZITADEL_ROLES_CLAIM = "urn:zitadel:iam:org:project:roles"
+
+
+async def require_admin(payload: dict = Depends(require_auth)) -> dict:
+    """Réservé au rôle admin — couvre les humains (front) et le service
+    user M2M, à condition que le rôle admin leur soit assigné dans Zitadel."""
+    roles = payload.get(ZITADEL_ROLES_CLAIM) or {}
+    if "admin" not in roles:
+        logger.warning(
+            "Accès refusé, rôle admin requis | sub={} | roles={}",
+            payload.get("sub"),
+            list(roles.keys()) if isinstance(roles, dict) else roles,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Rôle admin requis",
+        )
+    return payload
