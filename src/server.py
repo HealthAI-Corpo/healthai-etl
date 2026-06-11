@@ -14,7 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import shutil
 from time import time
 
-from src.auth.dependencies import require_auth
+from src.auth.dependencies import require_admin
 from src.data_pipeline.pipeline import (
     execute_pipeline_daily_food,
     execute_pipeline_diet_recommendations_dataset,
@@ -98,7 +98,7 @@ async def upload_file(
     pipeline_type: str,
     file: UploadFile,
     background_tasks: BackgroundTasks,
-    _user: dict = Depends(require_auth),
+    _user: dict = Depends(require_admin),
 ):
     """Endpoint pour télécharger et traiter un fichier CSV ou JSON."""
 
@@ -159,7 +159,7 @@ async def upload_file(
 async def run_pipeline(
     pipeline_type: str,
     background_tasks: BackgroundTasks,
-    _user: dict = Depends(require_auth),
+    _user: dict = Depends(require_admin),
 ):
     """Endpoint pour exécuter une pipeline spécifique sans fichier uploadé."""
 
@@ -194,7 +194,7 @@ async def run_pipeline(
 @app.post("/run-all", status_code=202)
 async def run_all_pipelines_endpoint(
     background_tasks: BackgroundTasks,
-    _user: dict = Depends(require_auth),
+    _user: dict = Depends(require_admin),
 ):
     """Endpoint pour exécuter toutes les pipelines ETL en arrière-plan."""
     logger.info("Exécution complète de toutes les pipelines lancée")
@@ -207,7 +207,7 @@ async def run_all_pipelines_endpoint(
 @app.post("/run-download", status_code=202)
 async def run_download(
     background_tasks: BackgroundTasks,
-    _user: dict = Depends(require_auth),
+    _user: dict = Depends(require_admin),
 ):
     """Endpoint pour exécuter la phase EXTRACT (téléchargement des données)."""
     logger.info("Exécution du téléchargement des données lancée")
