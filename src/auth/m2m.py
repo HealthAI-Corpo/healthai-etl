@@ -19,9 +19,12 @@ import os
 import time
 
 import requests
+from dotenv import load_dotenv
 from jose import jwt
 
 from src.utils.logger import logger
+
+load_dotenv()
 
 # Renouvelle le token quand il reste moins de 60 s de validité
 _SAFETY_MARGIN = 60
