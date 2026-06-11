@@ -96,9 +96,9 @@ class Exercice(Base):
     id_exercice = Column(Integer, primary_key=True, index=True)
     nom = Column(String(150), nullable=False)
     type_exercice = Column(String(100), nullable=False)
-    muscles_principaux = Column(String(100))
-    muscles_secondaires = Column(String(100))
-    equipement = Column(String(100))
+    muscles_principaux = Column(String(1500))
+    muscles_secondaires = Column(String(1500))
+    equipement = Column(String(1500))
     difficulte = Column(String(50))
     instructions = Column(Text)
 

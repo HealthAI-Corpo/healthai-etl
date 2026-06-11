@@ -45,3 +45,7 @@ Thumbs.db
 *.swp
 
 alembic/__pycache__/
+
+# Clés machine Zitadel (privées)
+secrets/
+*service-key*.json

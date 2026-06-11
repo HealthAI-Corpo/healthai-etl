@@ -1,11 +1,20 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-from fastapi import FastAPI, UploadFile, BackgroundTasks, HTTPException, Request
+from prometheus_fastapi_instrumentator import Instrumentator
+from fastapi import (
+    FastAPI,
+    UploadFile,
+    BackgroundTasks,
+    HTTPException,
+    Request,
+    Depends,
+)
 from fastapi.middleware.cors import CORSMiddleware
 import shutil
 from time import time
 
+from src.auth.dependencies import require_admin
 from src.data_pipeline.pipeline import (
     execute_pipeline_daily_food,
     execute_pipeline_diet_recommendations_dataset,
@@ -86,7 +95,10 @@ async def health():
 
 @app.post("/upload/{pipeline_type}", status_code=202)
 async def upload_file(
-    pipeline_type: str, file: UploadFile, background_tasks: BackgroundTasks
+    pipeline_type: str,
+    file: UploadFile,
+    background_tasks: BackgroundTasks,
+    _user: dict = Depends(require_admin),
 ):
     """Endpoint pour télécharger et traiter un fichier CSV ou JSON."""
 
@@ -144,7 +156,11 @@ async def upload_file(
 
 
 @app.post("/run/{pipeline_type}", status_code=202)
-async def run_pipeline(pipeline_type: str, background_tasks: BackgroundTasks):
+async def run_pipeline(
+    pipeline_type: str,
+    background_tasks: BackgroundTasks,
+    _user: dict = Depends(require_admin),
+):
     """Endpoint pour exécuter une pipeline spécifique sans fichier uploadé."""
 
     logger.info("Exécution d'un pipeline demandée | Type : {}", pipeline_type)
@@ -176,7 +192,10 @@ async def run_pipeline(pipeline_type: str, background_tasks: BackgroundTasks):
 
 
 @app.post("/run-all", status_code=202)
-async def run_all_pipelines_endpoint(background_tasks: BackgroundTasks):
+async def run_all_pipelines_endpoint(
+    background_tasks: BackgroundTasks,
+    _user: dict = Depends(require_admin),
+):
     """Endpoint pour exécuter toutes les pipelines ETL en arrière-plan."""
     logger.info("Exécution complète de toutes les pipelines lancée")
     background_tasks.add_task(run_all_pipelines)
@@ -186,8 +205,14 @@ async def run_all_pipelines_endpoint(background_tasks: BackgroundTasks):
 
 
 @app.post("/run-download", status_code=202)
-async def run_download(background_tasks: BackgroundTasks):
+async def run_download(
+    background_tasks: BackgroundTasks,
+    _user: dict = Depends(require_admin),
+):
     """Endpoint pour exécuter la phase EXTRACT (téléchargement des données)."""
     logger.info("Exécution du téléchargement des données lancée")
     background_tasks.add_task(run_downloader)
     return {"message": "Exécution du téléchargement des données lancée en arrière-plan"}
+
+
+Instrumentator().instrument(app).expose(app)
