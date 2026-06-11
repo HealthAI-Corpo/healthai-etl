@@ -124,29 +124,38 @@ Deux types d'appelants :
 | Humain (dashboard admin) | OIDC via le front Next.js | `admin` |
 | Machine (cron, CI, scripts) | **Client Credentials (M2M)** | `admin` |
 
-### Configurer le M2M dans Zitadel
+### Configurer le M2M dans Zitadel (clé machine JSON)
 
 1. **Users → New → Service User** — nom : `etl-service`, Access Token Type : **JWT**
-2. Onglet **Actions** du service user → **Generate Client Secret** — note le `client_id` + `client_secret`
+2. Fiche du service user → **Keys → New** → **Download** le fichier JSON
+   (clé privée, affichée une seule fois — à stocker hors git, ex. `./secrets/`)
 3. Projet **Frontend** → **Role Assignments** → assigner le rôle **`admin`** au service user
 
 ### Obtenir un token M2M
 
-```bash
-curl -s -X POST https://auth-zitadel.harmel.me/oauth/v2/token \
-  -d grant_type=client_credentials \
-  -d client_id="$ETL_CLIENT_ID" \
-  -d client_secret="$ETL_CLIENT_SECRET" \
-  -d scope="openid urn:zitadel:iam:org:project:id:375235925845737475:aud urn:zitadel:iam:org:projects:roles"
+Le client `src/auth/m2m.py` signe une assertion JWT avec la clé du fichier
+JSON (flux *JWT Profile*) et l'échange contre un access token — avec cache
+jusqu'à expiration. Variables requises :
+
+```env
+ZITADEL_ISSUER=https://auth-zitadel.harmel.me
+ZITADEL_PROJECT_ID=375235925845737475
+ZITADEL_M2M_KEY_FILE=./secrets/etl-service-key.json
 ```
 
-- le scope `…:project:id:<PROJECT_ID>:aud` ajoute l'audience du projet au token
-  (sans lui, la validation `JWT_AUDIENCE` échoue → 401)
-- le scope `…:projects:roles` injecte le claim de rôles (sans lui → 403)
-
-### Appeler l'ETL avec le token
-
 ```bash
-TOKEN=$(curl -s ... | jq -r .access_token)
+# En CLI (pratique pour un cron)
+TOKEN=$(uv run python -m src.auth.m2m)
 curl -X POST https://ton-etl/run-all -H "Authorization: Bearer $TOKEN"
 ```
+
+```python
+# En Python
+from src.auth.m2m import get_m2m_token
+token = get_m2m_token()
+```
+
+Le token demandé porte deux scopes indispensables :
+- `urn:zitadel:iam:org:project:id:<PROJECT_ID>:aud` → audience du projet
+  (sans lui, la validation `JWT_AUDIENCE` échoue → 401)
+- `urn:zitadel:iam:org:projects:roles` → claim de rôles (sans lui → 403)
