@@ -79,20 +79,54 @@ async def require_auth(
         )
 
 
-# Claim Zitadel contenant les rôles du projet (assertion activée dans la
-# console). Présent pour les utilisateurs ET les service users M2M.
+# Claim Zitadel contenant les rôles du projet. Deux formats selon le
+# contexte : générique (tokens humains via le front) ou scopé par projet
+# « urn:zitadel:iam:org:project:<id>:roles » (userinfo des service users).
 ZITADEL_ROLES_CLAIM = "urn:zitadel:iam:org:project:roles"
+_ROLES_PREFIX = "urn:zitadel:iam:org:project:"
 
 
-async def require_admin(payload: dict = Depends(require_auth)) -> dict:
-    """Réservé au rôle admin — couvre les humains (front) et le service
-    user M2M, à condition que le rôle admin leur soit assigné dans Zitadel."""
-    roles = payload.get(ZITADEL_ROLES_CLAIM) or {}
+def _extract_roles(claims: dict) -> dict:
+    for key, value in claims.items():
+        is_roles_claim = key == ZITADEL_ROLES_CLAIM or (
+            key.startswith(_ROLES_PREFIX) and key.endswith(":roles")
+        )
+        if is_roles_claim and isinstance(value, dict) and value:
+            return value
+    return {}
+
+
+def _fetch_userinfo_roles(token: str) -> dict:
+    """Zitadel n'asserte pas les rôles dans l'access token des service
+    users M2M — ils ne sont disponibles que via le userinfo endpoint."""
+    try:
+        resp = requests.get(
+            f"{_issuer()}/oidc/v1/userinfo",
+            headers={"Authorization": f"Bearer {token}"},
+            timeout=10,
+        )
+        if not resp.ok:
+            return {}
+        return _extract_roles(resp.json())
+    except requests.RequestException as exc:
+        logger.warning("Userinfo injoignable pour les rôles | {}", exc)
+        return {}
+
+
+async def require_admin(
+    payload: dict = Depends(require_auth),
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer),
+) -> dict:
+    """Réservé au rôle admin — humains (rôles dans le token) et service
+    users M2M (rôles récupérés via userinfo avec le même token)."""
+    roles = _extract_roles(payload)
+    if not roles and credentials is not None:
+        roles = _fetch_userinfo_roles(credentials.credentials)
     if "admin" not in roles:
         logger.warning(
             "Accès refusé, rôle admin requis | sub={} | roles={}",
             payload.get("sub"),
-            list(roles.keys()) if isinstance(roles, dict) else roles,
+            list(roles.keys()),
         )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

@@ -205,6 +205,33 @@ def test_valid_token_without_admin_role_returns_403(client, valid_token, url):
     assert resp.status_code == 403
 
 
+def test_m2m_roles_resolved_via_userinfo(client, valid_token):
+    """Service user M2M : rôles absents du token mais présents dans le
+    userinfo (claim scopé par projet) → accès accordé."""
+    userinfo = MagicMock(ok=True)
+    userinfo.json.return_value = {
+        "sub": "service-user",
+        "urn:zitadel:iam:org:project:375235925845737475:roles": {
+            "admin": {"375232009271836675": "org"}
+        },
+    }
+    with patch("src.auth.dependencies.requests.get", return_value=userinfo):
+        resp = client.post(
+            "/run-all", headers={"Authorization": f"Bearer {valid_token}"}
+        )
+    assert resp.status_code == 202
+
+
+def test_m2m_userinfo_without_admin_returns_403(client, valid_token):
+    userinfo = MagicMock(ok=True)
+    userinfo.json.return_value = {"sub": "service-user"}
+    with patch("src.auth.dependencies.requests.get", return_value=userinfo):
+        resp = client.post(
+            "/run-all", headers={"Authorization": f"Bearer {valid_token}"}
+        )
+    assert resp.status_code == 403
+
+
 def test_token_with_other_role_returns_403(client, rsa_private_key):
     token = _sign_token(
         rsa_private_key,
